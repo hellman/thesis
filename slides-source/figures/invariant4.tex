@@ -1,0 +1,18 @@
+\IfFileExists{figures/invariant4.pdf}{
+\includegraphics[height=\HEIGHT]{figures/invariant4.pdf}
+}{
+\centering
+\begin{tikzpicture}[xscale=1.0,yscale=-1.0]
+    \draw (0.0,0.0) -- (0.5,0.0);
+    \draw[->] (0.5,0.0) -- (1.0,0.0);
+    \draw (1.0,-0.5) rectangle (2.0,0.5) node[pos=0.5] {$E_k$};
+    \draw (2.0,0.0) -- (2.5,0.0);
+    \fill[white] (1.5,-1.55) ellipse (0.05 and 0.05);
+    \fill[white] (-1.55,0.0) ellipse (0.05 and 0.05);
+    \fill[white] (5.05,0.0) ellipse (0.05 and 0.05);
+    \fill[white] (1.5,0.8) ellipse (0.05 and 0.05);
+    \draw[->] (2.5,0.0) -- (3.0,0.0);
+    \draw (0.0,0.0) node[anchor=east] {$\mathtt{a9a9}$};
+    \draw (3.0,0.0) node[anchor=west] {$\mathtt{2727}$};
+\end{tikzpicture}
+}

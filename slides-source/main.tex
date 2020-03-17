@@ -1,0 +1,47 @@
+\documentclass[aspectratio=169,usenames,dvipsnames,presentation,unknownkeysallowed]{beamer}
+% unknownkeysallowed
+%\documentclass[usenames,dvipsnames,handout]{beamer}
+
+\input{packages}
+\input{beamer}
+\input{macros}
+
+
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={Design and Cryptanalysis of Symmetric-Key Algorithms in Black- and White-box Models},
+  pdfcreator={Aleksei Udovenko}
+}
+
+% -----------------------------------------------------------
+% Intro slide
+% -----------------------------------------------------------
+
+\author{Aleksei Udovenko}
+
+\date{April 9, 2019 \\ \footnotesize PhD Defense \\ \vspace{1cm}} % hax
+
+\title{
+Design and Cryptanalysis \\
+of Symmetric-Key Algorithms \\
+in Black and White-box Models
+}
+
+\institute[uni.lu]{SnT, University of Luxembourg}
+
+\setbeamertemplate{footline}[]
+
+\titlegraphic{
+  \Block{3cm,6.65cm}{4cm}{\includegraphics[height=2cm]{uniLux_logo.jpg}}
+  \Block{6cm,7cm}{4cm}{\includegraphics[height=1.5cm]{SnT_Logo.jpg}}
+  \Block{10cm,5.65cm}{4cm}{\includegraphics[height=2.5cm]{FNR_logo_UK_RGB.eps}}
+}
+
+\begin{document}
+
+% \maketitle
+\frame[plain]{\titlepage \addtocounter{framenumber}{-1}}
+
+\input{tex/0.tex}
+
+\end{document}

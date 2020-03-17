@@ -1,0 +1,100 @@
+\usetikzlibrary{shapes}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations.markings}
+
+%% Custom TikZ packages
+\usetikzlibrary{crypto.symbols}
+
+\tikzset{
+    init/.style={
+  %      draw,
+        rectangle split,
+        rectangle split parts=2,
+        text centered,
+%        fill=green!10!white,
+        minimum height=6em,
+    },
+    SpongePerm/.style={
+        draw,
+        rounded corners=6pt,
+        minimum height=6em,
+        fill=green!30!white,
+    },
+    dot/.style={
+        fill,
+        shape=circle,
+        minimum size=3pt,
+        inner sep=0pt,
+    },
+    decoration={
+        markings,
+        mark= at position 0.5 with {\node[font=\footnotesize] {/};
+    },
+  }
+}
+
+\newcommand\Textbox[2]{\parbox[c][\dimexpr#1][c]{2.5em}{\centering#2}}
+
+\begin{tikzpicture}[thick]
+
+    %%% Init
+    \node[init] (init) {\Textbox{2em}{Key} \nodepart{second} \Textbox{1.75em}{Nonce}};
+%    \node[above = 1.2em of init, anchor=south east] (i) {$\textsf{Key,Nonce}$};
+%   \draw[->] (i) -| (init);
+
+    %%%
+    \node[SpongePerm, right = 2em of init] (f1) {$f$};
+    \node[above right = -2em and 1.25em of f1] (x00) {};
+    \node[below right = -2em and 1.25em of f1] (x11) {};
+%    \node[SpongePerm, right = 2.5em of f0] (f1) {$\textsf{P}$};
+
+    \draw[->] (init.east|-x00) -- (f1.west|-x00);
+    \draw[->] (init.east|-x11) -- (f1.west|-x11);
+    %%% First message block
+    \node[SpongePerm, right = 4.5em of f1] (f4) {$f$};
+
+    \node[XOR, scale=0.8, above right = -2em and 1.25em of f1] (x0) {};
+    \node[above = 1em of x0] (m) {$M_{0}$};
+    \draw[->] (m) -- (x0);
+
+    \node[dot, right = 0.85em of x0] (ct) {};
+    \node[above = 1.2em of ct] (ctx) {$C_{0}$};
+    \draw[->] (ct) -- (ctx);
+
+    \node[below right = -1.75em and 2em of f1, inner sep=0pt] (x1) {};
+
+    \draw[->] (f1.east|-x0) -- (x0);
+    \draw (x0) -- (ct);
+    \draw[->, densely dashed] (ct) -- (f4.west|-x0);
+    \draw[-] (f1.east|-x1) -- (x1);
+    \draw[->, densely dashed] (x1) -- (f4.west|-x1);
+
+    %%% Last message block
+    \node[SpongePerm, right = 4.5em of f4] (f5) {$f$};
+
+    \node[XOR, scale=0.8, above right = -2em and 1em of f4] (x0) {};
+    \node[above = 1em of x0] (m) {$M_{m-1}~~$};
+    \draw[->] (m) -- (x0);
+
+    \node[dot, right = 1.5em of x0] (ct) {};
+    \node[above = 1.2em of ct] (ctx) {$~~C_{m-1}$};
+    \draw[->] (ct) -- (ctx);
+
+    \node[inner sep = 0pt, below right = -1.75em and 2em of f4] (x1) {};
+
+
+    \draw[->, densely dashed] (f4.east|-x0) -- (x0);
+    \draw[->] (x0) -- (f5.west|-x0);
+    \draw[-, densely dashed] (f4.east|-x1) -- (x1);
+    \draw[->] (x1) -- (f5.west|-x1);
+
+    %%% First TRAILER block
+
+
+    %%% Tag generation
+    \node[above right = -2em and 1.5em of f5] (x1) {};
+    \node[right = 0em of x1] (tag) {Tag};
+
+    \draw[->] (f5.east|-x1) -- (tag);
+
+\end{tikzpicture}

@@ -1,0 +1,43 @@
+\tiny
+        \begin{algorithmic}
+            % \Function{Encode}{$x,r_a,r_b$}
+            %     \State \Return{$(r_a,r_b,r_ar_b \oplus x)$}
+            % \EndFunction
+            % \Statex
+            % \Function{Decode}{$a,b,c$}
+            %     \State \Return{$ab\oplus c$}
+            % \EndFunction
+            % \Statex
+            \Function{EvalXOR}{$(a,b,c),(d,e,f),(r_a,r_b,r_c),(r_d,r_e,r_f)$}
+                \State $(a,b,c) \gets \textsc{Refresh}((a,b,c),(r_a,r_b,r_c))$
+                \State $(d,e,f) \gets \textsc{Refresh}((d,e,f),(r_d,r_e,r_f))$
+                \State $x \gets a \oplus d$
+                \State $y \gets b \oplus e$
+                \State $z \gets c \oplus f \oplus ae \oplus bd$
+                \State \Return{$(x,y,z)$}
+            \EndFunction
+            \Statex
+            \Function{EvalAND}{$(a,b,c),(d,e,f),(r_a,r_b,r_c),(r_d,r_e,r_f)$}
+                \State $(a,b,c) \gets \textsc{Refresh}((a,b,c),(r_a,r_b,r_c))$
+                \State $(d,e,f) \gets \textsc{Refresh}((d,e,f),(r_d,r_e,r_f))$
+                \State $m_a \gets bf \oplus r_c e$
+                \State $m_d \gets ce \oplus r_f b$
+                \State $x \gets ae \oplus r_f$
+                \State $y \gets bd \oplus r_c$
+                \State $z \gets am_a \oplus dm_d \oplus r_c r_f \oplus cf$
+                \State \Return{$(x,y,z)$}
+            \EndFunction
+            \Statex
+            \Function{Refresh}{$(a,b,c),(r_a,r_b,r_c)$}
+                \State $m_a \gets r_a \cdot (b \oplus r_c)$
+                \State $m_b \gets r_b \cdot (a \oplus r_c)$
+                \State $r_c \gets
+                    m_a \oplus m_b \oplus
+                    (r_a \oplus r_c) (r_b \oplus r_c) \oplus
+                    r_c$
+                \State $a \gets a \oplus r_a$
+                \State $b \gets b \oplus r_b$
+                \State $c \gets c \oplus r_c$
+                \State \Return{$(a,b,c)$}
+            \EndFunction
+        \end{algorithmic}

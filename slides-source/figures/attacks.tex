@@ -1,0 +1,70 @@
+{
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{10pt}
+\newcommand{\numnodes}{n}
+\newcommand{\matexp}{{2.8}}
+\newcommand\numshares{t}
+\newcommand\numpred{k}
+\newcommand\cororder{t}
+\newcommand\sumbinom[2]{\sigma(#1,#2)}
+\newcommand\winsize{n}
+\newcommand\OO{\mathcal{O}}
+
+\newcommand\com[1]{{\scriptsize #1}}
+\newcommand\attknown{$\text{}^*$}
+\begin{table}
+    \label{tab:attacks}
+    \begin{center}
+    \begin{tabular}{@{} l l l @{}}
+        % \toprule
+        Attack & Data & Time \\
+        \midrule
+            Correlation\attknown{} &
+            $\OO(2^{\cororder})$ &
+            $\OO(\numnodes^{\cororder} \numpred 2^{2\cororder})$
+            \\
+            
+            Time-Memory Trade-off &
+            $\OO(1)$ &
+            $\OO(\numnodes^{\lceil \numshares/2 \rceil} + \numnodes^{\lfloor \numshares/2 \rfloor} \numpred)$ 
+            \\
+            
+            Linear Algebra\attknown{} &
+            $\OO(\numnodes)$ &
+            $\OO(\numnodes^\matexp + \numnodes^2\numpred)$ %&
+            \\
+        
+            Generalized Lin. Alg.\attknown{}&
+            $\OO(\sumbinom{\numnodes}{d}))$ &
+            $\OO(\sumbinom{\numnodes}{d}^\matexp + \sumbinom{\numnodes}{d}^2\numpred)$ 
+            \\
+            
+            LPN-based Gen. Lin. Alg. &
+            $D_{LPN}(r,\sumbinom{\winsize}{d})$ &
+            $T_{LPN}(r,\sumbinom{\winsize}{d})$
+            \\
+
+            1-Share Fault Injection &
+            $\OO(\numnodes)$ &
+            $\OO(\numnodes^2)$
+            \\
+            
+            2-Share Fault Injection &
+            $\OO(\numnodes^2)$ &
+            $\OO(\numnodes^3)$
+            % \\
+        % \bottomrule
+    \end{tabular}
+    \end{center}
+    
+    {\bf Notations:}
+    $\numnodes$ denotes size of the obfuscated circuit or its part selected for the attack;
+    $\numshares$ is the number of shares in the masking scheme;
+    $\numpred$ is the number of key candidates required to compute a particular intermediate value in the circuit;
+    $\cororder$ denotes the correlation order ($t \le s$);
+    $\matexp$ is the matrix multiplication exponent (e.g. $\matexp = 2.8074$ for Strassen algorithm);
+    $d$ is the algebraic degree of the masking decoder (see Section~\ref{sec:attacks});
+    $\sumbinom{\numnodes}{d} = \sum_{i=0}^d \binom{\numnodes}{i}$ is the number of monomials of $\numnodes$ bit variables of degree at most $d$;
+    $r$ is the noise ratio in the system of equations, $T_{LPN}(r,m),D_{LPN}(r,m)$ are time and data complexities of solving an LPN instance with noise ratio $r$ and $m$ variables.
+\end{table}
+}

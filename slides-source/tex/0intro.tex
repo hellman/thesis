@@ -1,0 +1,179 @@
+\begin{frame}[t]
+\newcommand\HT{4cm}
+
+\begin{center}
+\only<1>{\includegraphics[height=\HT,page=1]{figures/alicebobeve-crop.pdf}}%
+\only<2>{\includegraphics[height=\HT,page=2]{figures/alicebobeve-crop.pdf}}%
+\only<3>{\includegraphics[height=\HT,page=3]{figures/alicebobeve-crop.pdf}}%
+\only<4>{\includegraphics[height=\HT,page=4]{figures/alicebobeve-crop.pdf}}%
+\only<5->{\includegraphics[height=\HT,page=5]{figures/alicebobeve-crop.pdf}}%
+\end{center}
+
+\Block{4.5cm,5cm}{10cm}{
+\only<6->{
+    {\Large\bf Symmetric-key Cryptography}
+}
+
+\only<7->{
+    \large ensures that the message is:
+
+    \begin{enumerate}
+        \item secret \textcolor{blue}{(confidentiality)}
+        \item unmodified \textcolor{blue}{(integrity)}
+        \item from the correct person \textcolor{blue}{(authenticity)}
+    \end{enumerate}
+}
+}
+\end{frame}
+
+% ======================================================
+
+\begin{frame}[t]
+
+\only<1->{
+\Block{2cm,2cm}{4cm}{
+    \Large
+    $
+    \begin{rcases*}
+        \text{\textcolor{blue}{(confidentiality)}} & \\
+        \text{\textcolor{blue}{(integrity)}} & \\
+        \text{\textcolor{blue}{(authenticity)}} & \\
+    \end{rcases*}
+    $
+}}
+\only<2->{
+\Block{7.5cm,3cm}{2cm}{
+    \Huge $\Leftrightarrow$
+}
+\Block{9cm,2cm}{5cm}{
+    \LARGE
+    \Center{
+        Authenticated \\ 
+        Encryption
+    }
+}}
+
+\only<3->{
+\vspace{4.5cm}
+\Center{
+    \Large\bf The main goal of
+    
+    symmetric-key cryptography!
+    
+    \includegraphics[height=2cm]{figures/holy.eps}
+}
+}
+\end{frame}
+
+% ======================================================
+
+\begin{frame}
+\center{\LARGE How does it work?}
+
+\vspace{0.5cm}
+
+\includegraphics[height=3cm]{gear.pdf}
+\end{frame}
+
+% ======================================================
+
+\begin{frame}
+\center{\LARGE Construction 1:}
+
+\center{\LARGE \textcolor{blue}{Block Cipher} + \textcolor{red}{Mode of Operation}}
+\end{frame}
+
+
+\begin{frame}
+\Title{Block Cipher}
+\begin{columns}
+\column{0.1\linewidth}{}
+\column{0.35\linewidth}{
+{\Large An \emph{Algorithm} $E_k$:} \vspace{0.5cm}
+\begin{itemize}
+    \item $\color{blue}{n}$-bit message $\color{blue}{m}$
+    \item $\color{purple}{\kappa}$-bit key $\color{purple}{k}$
+    \item $\color{blue}{n}$-bit ciphertext $\color{blue}{c}$
+    \item $E_k$ is invertible
+\end{itemize}
+}
+\column{0.3\linewidth}{
+    \FigTex{5cm}{blockcipher.tex} 
+}
+\column{0.1\linewidth}{}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}
+\Title{Example: Advanced Encryption Standard}
+\begin{columns}
+\column{0.1\linewidth}{}
+\column{0.35\linewidth}{
+{\Large AES Algorithm:} \vspace{0.5cm}
+\begin{itemize}
+    \item $\color{blue}{128}$-bit message $\color{blue}{m}$
+    \item $\color{purple}{128/192/256}$-bit key $\color{purple}{k}$
+    \item $\color{blue}{128}$-bit ciphertext $\color{blue}{c}$
+\end{itemize}
+\begin{itemize}
+    \item designed in 1998 \\
+          by V. Rijmen and J. Daemen
+\end{itemize}
+}
+\column{0.3\linewidth}{
+    \FigTex{5cm}{blockcipher_aes.tex} 
+}
+\column{0.1\linewidth}{}
+\end{columns}
+\end{frame}
+
+% ======================================
+
+\begin{frame}
+\CreditsTikz{}
+\Title{Mode of Operation}
+
+\Center{
+    \FigTex{5cm}{cbc.tex} 
+}
+\end{frame}
+
+
+\begin{frame}
+\Credits{COLM v1 Specification}
+\Title{Example: COLM Mode of Operation \\
+\normalsize One of CAESAR competition winners (2019)
+}
+
+\Center{
+\includegraphics[height=6cm]{figures/colm.pdf} 
+}
+\end{frame}
+
+% ======================================================
+
+\begin{frame}
+\center{\LARGE Construction 2:}
+
+\center{\LARGE Sponge Structure}
+\end{frame}
+
+
+\begin{frame}
+\CreditsTikz{}
+\Title{(Duplexed) Sponge Structure}
+
+
+\Center{
+\includegraphics[height=3.5cm]{sponge-ae.pdf}
+}
+
+\Center{
+    $f$: \emph{keyless} invertible function (permutation)
+}
+\end{frame}
+
+% ======================================================
+% ======================================================
+% ======================================================

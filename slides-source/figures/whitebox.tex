@@ -1,0 +1,12 @@
+\IfFileExists{figures/whitebox.pdf}{
+\includegraphics[height=\HEIGHT]{figures/whitebox.pdf}
+}{
+\centering
+\begin{tikzpicture}[xscale=1.0,yscale=-1.0]
+    \draw (3.35,0.0) node {\includegraphics[height=1.58cm]{/tmp/prince.pdf}};
+    \draw (-0.5,-0.25) node[anchor=east] {$x$};
+    \draw (7.2,-0.25) node[anchor=west] {$E_k(x)$};
+    \draw[<-] (3.35,-0.79) -- (3.35,-1.29);
+    \draw (3.35,-1.29) node[anchor=south] {$k$};
+\end{tikzpicture}
+}

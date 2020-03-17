@@ -1,0 +1,52 @@
+\IfFileExists{figures/apn.pdf}{
+\includegraphics[height=\HEIGHT]{figures/apn.pdf}
+}{
+    \begin{tikzpicture}[xscale=1.0, yscale=-0.5]
+                \draw [->] (0,0) -- (0,0.5);
+                \draw [very thin] (0,0.7) ellipse (0.1 and 0.2);
+                \draw [very thin] (0,0.5) -- (0,0.9);
+                \draw [very thin] (-0.1,0.7) -- (0.1,0.7);
+                \draw (2,0) -- (2,0.7);
+                \draw [->] (2,0.7) -- (1.3,0.7);
+                \draw (0.7,0.2) rectangle (1.3,1.2) node[pos=0.5] {$\mathcal{I}$};
+                \draw [->] (0.7,0.7) -- (0.1,0.7);
+                \draw [->] (0,0.9) -- (0,1.4);
+                \draw (-0.3,1.4) rectangle (0.3,2.4) node[pos=0.5] {$\mathcal{I}$};
+                \draw [->] (0,2.4) -- (0,2.9);
+                \draw [very thin] (0,3.1) ellipse (0.1 and 0.2);
+                \draw [very thin] (0,2.9) -- (0,3.3);
+                \draw [very thin] (-0.1,3.1) -- (0.1,3.1);
+                \draw (2,0.7) -- (2,3.1);
+                \draw [->] (2,3.1) -- (1.1,3.1);
+                \draw [very thin] (1,3.1) ellipse (0.1 and 0.2);
+                \fill[black] (1,3.1) ellipse (0.0285714285714 and 0.0571428571429);
+                \draw (1,2.9) node[anchor=south] {$\alpha$};
+                \draw [->] (0.9,3.1) -- (0.1,3.1);
+                \draw (0,3.3) -- (0,3.8);
+                \draw (2,3.1) -- (2,3.8);
+                \draw (2,3.8) -- (0,4.3);
+                \draw (0,3.8) -- (2,4.3);
+                \draw [->] (0,4.3) -- (0,4.8);
+                \draw [very thin] (0,5) ellipse (0.1 and 0.2);
+                \draw [very thin] (0,4.8) -- (0,5.2);
+                \draw [very thin] (-0.1,5) -- (0.1,5);
+                \draw (2,4.3) -- (2,5);
+                \draw [->] (2,5) -- (1.1,5);
+                \draw [very thin] (1,5) ellipse (0.1 and 0.2);
+                \fill[black] (1,5) ellipse (0.0285714285714 and 0.0571428571429);
+                \draw (1,5.2) node[anchor=north] {$\alpha$};
+                \draw [->] (0.9,5) -- (0.1,5);
+                \draw [->] (0,5.2) -- (0,5.7);
+                \draw (-0.3,5.7) rectangle (0.3,6.7) node[pos=0.5] {$\mathcal{I}$};
+                \draw [->] (0,6.7) -- (0,7.2);
+                \draw [very thin] (0,7.4) ellipse (0.1 and 0.2);
+                \draw [very thin] (0,7.2) -- (0,7.6);
+                \draw [very thin] (-0.1,7.4) -- (0.1,7.4);
+                \draw (2,5) -- (2,7.4);
+                \draw [->] (2,7.4) -- (1.3,7.4);
+                \draw (0.7,6.9) rectangle (1.3,7.9) node[pos=0.5] {$\mathcal{I}$};
+                \draw [->] (0.7,7.4) -- (0.1,7.4);
+                \draw [->] (0,7.6) -- (0,8.1);
+                \draw [->] (2,7.4) -- (2,8.1);
+            \end{tikzpicture}
+}

@@ -1,0 +1,12 @@
+\IfFileExists{figures/blackbox.pdf}{
+\includegraphics[height=\HEIGHT]{figures/blackbox.pdf}
+}{
+\centering
+\begin{tikzpicture}[xscale=1.0,yscale=-1.0]
+    \draw (0.0,0.0) node[anchor=south] {$x$};
+    \draw[->] (0.0,0.0) -- (0.0,0.15);
+    \draw[fill,black] (-1.15,0.15) rectangle (1.15,3.6);
+    \draw[->] (0.0,3.6) -- (0.0,3.75);
+    \draw (0.0,3.75) node[anchor=north] {$E(x)$};
+\end{tikzpicture}
+}

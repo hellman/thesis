@@ -1,0 +1,33 @@
+% \Grid{}
+
+% Intro
+\section{Introduction}
+\input{tex/0intro.tex}
+
+% for overview + white-box
+\AtBeginSection[] { %
+\begin{frame}[t,noframenumbering]
+\Title{Plan}
+\Block{4cm,2cm}{8cm}{
+    \tableofcontents[
+        currentsection,
+        % currentsubsection,
+        % hideothersubsections,
+        sectionstyle=show/shaded,
+        subsectionstyle=show/show/hide
+    ]
+}
+\end{frame}
+}
+
+% Overview
+\section{Thesis Overview}
+\input{tex/10overview.tex}
+
+% White-box
+\subsection{White-box Cryptography}
+\section{White-box Cryptography}
+\input{texwb/main.tex}
+
+% Final slide
+\input{tex/2final.tex}

@@ -1,0 +1,14 @@
+\IfFileExists{figures/blockcipher_aes.pdf}{
+\includegraphics[height=\HEIGHT]{figures/blockcipher_aes.pdf}
+}{
+\centering
+\begin{tikzpicture}[xscale=1.0,yscale=-1.0]
+    \draw (0.0,0.0) node[anchor=south,blue] {$m$};
+    \draw[->] (0.0,0.0) -- (0.0,1.0);
+    \draw (-0.5,1.0) rectangle (0.5,2.0) node[pos=0.5] {$AES$};
+    \draw[->] (0.0,2.0) -- (0.0,3.0);
+    \draw (0.0,3.0) node[anchor=north,blue] {$c=AES_k(m)$};
+    \draw[<-] (-0.5,1.5) -- (-1.5,1.5);
+    \draw (-1.5,1.5) node[anchor=east,purple] {$k$};
+\end{tikzpicture}
+}

@@ -1,0 +1,63 @@
+\input{tex/11design.tex}
+
+\begin{frame}
+\Center{\LARGE How to make sure \\
+that an encryption scheme is \alert{secure}?
+}
+
+\Center{
+\includegraphics[height=3cm]{lock.pdf}
+% \includegraphics[height=3cm]{figures/locked.pdf}
+% \includegraphics[height=3cm]{figures/unlocked.pdf}
+}
+
+\pause
+
+\Center{
+\LARGE \textcolor{blue}{Security Proofs} and \textcolor{red}{Cryptanalysis}!
+}
+
+\end{frame}
+
+% ======================================================
+\begin{frame}
+\Title{\textcolor{blue}{Security Proofs: Modes and Structures}}
+
+\Center{
+\includegraphics[height=3.5cm]{sponge-ae.pdf}
+}
+
+\pause
+
+\Center{
+\Large \textcolor{green!30!black}{secure} \textbf{if} the permutation $f$ is \textcolor{green!30!black}{secure} (\textcolor{purple}{random})
+}
+\end{frame}
+
+\begin{frame}
+\Title{\textcolor{red}{Cryptanalysis:}}
+
+\Center{
+    an attempt to invalidate \\
+    security claims of a cryptosystem \\
+    by developing an \alert{attack}
+}
+
+\vspace{1cm}
+\pause
+
+\begin{columns}
+\column{0.15\linewidth}{}
+\column{0.8\linewidth}{
+\begin{itemize}
+    \item a large variety of methods: differential, linear, integral, ...
+    \item attacks on simplified versions
+    \item analysis of components
+\end{itemize}
+}
+\end{columns}
+\end{frame}
+
+\input{tex/11str.tex}
+\input{tex/12nonlininv.tex}
+
