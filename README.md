@@ -11,6 +11,7 @@ For citation, please use the following bibtex:
   title     = {Design and Cryptanalysis of Symmetric-Key Algorithms in Black and
                White-box Models},
   school    = {University of Luxembourg, Luxembourg},
-  year      = {2019}
+  year      = {2019},
+  url       = "http://hdl.handle.net/10993/39350",
 }
 ```
