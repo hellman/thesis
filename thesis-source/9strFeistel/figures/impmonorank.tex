@@ -1,0 +1,53 @@
+{
+  \renewcommand\arraystretch{1.2}
+%   \setlength{\tabcolsep}{4pt}
+
+  \begin{table}
+      \centering
+      \begin{tabular}{c|lllll}
+        \toprule
+        \multirow{2}{*}{$n$} & \multicolumn{5}{c}{\#rounds : avg. rank / dimension} \\
+
+        & $d=2$ & $d=3$ & $d=n-1$ & $d=n$ & $d=n-1$, bij. \\
+        \midrule
+        
+3 &
+5 : $3.80 / 6$ &
+3 : $6.62 / 7$ &
+5 : $3.80 / 6$ &
+3 : $6.62 / 7$ &
+5 : $4.21 / 6$ \\ 
+
+4 &
+5 : $7.63 / 10$ &
+4 : $13.97 / 14$ &
+4 : $13.97 / 14$ &
+3 : $15.00 / 15$ &
+5 : $13.97 / 14$ \\ 
+
+5 &
+6 : $14.97 / 15$ &
+5 : $24.06 / 25$ &
+4 : $30.00 / 30$ &
+3 : $31.00 / 31$ &
+5 : $30.00 / 30$ \\ 
+
+6 &
+7 : $20.16 / 21$ &
+5 : $41.00 / 41$ &
+4 : $62.00 / 62$ &
+3 : $63.00 / 63$ &
+5 : $62.00 / 62$ \\
+
+7 &
+7 : $28.00 / 28$ &
+5 : $63.00 / 63$ &
+4 : $126.0 / 126$ &
+3 : $127.0 / 127$ &
+5 : $126.0 / 126$ \\
+        
+        \bottomrule
+      \end{tabular}
+      \TabDef{impmonorank}{The maximum number of rounds for type-II distinguisher and the average rank of the equation system in the impossible monomial attack on $2n$-bit Feistel Networks. Evaluated experimentally on 100 random instances per each parameter set.}
+  \end{table}
+}

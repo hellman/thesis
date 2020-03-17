@@ -1,0 +1,44 @@
+\SecDef{linear}{The Linear Layer of \sparx{}}
+
+The linear layer of $\sparx{}$ had to satisfy the following criteria:
+\begin{enumerate}
+    \item the diffusion should be slow enough to foster long trails;
+    \item the diffusion should be fast enough to avoid integral attacks;
+    \item it should be simple and lightweight.
+\end{enumerate}
+
+The first two criteria are in a trade-off with each other. Stronger diffusion means achieving security against structural attacks in less rounds, but fewer long trails and therefore, achieving provable security against linear and differential attacks in more rounds.
+
+For $\sparx{}$ with 64-bit block, there are only two branches, and the linear Feistel round was the best choice. For 128-bit $\sparx{}$ instances, the choice was not so clear. We decided to exhaustively check a large class of possible linear layers with reasonable implementation properties and for which we could prove \medp{} and \melp{} bounds. Note that, for the specified criteria, we are only interested in the high-level structure of the linear layer, i.e. its $w \times w$ matrix over $\pset{0,1,L}$, as in \SecRef{alg-special}.
+
+The algorithm from \SecRef{alg-special} requires the matrix to have at most one $1$ in each column and in each row (because of the linear case). We strengthened the requirement for the matrix to have \emph{exactly} one $1$ in each row and column. This should lead to better implementation properties and foster long trails at the same time.  
+
+The matrices we look at correspond to permutations of 4 words with some zeroes possibly replaced by special elements which we denote by $L$. Though there may be several elements $L$ in the matrix, it is not necessary that all the corresponding small linear functions are equal. The total number of such matrices is $4!\cdot 2^{12} = 98304$.
+
+For any matrix $M$ and for any word permutation matrix $P$, the matrices $M$ and $P\times M \times P^{-1}$ are equivalent up to reordering the S-Boxes in the whole cipher. Only one representative from each such class is kept. Next, the matrices which do not provide full diffusion are also dropped.
+%We applied two different techniques to check for full diffusion and the results were the same. The first way is to use symbolic computations. The second one is based on 
+In order to check the diffusion, we replaced each $L$ with a random small matrix (e.g. $5\times 5$) and applied the matrix multiple times to inputs with one active word. We assumed full diffusion if the full diffusion was reached before 20 matrix applications. After this filtering step we had only 3282 matrices left.
+
+For all reasonable numbers of steps and rounds in a step, we ran \AlgRef{special} to obtain bounds on $\MEDP{}$ and $\MELC{}$. We also searched for integral characteristics using the division property in order to both ensure good diffusion and to estimate resilience against this type of attack.
+
+Recall that the S-Boxes in our cipher are actually 32-bit block ciphers, based on Speck. Let $r_a$ denote the number of rounds used. The integral characteristic search does not depend on the number of rounds per step because we analyze only the high-level structure. However, the differential and linear bounds do depend on this value, so we had to make the choice. 2 rounds per step completely contradict our analysis simplification about randomness of the ARX box. Whereas for 5 or more rounds per step we have to take fewer steps and the cipher may become susceptible to structural attacks. Therefore, we considered only 3- or 4- round \speckey{}.
+
+Matrices with many ``$L$'' are hard to analyze and to implement. We considered different cases based on the number of words which are copied from the input to the output without change. More copies results in easier and more efficient implementation, easier identification of long trails, but weaker diffusion.
+
+Finally, we selected the best matrices according to one of the following two criteria.
+\begin{enumerate}
+    \item Minimizing the differential/linear trail probability. We compute the number of steps when the trail probability bound derived by the algorithm is less than $2^{-128}$ for differential trails and less than $2^{-64}$ for linear.
+    \item Minimizing the number of steps of the integral characteristic found with division property.
+\end{enumerate}
+
+The results are given in \TabRef{layers3} and \TabRef{layers4}, where $+S$ denotes an additional S-Box layer.
+
+\FigTex{best-layers.tex}
+
+The results show that heavier matrices (without words copied) lead to better diffusion, as expected, whereas for linear/differential security the matrices with 2 words copied give best results for both $r_a = 3$ and $r_a = 4$. Though heavy matrices can give a good compromise between these two criteria, they are hard to implement, to study and to implement their inverses. Thus, we decided to stick to light matrices.
+
+The most interesting matrices are marked by (A),(B),(C),(D) and the structures of the corresponding layers are depicted in \FigRef{best-layers}. For $r_a = 3$ the matrix with the best differential/linear security, (A),  yields an integral characteristic covering almost 8 steps. Another interesting matrix, (B), requires 7 steps which corresponds to 21 rounds. For $r_a = 4$, we can achieve differential/linear security in 5 steps (20 rounds) using matrix (C). Notably, this matrix is a Feistel round. Matrix (D) is similar but it adds additional mixing between the two left branches, which improves diffusion but slightly weakens differential/linear provable security.
+
+A cipher built with $r_a = 4$ and matrix (C) provides a good compromise between differential/linear security, diffusion, strength of the ARX-box, simplicity and easiness/efficiency of implementation. It also generalizes elegantly the linear layer of the 64-bit version of \sparx{}. We thus settled for this Feistel-like function. For convenience, we decided to use its mirrored version.
+
+\FigTex{best-layers-tikz}

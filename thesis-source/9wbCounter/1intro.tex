@@ -1,0 +1,15 @@
+\SecDef{intro}{Introduction}
+
+\subsection{Our Contribution}
+
+{\bf Components of Protection.} We propose in \SecRef{method} a general method for designing a secure white-box implementation. The idea is to split the protection into two independent components: \emph{value hiding} and \emph{structure hiding}. The value hiding component must provide protection against passive DCA-style attacks - attacks that rely solely on analysis of computed values. In particular, it must provide security against the correlation attack and the algebraic attack. We suggest that security against these two attacks can be achieved by applying a classic linear masking scheme on top of a nonlinear masking scheme protecting against the algebraic attack. The structure hiding component must secure the implementation against circuit analysis attacks. The component must protect against circuit minimization, pattern recognition, pseudorandomness removal, fault injections, etc. Possibly this component may be splitted into more sub-components (e.g. an integrity protection). Development of a structure hiding protection is left as a future work.
+
+{\bf Provably Secure Construction.} Classic $t$-th order masking schemes protect against adversaries that are allowed to probe $t$ intermediate values computed by the implementation. The complexity of the attack grows fast when $t$ increases. In the new algebraic attack the adversary is allowed to probe all intermediate values but she can combine them only with a function of low algebraic degree $d$. Similarly, the attack complexity grows fast when $d$ increases and also when the circuit size increases. We develop a framework for securing an implementation against the algebraic attack. It includes a formal security model and a proof of the composability of first-order secure circuits. Finally, I describe our first-order secure masking scheme implementing \txor{} and \tand{} operations. As a result, our framework provides provable security against the first-order algebraic attack. I show concrete security bounds for our construction. Finally, we implement the AES-128 block cipher protected using our new masking scheme.
+
+A code implementing the attacks from \ChapRef{wba}, verification of the algebraic masking schemes and the masked AES-128 implementation is publicly available at~\cite{OurWhiteboxCode}:
+\begin{center}
+    \url{https://github.com/cryptolu/whitebox}
+\end{center}
+
+\subsection{Outline}
+I describe our general method for securing a white-box design in \SecRef{method}. In \SecRef{framework} a framework is developed for countermeasures against the algebraic attack. In~\SecRef{minimalist} I describe a simple quadratic masking scheme following the proposed framework. Finally, I conclude and suggest future work in \SecRef{conclusions}.

@@ -1,0 +1,206 @@
+\SecDef{expo}{Decomposition based on Finite Field Logarithm}
+
+\subsection{BelT Block Cipher and its S-Box}
+
+BelT is a block cipher from the Belarusian cryptographic standard~\cite{BELT}. It uses an 8-bit S-Box $H\colon \field{8} \to \field{8}$ which is given as a look-up table in the standard. The rationale behind this S-Box is not given in the standard, but instead in a separate rationale document by Agievich~\etal{}~\cite{BELTratio}.
+
+\begin{proposition}[The BelT S-Box Construction, \cite{BELTratio} (translated)]
+The look-up tables of the S-Box coordinate functions were chosen as different segments of length 255 of different linear recurrences defined by the irreducible polynomial $p(\lambda)$:
+$$
+p(\lambda) = \lambda^8 + \lambda^6 + \lambda^5 + \lambda^2 + 1.
+$$
+Additionally, a zero element was inserted in a fixed position of each segment.
+\end{proposition}
+
+Agievich also explains in~\cite{AA2004,AA2004rus} that such a construction is equivalent to an \emph{exponential} function in the finite field. 
+
+\newcommand\fexp[2]{#1^{(#2)}}
+\newcommand\pexp[1]{\mathsf{exp}_{#1}}
+\newcommand\plog[1]{\mathsf{log}_{#1}}
+
+\begin{definition}
+For a primitive element $w \in \fielde{n}$ let $x \mapsto \fexp{w}{x}$ be the map from $\field{n}$ to itself, obtained by raising $w$ to the power given by the integer represented by $x \in \field{n}$, and representing the result as an element of $\field{n}$, where the polynomial defining the field should be clear from context.
+
+The exponential mapping can be turned into a permutation of $\field{n}$ by letting it map 0 to 0. Let $w \in \fielde{n}$ be a primitive element. Let $\pexp{w}$ be a permutation of $\field{n}$ given by:
+$$
+\pexp{w}(x) \eqdef \mapsto \begin{cases}
+0, &~\text{if}~x = 0,\\
+\fexp{w}{x}, &~\text{otherwise}.
+\end{cases}
+$$
+Let $\plog{w}\colon \field{n} \to \field{n}$ denote the functional inverse of $\pexp{w}$:
+$$
+\plog{w} \eqdef \pexp{w}^{-1}.
+$$
+\end{definition}
+
+\begin{remark}
+In the S-Box $H$ used in BelT, the zero was inserted at $x = \hex{0a} \in \field{8}$ instead of 0.
+\end{remark}
+
+\FigRef{h_lat} shows the Jackson Pollock representations of the column and row frequency tables of the LAT of $H$. In the row frequency table several rows stick out, similarly to the special columns in the column frequency table of the LAT of $\pi$. This similarity suggests that there might be a relation between $H$ and the inverse of $\pi$. 
+
+Since this chapter is devoted to $\pi$, for a closer analysis of the S-Box used in BelT, I refer to our paper~\cite{OurKuz2}.
+
+\FigTex{h_lat.tex}
+
+
+\subsection{Exponential Behaviour of $\pi$}
+
+An exponential function $x \mapsto w^x$ has the following property: for all $x,c \in \field{8}$
+$$
+\fexp{w}{x + c} = \fexp{w}{x} \fmult \fexp{w}{c}.
+$$
+This property can be used to distinguish exponential permutations or functions close to them. However, the integer addition can be partially hidden by a whitening affine layer. Still, a strong property can be observed if the addition is approximated by \txor{}. Indeed, for a unit vector $e_i$ of $\field{n}$ and all $x \in \field{8}$,
+$$
+x \oplus e_i =
+\begin{cases}
+x \boxplus e_i, & ~\text{if}~ \inprod{x, e_i} = 0,\\
+x \boxminus e_i, & ~\text{if}~ \inprod{x, e_i} = 1.
+\end{cases}
+$$
+
+An advantage of this approximation is that the \txor{} with $e_i$ after a whitening input linear map $L \in \linbij{n}$ maps back to the \txor{} with $L^{-1}(e_i)$ before the application of $L$. And indeed such behaviour can be observed in $\pi$! By an exhaustive search over the parameters, the following relations were found in $\pi$.
+
+\begin{observation}
+Let $c \in \pround{\hex{12}, \hex{26}, \hex{24}, \hex{30}}$. For any $i \in \seg{1}{4}$
+\begin{equation}
+\Label{eq:exprel}
+\Pr_{x \in \field{8}} \psquare{
+    \begin{aligned}
+    \pi^{-1}(x \oplus c_i) = \pi^{-1}(x) \fmult X^{2^{i-1}} && ~\text{or}\\
+    \pi^{-1}(x \oplus c_i) = \pi^{-1}(x) \fdiv X^{2^{i-1}}. &&
+    \end{aligned}
+} = 240/256,
+\end{equation}
+where multiplication $\fmult$ and division $\fdiv$ are performed in the finite field $\fielde{8} \simeq \field{}[X]/(X^8 + X^4 + X^3 + X^2 + 1)$ and $X$ defines a primitive element.
+\end{observation}
+
+\newcommand\taupi{\plog{X} \circ \pi^{-1}}
+
+This strong property suggests that the output side of $\pi^{-1}$ is not masked by a random linear layer. Otherwise, the multiplication and the division by $X^{2^i}$ would be masked and not triggered by the constant \txor{} in the input. Therefore, we assume that the output of $\pi^{-1}$ is the output of an exponential function composed with some simple layer. The simple layer then can be analyzed separately as $\taupi$.
+
+
+\subsection{Decomposing the Arithmetic Layer}
+
+Our hypothesis was that there  is a linear whitening layer mapping all $c_i$ to unit vectors. Equation~\Ref{eq:exprel} suggests that the unit vectors are consecutive powers of 2. Let $\alpha \in \linbij{8}$ be given by
+$$
+\alpha \eqdef \matb{
+    1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+}^{-1}.
+$$
+It is such that for all $i \in \pset{1,2,3,4}$, $\alpha(c_i)$ is the unit vector corresponding to $2^{i-1}$. Preimages of the other four unit vectors were chosen randomly to complete the map. The look-up table of $\taupi \circ \alpha^{-1}$ is given in \TabRef{taupialpha}. 
+
+\FigTex{taupialpha.tex}
+
+The rows of \TabRef{taupialpha} are clearly structured. We observe that each row can be sorted by modifying the linear mapping $\alpha$ (except the zero value). Indeed, let $\beta \in \linbij{8}$ be given by
+$$
+\beta \eqdef \matb{
+    1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    1 & 0 & 0 & 0 & 1 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 \\
+    1 & 0 & 1 & 0 & 0 & 0 & 1 & 1 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+}.
+$$
+Then the look-up table of $\taupi \circ \beta^{-1}$ is the same as the look-up table of $\taupi \circ \alpha^{-1}$ with sorted rows.
+It is shown in \TabRef{taupibeta}.
+
+\FigTex{taupibeta.tex}
+
+Furthermore, the rows can be reordered by applying a 4-bit nonlinear mapping to the left branch. Let $q$ be a permutation of $\field{4}$ given by its lookup table
+$$
+\lookup{q} \eqdef (12, 2, 9, 10, 13, 6, 3, 5, 11, 4, 8, 15, 14, 7, 0, 1).
+$$
+Let $q_L$ be a permutation of $\field{8}$ made by applying $q$ to the left half of the input:
+$$
+q_L(x, y) \eqdef (q(x), y)).
+$$
+Then the look-up table of $\taupi \circ \beta^{-1} \circ q_L^{-1}$ has a very simple structure. It is shown in \TabRef{taupibetaq}. This structure has a simple arithmetic expression. As a result, an algorithmic decomposition of $\pi^{-1}$ can be deduced. It is given in Algorithm~\Ref{alg:pinv}.
+
+\begin{remark}
+It is also possible to define $q$ such that it moves the row $(17, 34, \ldots, 255, 0)$ to the end of the table. This change results in similar expressions.
+\end{remark}
+
+\FigTex{taupibetaq.tex}
+
+\begin{algorithm}
+    \caption{\Label{alg:pinv}
+        Computing the inverse of $\pi$: $y = \pi^{-1}(x)$.
+    }
+    \begin{algorithmic}[1]
+        \State{$(l, r) \gets \beta(x)$}
+        \State{$l \gets q(l)$}
+        \If{$l = 0$}
+            \State{$z \gets 17 \times ((r + 1) \mod 16)$} \Comment{integer arithmetic}
+        \Else
+            \State{$z \gets 17 \times l + r - 16$} \Comment{integer arithmetic}
+        \EndIf
+        \State{$y \gets \plog{X}(z)$}
+        \State{\Return{$y$}}
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Obtaining a Decomposition of $\pi$}
+
+\newcommand\arith{\widehat{\pi}}
+Let $\arith$ be the permutation of $\field{8}$ given by
+$$
+    \arith \eqdef \plog{X} \circ \pi^{-1} \circ \beta^{-1} \circ q_L^{-1}.
+$$
+It corresponds to the arithmetic part of the decomposition. Observe that it has a TU-decomposition as $\pi$ has itself (see Section~\Ref{sec:tu}).
+
+\begin{observation}
+There exist permutations of $\field{4}$ $T_{\hex{0}},\ldots,T_{\hex{f}}$ and $U_{\hex{0}}, \ldots, U_{\hex{f}}$ such that for all $l,r \in \field{4}$
+$$
+\arith(l,r) = U_{T_l(r)}(l), T_l(r).
+$$
+
+\FigTex{arith-tu.tex}
+
+Such $T,U$ are given in \TabRef{arith-tu}. They can also be expressed arithmetically:
+
+\begin{equation*}
+    T_k(x) = \begin{cases}
+    x + k, \mbox{ if } k \ne 0, \\
+    x + k + 1, \mbox{ otherwise},
+    \end{cases}
+    U_k(x) = \begin{cases}
+    ((x - k - 1) \mod{15}) + k + 1, \mbox{ if } x \ne 0, \\
+    k, \mbox{ otherwise}.
+    \end{cases}
+\end{equation*}
+\end{observation}
+
+$T$ and $U$ can be inverted separately. By further using the finite field logarithm and inverses of $\beta$ and $q_L$, the logarithmic decomposition of $\pi$ is obtained. The corresponding algorithm is given in Algorithm~\Ref{alg:forward} and graphical representation is given in \FigRef{logarithmic}.
+
+\begin{algorithm}
+    \caption{Computing the S-Box $y = \pi(x)$ using the logarithmic decomposition.}
+    \Label{alg:forward}
+    \begin{algorithmic}
+        \State{$(l, r) \gets \plog{X}(x)$}
+        \State{$l \gets l - r$}
+        \If{$l = 0$}
+            \State{$r \gets r - 1$}
+        \Else
+            \State{$l \gets (l + r - 1) \mod 15 + 1$}
+        \EndIf
+        \State{$r \gets r - l$}
+        \State{$l \gets q^{-1}(l)$}
+        \State{$y \gets \beta^{-1}(l||r)$}
+        \State{\Return{$y$}}
+    \end{algorithmic}
+\end{algorithm}
+
+\FigTex{logarithmic}

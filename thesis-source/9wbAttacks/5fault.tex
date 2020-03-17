@@ -1,0 +1,76 @@
+\SecDef{fault}{Fault Attacks}
+
+Previous attacks assumed that the adversary knows the obfuscated circuit and can analyze it in an arbitrary way. Still, the attacks described in previous sections were passive: they relied on analysis of computed intermediate values during encryptions of random plaintexts. In this section I describe active attacks - fault injections - that can also be used to attack masked white-box implementations. We assume that the classic Boolean masking is used. We also allow any form of \emph{integrity protection} which protects the values but does not protect the shares. That is, the protection may detect a fault that influences ciphertext, but does not detect a fault that modifies masks in a way that does not alter the masked value.
+
+
+\SubSecDef{fault2}{Two-Share Fault Injection}
+
+The main goal of a fault attack against masking is to locate shares of the masked values. Observe that flipping two \txor{}-shares of a value does not change the value. This property can be used to locate positions of possible shares. The attack procedure is given in \AlgRef{fault2}.
+
+\begin{algorithm}[ht]
+\AlgDef{fault2}{Two-share fault attack on a circuit $C\colon \field{N} \to \field{M}$}
+
+\begin{algorithmic}[1]
+    \State $p \xleftarrow{\$} \field{N}$
+    \State $c \gets C(p) \in \field{M}$
+    
+    \ForAll{$i,j \in \seg{1}{|C|}, i < j$}
+        \State $c_{i,j} \gets C(p) \in \field{M},$ with the values in the nodes indexed $i$ and $j$
+        \Statex \hspace{0.5cm} flipped during encryption
+
+        \If{$c = c_{i,j}$}
+            \State repeat the check several times (for random plaintexts)
+            \State \Return \textsf{possible shares $i, j$}
+        \EndIf
+    \EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{remark}
+As shares of the same value should be placed closely in the circuit, a window coverage can be used to improve efficiency of this attack too. The idea is to choose two shares only inside each window and not across the windows.
+\end{remark}
+
+\begin{remark}
+There may be a lot of false positives. For example, if values in the nodes indexed $i$ and $j$ are \txor{}ed and not used anymore, the attack will always return these two nodes. In general, for any two nodes returned by the algorithm, the two values can be compressed into one. Indeed, since flipping both values does not change the result, then only the \txor{} of the two can be relevant. Effectively this means that these two nodes can be excluded from analysis, and their \txor{} included instead. After finishing the process, all shares will be compressed into one and can be attacked with simple DCA attacks.
+\end{remark}
+
+The described attack allows to locate all shares of each value, independently of the sharing degree. The attack performs $\OO(\winsize^2)$ encryptions and has time complexity $\OO(|C|\winsize^2)$.
+
+% -------------------------------------------------------------------
+
+
+\SubSecDef{fault1}{One-Share Fault Injection}
+
+Recall that we allow an integrity protection on the values but not on the shares. One possible way an integrity protection may be implemented is to perform the computations twice and spread the difference between the two results across the output in some deterministic way. In such way small errors are amplified into random ciphertext differences. In case of such protection or absence of any protection the efficiency of the fault attack can be improved.
+
+The main idea for improvements comes from the following observation: if we flip a single share of some value, the masked value will be flipped as well. This results in a fault injected in the unmasked circuit. The assumption is that the circuit output does not depend on which share was faulted. This observation allows to split the two-share fault attack and perform fault injection only for each node instead of each pair of nodes, at the cost of additional storage. The procedure is given in~\AlgRef{fault1}
+
+\begin{algorithm}[ht]
+\AlgDef{fault1}{One-share fault attack on a circuit $C\colon \field{N} \to \field{M}$}
+
+\begin{algorithmic}[1]
+    \State $p \xleftarrow{\$} \field{N}$
+    \State $c \gets C(p) \in \field{M}$
+    \State initialize a hash map $T\colon \field{M} \to \pset{1, \ldots, |C|}^*$
+    \ForAll{$i \in \seg{1}{|C|}$}
+        \State $c_{i} \gets C(p) \in \field{M},$ with the value in the node indexed $i$
+        \Statex \hspace{0.5cm} flipped during encryption
+        \State append $i$ to $T(c_i)$
+        \If{$T(c_i)$ contains more than one value}
+            \State $(i_1, i_2, \ldots) \gets T(c_i)$
+            \State repeat the check several times (for random plaintexts)
+            \State \Return \textsf{possible shares $(i_1, i_2, \ldots)$}
+        \EndIf
+    \EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The attack performs $\OO(\winsize)$ encryptions, which requires $\OO(|C|\winsize)$ time. It provides substantial improvement over previous attack, though it requires stronger assumption about the implementation. The most relevant counter-example is when the integrity protection does not amplify the error but simply returns a fixed output for any detected error. In a sense, such protection does not reveal in the output any information about the fault. On the other hand, it may be easier to locate the error checking part in the circuit and remove the protection.
+
+The attacks can be adapted for nonlinear masking as well. In such case the injected fault may leave the masked value unflipped. When a zero difference is observed in the output, the fault injection should be repeated for other plaintexts. As plaintext is the only source of pseudorandomness, changing the plaintext should result in different values of shares. Flipping a share would result in flipping the masked value with nonzero probability. The exact probability depends on the decoder function.
+
+Similarly to the two-share fault attack, there may be many false-positives. That is, the algorithm may return nodes that do not correspond to shares of the same value. Still, it is likely that there is a strong relation between the nodes. The algorithm thus provides some information about the implementation, which can be further used for detailed analysis.
+
+\begin{remark}
+The two described attacks perform faults on \emph{nodes} of the circuit. In some cases, a node value may be used as a share of multiple different values, for example, if the same pseudorandom value is used to mask several values. A more general variant of attacks would inject faults on \emph{wires}. However, multiple wires may need to be faulted in order to succeed and the attack may become complicated and inefficient.
+\end{remark}

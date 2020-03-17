@@ -1,0 +1,273 @@
+\section{HDIM of Feistel Networks}
+\SecLabel{hdim-feistel}
+
+The Feistel Network is a rather asymmetric and imbalanced structure. After any round, the left branch is a result of more computations, and the right branch is ``weaker'' in this sense. Often it may occur that, after a particular number of rounds, the left branch has full algebraic degree, while the right branch is still of incomplete degree. This can be seen as the maximum number of rounds available for an integral distinguisher, since after the next round the strong left branch is mixed into the weak right branch, and, in general, we can expect both branches to have full degree. To exploit the imbalance of Feistel Networks, we analyze the degree of the ``weak'' right branch.
+
+\begin{definition}
+Let $\maxdegnbij{r}{d}$ denote the maximum possible degree of the right output branch of a Feistel Network with $r$ rounds and Feistel functions of degree at most $d$. Let $\maxdegbij{r}{d}$ denote the maximum possible degree in the case when the Feistel functions are bijective:
+\eq{
+& \maxdegnbij{r}{d} = \max_{F \in \nbij{r}{d}} \deg{(\RB\circ F)}, \\
+& \maxdegbij{r}{d} = \max_{F \in \bij{r}{d}} \deg{(\RB \circ F)}.
+}
+\end{definition}
+
+\begin{remark}
+The maximum degree of the left branch is equal to the maximum degree of the right branch in the next round, since the branch is transferred untouched.
+\end{remark}
+
+\begin{remark}
+The exact values of $\maxdegnbij{r}{d},\maxdegbij{r}{d}$ are hard to compute. However, upper bounds can be computed using different methods. Improving further the upper bounds should lead to strengthening the results from this chapter.
+\end{remark}
+
+The definition of HDIM leads to an interesting insight into proving absence of particular monomials of maximum degree (i.e. $n-1$ for $n$-bit permutations), or, equivalently, zeroes in the HDIM itself. The idea is to split the computed function into two roughly equal parts. Then the algebraic/integral distinguisher exists when the \emph{sum} of the degrees of the two parts is less than the block size $n$. In the original case, the parts are composed and the degrees are roughly \emph{multiplied}, i.e. the distinguisher is found when the \emph{product} of the degrees is less than $n-1$.
+
+In this section the utility functions $\thetanbij{r}{d}$ and $\thetabij{r}{d}$ will be used to describe the conditions when the integral distinguisher exists.
+
+\begin{definition}
+The functions $\thetanbij{r}{d}, \thetabij{r}{d}$ are defined as follows:
+\begin{align*}
+    \thetanbij{r}{d} &= \maxdegnbij{\floor{r/2}}{d} + \maxdegnbij{\ceil{r/2}}{d},\\
+    \thetabij{r}{d} &= \maxdegbij{\floor{r/2}}{d} + \maxdegbij{\ceil{r/2}}{d}.
+\end{align*}
+\end{definition}
+
+The following lemma shows a simple upper bound from the product bound of a composition.
+
+\begin{lemma}
+\Label{lem:bound}
+A Feistel Network with $r \ge 1$ rounds and degree-$d$ round functions has degree at most $d^r$ on the left output branch and degree at most $d^{r-1}$ on the right output branch:
+$$
+\maxdegbij{r}{d} \le \maxdegnbij{r}{d} \le d^{r-1}.
+$$
+In particular,
+$$
+\thetabij{r}{d} \le \thetanbij{r}{d} \le d^{\floor{r/2}-1} + d^{\ceil{r/2}-1}.
+$$
+\end{lemma}
+
+\begin{remark}
+In the case of Feistel Networks, the block size is assumed to be $2n$, whereas in discussions about general permutations, the block size is $n$.
+\end{remark}
+
+The HDIM-based distinguishers that we exhibit in this section have the same structure: if conditions of a distinguisher are satisfied, then the $2n\times 2n$ HDIM has the form $\begin{bmatrix}? & 0 \\ 0 & 0\end{bmatrix}$ as a $2\times 2$ block-matrix. Such distinguisher is automatically extended to one more round leading to an HDIM of the form $\begin{bmatrix}? & ? \\ ? & 0\end{bmatrix}$. This is formalized in the following definition and a lemma.
+
+\begin{definition}[Type-I, Type-II Distinguishers]
+Let $S\colon \field{2n} \to \field{2n}$. Then
+\begin{itemize}
+    \item $S$ is said to have the type-I distinguisher if
+    $$\HDIM{S}[i,j] = 0 ~\text{for}~ n < i \le 2n ~\text{\bf or}~ n < j \le 2n;$$
+    \item $S$ is said to have the type-II distinguisher if
+    $$\HDIM{S}[i,j] = 0 ~\text{for}~ n < i \le 2n ~\text{\bf and}~ n < j \le 2n.$$
+\end{itemize}
+\end{definition}
+
+\begin{lemma}
+\Label{lem:type-ext}
+Let $r\ge 1$, $S_r \in \nbij{r}{d}$ and $S_{r+1} \in \nbij{r+1}{d}$ be $2n$-bit permutations such that
+$$
+S_{r+1} = \Swap \circ R_{f} \circ \Swap \circ S_r
+$$
+for some function $f\colon \field{n} \to \field{n}$.
+
+If $S_{r}$ has the type-I distinguisher, then $S_{r+1}$ has the type-II distinguisher.
+\end{lemma}
+\begin{proof}
+Since, $\RB \circ S_{r+1} = \LB \circ S_r$ the last $n$ rows of $\HDIM{S_{r+1}}$ are the same as the first $n$ rows of $\HDIM{S_r}$.
+\end{proof}
+
+% ===================================================
+
+\subsection{General Case}
+
+The following theorem applies the described ideas to general Feistel Networks.
+
+\begin{theorem}
+\Label{thm:nbij}
+Any $S \in \nbij{r}{d}$ has the type-I distinguisher if $$\thetanbij{r+1}{d} < 2n.$$
+
+Similarly, any $S \in \bij{r}{d}$ has the type-I distinguisher if $$\thetabij{r+1}{d} < 2n.$$
+ 
+\end{theorem}
+\begin{proof}
+Let $(a,b) \in \field{2n}$ denote the intermediate state of $S$ after $\floor{r/2}$ rounds (see \FigRef{mitmproof}). Let $x_l(a,b), x_r(a,b)$ denote the input branches of $S$ as functions of $a,b$, and $y_l(a,b),y_r(a,b)$ the output branches of $S$ as functions of $a,b$. We now perform the variable replacement in the definition of HDIM:
+$$
+\HDIM{S}[i,j] =
+\bigoplus_{x\in \field{2n}} \inprod{e_i, S(x)} \inprod{e_j, x} =
+\bigoplus_{(a,b)\in \field{2n}} \inprod{e_i, (x_l,x_r)(a,b)} \inprod{e_j, (y_l,y_r)(a,b)}.
+$$
+Our goal is to prove a bound on the algebraic degree of the product of the two inner products.
+
+Variables $x_l,x_r,y_l,y_r$ can be computed using a Feistel Network with $a,b$ as inputs: $(x_l,x_r) \circ \Swap \in \nbij{\floor{r/2}}{d}$ and $(y_l,y_r) \in \nbij{\ceil{r/2}}{d}$. Therefore, they have the following degree bounds:
+\begin{itemize}
+    \item $\deg{x_l} \le \maxdegnbij{\floor{r/2}+1}{d}$, $\deg{x_r} \le \maxdegnbij{\floor{r/2}}{d}$,
+    \item $\deg{y_l} \le \maxdegnbij{\ceil{r/2}+1}{d}$,          $\deg{y_r} \le \maxdegnbij{\ceil{r/2}}{d}$.
+\end{itemize}
+
+The zeroes in the HDIM required for the type-I distinguisher correspond to products $x_r\cdot y_r$, $x_r \cdot y_l$ and $x_l \cdot y_r$. It is enough to prove the case $n < i \le 2n$, since the inverse of $S$ is also a Feistel Network and thus the transpose of the $\HDIM{S}$ will have the same zeroes. The case corresponds to the products $x_r\cdot y_r$ and $x_l \cdot y_r$. It follows that $\HDIM{S}[i,j] = 0$ if $n < j \le 2n$ and $\maxdegnbij{\floor{r/2}+1}{d} + \maxdegnbij{\ceil{r/2}}{d} < 2n$. The condition is equivalent to $\thetanbij{r+1}{d} < 2n$.
+\end{proof}
+
+\FigTex{proof.tex}
+
+\begin{corollary}
+Any $S \in \nbij{r}{d}$ has the type-I distinguisher if $$d^{\floor{r/2}} + d^{\ceil{r/2}-1} < 2n,$$
+and the type-II distinguisher if 
+$$d^{\floor{r/2}-1} + d^{\ceil{r/2}-1} < 2n.$$
+\end{corollary}
+\begin{proof}
+Putting the bound from Lemma~\Ref{lem:bound} in Theorem~\Ref{thm:nbij} makes the proof. For the type-II distinguisher the result follows from Lemma~\Ref{lem:type-ext}.
+\end{proof}
+
+% ===================================================
+
+\subsection{Bijective Feistel Functions}
+
+In the case when the Feistel functions are bijective, an additional trick may be used. The intermediate state variables can be chosen in an alternative way by exploiting the fact that the middle Feistel function is invertible. However, in this case we need to know an upper bound on the degree of the \emph{inverse} of the middle Feistel function.
+
+In what follows, the upper bound on the algebraic degree of the inverse of the Feistel function is denoted by $\dinv$.
+
+\begin{theorem}
+\Label{thm:bij}
+Any $S \in \bij{r}{d}$ has the type-I distinguisher if
+$$
+    \max(d,\dinv)\cdot \thetabij{r-2}{d} < 2n.
+$$
+\end{theorem}
+\begin{proof}
+The proof is analogous to the proof of Theorem~\Ref{thm:nbij}, except that the choice of intermediate variables differs.
+Instead of choosing both left and right branches of the input of the middle round, it is possible to choose the left branch of the input and the right branch of the output. The variables chosen are $(a,c)$ instead of $(a,b)$ (see \FigRef{mitmproof}). In this case $b$ can be expressed as $f_{\floor{r/2}+1}^{-1}(a \oplus c)$, and degree of $b$ as a function of $(a,c)$ is upper bounded by $\dinv$.
+
+Without loss of generality, assume $r \ge 3$. Let $(a_x, b_x) \in \field{2n}$ denote the state before the $\floor{r/2}$-th round, and $)a_y, b_y) \in \field{2n}$ denote the state after the $(\floor{r/2}+2)$-th round. The following degree bounds hold (every variable is considered as a function of $(a,c)$):
+\begin{itemize}
+    \item $\deg{a_x} \le \max(d,\dinv), \deg{b_x} = 1$,
+    \item $\deg{a_y} \le \max(d,\dinv), \deg{b_y} = 1$,
+\end{itemize}
+The input $(x_l, x_r)$ of $S$ can be computed as a $(\floor{r/2}-1)$-round Feistel Network composed with the function $(a_x, b_x)$. Similarly, the output $(y_l, y_r)$ of $S$ can be computed as a $(\ceil{r/2}-2)$-round Feistel Network composed with the function $(a_y, b_y)$. It follows that
+\begin{itemize}
+    \item $\deg{x_l} \le \max(d,\dinv)\cdot \maxdegbij{\floor{r/2}}{d}$,
+    \item $\deg{x_r} \le \max(d,\dinv)\cdot \maxdegbij{\floor{r/2}-1}{d}$,
+    \item $\deg{y_l} \le \max(d,\dinv)\cdot \maxdegbij{\ceil{r/2}-1}{d}$, 
+    \item $\deg{y_r} \le \max(d,\dinv)\cdot \maxdegbij{\ceil{r/2}-2}{d}$.
+\end{itemize}
+It is easy to verify that the degrees of the products $x_r\cdot y_l$ and $x_r \cdot y_r$ are upper bounded by $$
+\max(d,\dinv)\cdot\pround{\maxdegbij{\floor{r/2}-1}{d} + \maxdegbij{\ceil{r/2}-1}{d}} = \max(d,\dinv)\cdot\thetabij{r-2}{d}.$$
+Similarly to Theorem~\Ref{thm:nbij}, by the transpose-inverse property of the HDIM, the type-I distinguisher follows if
+$$\max(d,\dinv)\cdot\thetabij{r-2}{d} < 2n.$$
+\end{proof}
+\begin{remark}
+When $\dinv \le d$, Theorem~\Ref{thm:bij} provides a type-I distinguisher for 1 more round compared to the general Theorem~\Ref{thm:nbij}.
+\end{remark}
+
+\begin{corollary}
+\Label{cor:bij}
+Any $S \in \bij{r}{d}$ has the type-I distinguisher if $$\max(d,\dinv)\cdot(d^{\floor{r/2}-2} + d^{\ceil{r/2}-2}) < 2n,$$
+and the type-II distinguisher if 
+$$\max(d,\dinv)\cdot(d^{\floor{r/2}-2} + d^{\ceil{r/2}-3}) < 2n.$$
+In particular, any 4-round Feistel Network with bijective round functions has the type-I distinguisher and any 5-round Feistel Network with bijective round functions has the type-II distinguisher.
+\end{corollary}
+
+\begin{remark}
+Note that the results for Feistel Networks with bijective functions are not very useful if a degree bound on Feistel functions is known, but a degree bound on their inverses is not known. In such case only the generic 5-round type-II distinguisher can be obtained. 
+\end{remark}
+
+% ===================================================
+
+\subsection{Applications}
+
+As an illustration of the theorems, consider the HDIM of random Feistel Networks with 3-bit branches. For particular $S_4,S_5\colon \field{6} \to \field{6}$, $S_4 \in \bij{4}{2}$ and $S_4 \in \bij{5}{2}$ (the LAT of these functions was shown in \FigRef{lat8motiv}):
+{
+\def\gzero{{\color{gray}0}}
+\begin{equation}
+  \HDIM{S_4} = \psquare{\footnotesize
+    \begin{array}{cccccccc}
+    1 & 0 & 1 & \gzero & \gzero & \gzero \\
+    0 & 1 & 1 & \gzero & \gzero & \gzero \\
+    1 & 0 & 1 & \gzero & \gzero & \gzero \\
+    \gzero & \gzero & \gzero & \gzero & \gzero & \gzero \\
+    \gzero & \gzero & \gzero & \gzero & \gzero & \gzero \\
+    \gzero & \gzero & \gzero & \gzero & \gzero & \gzero \\
+    \end{array}
+  }, ~\HDIM{S_5} = \psquare{\footnotesize
+    \begin{array}{cccccccc}
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    1 & 0 & 1 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    1 & 1 & 1 & \gzero & \gzero & \gzero \\
+    1 & 0 & 1 & \gzero & \gzero & \gzero \\
+    1 & 0 & 1 & \gzero & \gzero & \gzero \\
+    \end{array}
+  }.
+\end{equation}
+}
+
+It is interesting that from the HDIM we can see that all coordinates of $S_5$ have full degree $n-1$, but still the structure always has an integral distinguisher because particular monomials are always missing in the ANF.
+
+\FigTex{distinguishers.tex}
+
+\TabRef{distinguishers} shows application of theorems to several concrete parameters.
+
+In~\cite{division}, Todo proposed \emph{division property}, a method to find integral characteristics. I compared our results with those reported by Todo in Appendix~B of~\cite{division}. Our HDIM-motivated results (type-II distinguishers) correspond to maximum number of rounds for which an integral characteristic is proven.
+\begin{itemize}
+    \item For non-bijective cases, division property is better in 4 targets and provides the same results else. Those targets are $(n,d)$-Feistel networks $(24, 2),(48, 2),(48, 5),(64, 5)$. Our approach proves a distinguisher for one round less.
+    
+    \item For bijective cases, division property results in one more round than the respective non-bijective case in a few places. Our approach does not exploit this distinction in general and thus is weaker for these cases. However, under the assumption that the degree of the inverses of Feistel functions is upper-bounded by the same value (i.e. $\dinv \le d$), Corollary~\Ref{cor:bij} provides identical results and even one more round for a three cases: $(n,d)$ Feistel Networks $(32,5),(32,7),(64,7)$.
+    To the best of my knowledge, no known method existed to exploit a bound on the degree of the inverse functions in the division property framework. I describe such method in \SecRef{improve-division}
+\end{itemize}
+
+As the results show, the division property proposed by Todo allows to get slightly stronger integral characteristics than the HDIM-motivated approach, except the cases when the degree of the inverses of Feistel functions is known. The downside of division property is that it requires an algorithmic evaluation for each parameter set, whereas our approach provides a simple closed formula.
+Furthermore, the degree growth inside the two halves of a primitive is evaluated by a generic bound in our approach. It may be possible to combine our approach with division property or another degree evaluation method to obtain better results. In particular, a recursive approach used in~\cite{LeoSPN} for SPNs may be useful for Feistel Networks as well.
+
+
+\SubSecDef{improve-division}{Improving Division Property Propagation}
+
+I briefly note a method to improve the division property propagation rule given a bound on the algebraic degree of the inverse function of a permutation. I describe the division property using the equivalent characterization by Boura and Canteaut~\cite{anotherview}. Recall that the indicator of a multiset is defined as the indicator of the set containing elements from the multiset with odd multiplicities.
+
+\begin{definition}
+A multiset $X \subseteq \field{n}$ is said to satisfy the division property $\DP{n}{k}$, if
+$$
+\deg{\Ind_X} \le n - k.
+$$
+\end{definition}
+
+The main propagation rule of the division property is as follows (equivalently given in~\cite{division} by Todo)
+\begin{proposition}
+Let $X \subseteq \field{n}$ be a multiset satisfying $\DP{n}{k}$. Let $F$ be a permutation of $\field{n}$. Then the multiset $Y = F(X)$ satisfies the division property
+$$
+\DP{n}{k'}, ~\text{for all}~k' \le \ceil{\frac{k}{\deg{F}}}.
+$$
+\end{proposition}
+\begin{remark}
+I write inequality instead of original equality, to highlight all division properties that are satisfied, instead of only the strongest one.
+\end{remark}
+
+I now show that another propagation rule can be obtained, if the degree of $F^{-1}$ is known.
+
+\begin{proposition}
+The multiset $Y = F(X)$ satisfies the division property
+$$
+\DP{n}{k'}, ~\text{for all}~k' \le n - (n-k) \deg{F^{-1}}.
+$$
+\end{proposition}
+\begin{proof}
+Without loss of generality, assume that $X$ has no elements with a multiplicity greater than 1. Note that
+$$
+x \in X \Leftrightarrow F(x) \in Y.
+$$
+It can be rewritten as 
+$$
+\Ind_X = \Ind_Y\circ F.
+$$
+Equivalently,
+$$
+\Ind_X \circ F^{-1} = \Ind_Y.
+$$
+It follows that
+$$
+\deg{\Ind_Y} \le \deg{\Ind_X} \cdot \deg{F^{-1}} \le (n - k)\cdot \deg{F^{-1}},
+$$
+and thus, $\deg{\Ind_Y} \le n - k'$ for all
+$$
+k' \le n - (n - k) \deg{F^{-1}}.
+$$
+\end{proof}
+
+Using this proposition, the results from~\cite{division} can be improved for the case of bijective Feistel functions, assuming that $\dinv \le d$. The improved division property then provides the same or slightly better results than Corollary~\Ref{cor:bij} in all cases from~\cite{division}.

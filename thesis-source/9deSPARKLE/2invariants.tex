@@ -1,0 +1,35 @@
+\SecDef{invar}{Invariants in SPARKLE}
+
+\subsection{Invariant Subspaces}
+\Todo{describe method, probably briefly, probably in Chapter NORX}
+\Todo{maybe subspace trail from FSE paper? by Leander et al}
+
+Invariant subspace attacks were considered in~\cite{InvSpacePrint}.
+Using a similar to the "to and fro" method from \cite{LinAffEQold,LinAffEQ}, we searched for an affine subspace that is mapped by an ARX-box $A_{c_i}$ to a (possibly different) affine subspace of the same dimension. We could not find any such subspace of large dimension.
+\Todo{For what dimension is the search working with high probability? E.g. there are lots of affine subspaces of dimension 1 that are mapped to affine subspaces of dimension 1, probably also some of dimension 2 or 3}
+
+Note that the search is randomized so it does not result in a proof. As an evidence of the correctness of the algorithm, we found many such subspace trails for all 2-round reduced ARX-boxes, with dimensions from 56 up to 63. For example, let $A$ denote the first two rounds of $A_{c_0}$. Then for all $l,r,l',r' \in \bField{32}$ such that $A(l, r) = (l', r')$,
+\begin{multline*}
+(l_{29} + r_{21} + r_{30}) (l_{30} + r_{31}) (l_{31} + r_{0}) (r_{22}) (r_{23}) = \\
+(l'_{4} + r'_{21}) (l'_{5} + r'_{22}) (l'_{6} + r'_{23}) (l'_{28} + l'_{30} + l'_{31} + r'_{13} + 1) (l'_{29} + l'_{31} + r'_{14}).
+\end{multline*}
+This equation defines a subspace trail of constant dimension 59.
+\Todo{more data on subspaces}
+
+
+\subsection{Nonlinear Invariants in the ARX-boxes}
+Nonlinear invariant attacks were considered recently in~\cite{NonlinInv}.
+\Todo{Describe method algorithm}
+Using linear algebra, we experimentally verified that for any ARX-box $A_{c_i}$ and any non-constant Boolean function $f$ of degree at most 2, the compositions $f \circ A_{c_i}$ and $f \circ A_{c_i}^{-1}$ have degree at least 10:
+$$
+\forall f\colon \bField{64} \to \bField{}, 1 \le \deg{f} \le 2 ~~ \deg{f \circ A_{c_i}} \ge 10, \deg{f \circ A_{c_i}^{-1}} \ge 10,
+$$
+and for functions $f$ of degree at most 3, the compositions have degree at least 4:
+$$
+\forall f\colon \bField{64} \to \bField{}, 1 \le \deg{f} \le 3 ~~ \deg{f \circ A_{c_i}} \ge 4, \deg{f \circ A_{c_i}^{-1}} \ge 4.
+$$
+In particular, any $A_{c_i}$ has no cubic invariants. Indeed, a cubic invariant $f$ would imply that $f \circ A_{c_i} + \varepsilon = f$ is cubic (for a constant $\varepsilon \in \bField{}$). The same holds for the inverse of any ARX-box $A_{c_i}$.
+
+By using the same method, we also verified that there are no quadratic equations relating inputs and outputs of any $A_{c_i}$. However, there are quadratic equations relating inputs and outputs of 3-round reduced versions of each $A_{c_i}$.
+
+\Todo{more data on invariants}

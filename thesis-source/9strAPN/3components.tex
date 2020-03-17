@@ -1,0 +1,191 @@
+\SecDef{components}{Modifying Components}
+
+In this Section I study flexibility of the decomposition and of the discovered structure. What can be changed without breaking the APN property?
+
+\SubSecDef{affine-propagation}{Propagation of Affine Mappings through the Components}
+
+Recall the decomposition from \PropRef{middle-simplified} (\FigRef{middle-affine-b}). It is easy to check experimentally, that changing the xor constant or removing it does not break the APN property. Furthermore, the resulting permutation is affine-equivalent to $S_0$. It is not trivial to see how the constant xor goes through the nonlinear finite field inversions to the outside affine-equivalence maps. Furthermore, we observed experimentally, that changing the finite field inverse to an arbitrary 3-bit APN permutation (on the left branch in the first half of the structure its inverse must be used to preserve symmetry) leads to affine-equivalence with $S_0$ again. This property will be explained further in \SecRef{replace-inv}. From this observations we deduced the following theorem.
+
+\begin{theorem}
+\ThmLabel{affine-propagation}
+Let $\TI$ be the permutation of $\field{3}\times\field{3}$ given by
+$$
+\TI(x,k) \eqdef (\inv(x \oplus \inv(k)), k).
+$$
+Let $L \in \linbij{6}$ be given by a $2 \times 2$ block matrix:
+$$
+L \eqdef \matb{
+L_{1,1} & L_{1,2} \\
+L_{2,1} & L_{2,2} \\
+},
+$$
+where $L_{i,j} \in \linmap{3}{3}$ and $L_{1,2} \in \linbij{3}$.
+
+Then, for any $a_l, a_r, b_l, b_r \in \field{3}, A,B \in \linbij{3}$, the permutations $S,S'$ of $\field{6}$ given by
+\begin{align*}
+     S &\eqdef \TI^{-1} \circ L \circ \TI,\\
+    S' &\eqdef \TI^{-1} \circ \xorf{b_l,b_r} \circ \parf{B} \circ L \circ \parf{A} \circ \xorf{a_l,a_r} \circ \TI,
+\end{align*}
+are affine-equivalent. The structures of $S,S'$ are illustrated in~\FigRef{propagation-affine}.
+
+\FigTex{propagation-affine}
+\end{theorem}
+\begin{proof}
+\textbf{Part 1: constants.}
+Consider the case when $A$ and $B$ are identity mappings. Let $a_r',b_r' \in \field{3}$ be given by
+\begin{align*}
+a &= a_r \oplus L_{1,2}^{-1}(L_{1,1}(a_l) \oplus b_l), \\
+b &= b_r \oplus L_{2,1}(a_l) \oplus L_{2,2}(L_{1,2}^{-1}(L_{1,1}(a_l) \oplus b_l)).
+\end{align*}
+It is easy to verify that $L(0, a) \oplus (0, b) = L(a_l, a_r) \oplus (b_l, b_r)$. Therefore, it is enough to consider the constants on the right branches:
+$$
+\xorf{b_l, b_r} \circ L \circ \xorf{a_l, a_r} = \xorf{0, b} \circ L \circ \xorf{0, a}.
+$$
+This transformation is illustrated in \FigRef{propagation-xors-a} and \FigRef{propagation-xors-b}.
+
+
+It is left to show that the constant propagates through the Feistel function, the field inverse. Indeed, observe that
+$$
+\inv(x \oplus b) = (x + b)^6 = x^6 + b^2x^4 + b^4x^2 + b^6 = \inv(x) \oplus i_b(x),
+$$
+where $i_b \in \affbij{3}$ is an affine map. It can be also explained by the fact that $\inv{x}$ is quadratic and therefore, all its derivatives are linear. $i_b$ can be considered as an additional Feistel round, which is a part of the outer affine mapping. This transformation is shown in \FigRef{propagation-xors-c} and \FigRef{propagation-xors-d}. It can be equivalently applied to the other part of the structure to propagate the constant $a$ outside the structure.
+
+I conclude that arbitrary constants can be added around the central linear layer, without changing the affine-equivalence class.
+
+\FigTex{propagation-xors}
+
+\textbf{Part 2: linear layers.}
+Consider first the propagation of a linear map $L\in \linbij{3}$ through the finite field inverse $\inv$. It can be verified exhaustively that the only linear maps that propagate through the inverse (i.e. a linear map $B$ such that $\inv \circ B = B'\circ \inv$ and $B' \in \affbij{6}$) are the maps of the form $x \mapsto \lambda x^{2^e}$, where $\lambda \in \field{3},e \in \pset{0,1,2}$. Indeed, $\inv(\lambda x^{2^e}) = \lambda^6 (x^6)^{2^e} = \lambda^6 \inv(x)^{2^e}$. This propagation is illustrated in \FigRef{propagation-affine-inverse-a}.
+
+\FigTex{propagation-affine-inverse.tex}
+
+How do other linear maps propagate then? It turns out that an addition of constant is needed in order to propagate an arbitrary linear map.  Interestingly, this phenomenon seems to work only in $\fielde{3}$. For example, in $\fielde{4},\fielde{5}$ the only affine mappings that propagate through the field inverse into an affine mapping are those of the form $x \mapsto \lambda x^{2^e}$. The following observation was deduced and verified experimentally. Its effect is illustrated in \FigRef{propagation-affine-inverse-a}.
+
+\begin{observation}
+\Label{obs:affine-propagation}
+Let $B \in \linbij{3}$ be given by its $\fielde{3}$ polynomial:
+$$
+B(x) \eqdef \lambda_4x^4 + \lambda_2x^2 +\lambda_1x.
+$$
+Let 
+\begin{align*}
+\tau_B &\eqdef \lambda_1 \lambda_2 \lambda_4 \in \fielde{3},\\
+c &\eqdef (\tau_B)^5 \in \fielde{3},\\
+c' &\eqdef (\tau_B)^2 \in \fielde{3},\\
+B' &\eqdef c' \oplus \pround{\inv \circ (B \oplus c) \circ \inv}, B'\colon \fielde{3} \to \fielde{3}.
+\end{align*}
+
+Then, $B'$ is linear, i.e. $B' \in \linbij{3}$. By construction, it is such that
+$$
+\inv \circ (B\oplus c) = (B'\oplus c') \circ \inv.
+$$
+
+Furthermore, such $c$ is uniquely determined by the mapping $B$. That is, for any other $\hat{c} \ne c$, the mapping
+$$
+\inv \circ (B \oplus \hat{c}) \circ \inv
+$$
+is never affine.
+\end{observation}
+
+This observation sheds light on how arbitrary linear maps propagate through the inverse function. Note that the linear map $$
+L' \eqdef \parf{B} \circ L\circ \parf{A} \in \linbij{6}
+$$
+satisfies the conditions of this theorem, namely that the top-right $3\times 3$ submatrix of $L'$ is invertible. Therefore, the constants $a_l,a_r,b_l,b_r$ can be arbitrarily modified. Let us change them to $\tau_A^5, \tau_A^5, \tau_B^5, \tau_B^5$ respectively. Let $x,y \in \field{3}$ denote the output of the central linear layer $L$, and let $x',y' \in \field{3}$ denote the output of the map $S'$. The placement of these variables is shown in \FigRef{propagation-affine-bottom}. Observe that
+\begin{align*}
+    y' &\eqdef B(y) \oplus \tau_B^5, \\
+    x' &\eqdef \inv(B(x) \oplus \tau_B^5) \oplus \inv(B(y) \oplus \tau_B^5).
+\end{align*}
+By Observation~\Ref{obs:affine-propagation}, there exists $B' \in \linbij{6}$ such that
+$$
+    x' = B'(\inv(x)) \oplus \tau_B^2 \oplus B'(\inv(y)) \oplus \tau_B^2 = B'(\inv(x)\oplus \inv(y)).
+$$
+The propagation of the linear map $A$ to the input affine layer is symmetric. This concludes the proof.
+
+\FigTex{propagation-affine-bottom.tex}
+\end{proof}
+
+
+\SubSecDef{central-component}{Modifying the Central Linear Layer}
+
+In \ThmRef{main} it was shown the permutation
+$$
+S_{\inv} \eqdef \TI^{-1} \circ M \circ \TI,
+$$
+where $M \eqdef \matb{w & w^6 \\ 1 & w} \in \linbije{2}{3}$, is APN. Such $M$ has a 2-round Feistel network structure:
+$$
+M(l,r) = (r + w(l + wr), l + wr).
+$$
+The next proposition shows which Feistel functions can be used instead of multiplication by $w$.
+
+\begin{proposition}
+Let $M_{\sigma} \in \linbij{6}$ be a 2-round Feistel network with $\sigma \in \linbij{3}$ as the Feistel function. Its $2\times 2$ block matrix is
+$$
+M_{\sigma} = \matb{\sigma & \idmat{3} \oplus \sigma^2 \\ \idmat{3} & \sigma}.
+$$
+Then the permutation $S_{\sigma}$ of $\field{6}$ given by
+$$
+S_{\sigma} \eqdef \TI^{-1} \circ M_{\sigma} \circ \TI
+$$
+is APN if and only if $\sigma$ is similar to the matrix of multiplication by $w$ in $\fielde{3}$.
+In particular, $\sigma$ can be set to the matrix of multiplication by $c\in \fielde{3}$ such that $c \ne 0$ and $\Tr{c}=0$, independently of the choice of the field defining polynomial.
+\end{proposition}
+\begin{proof}
+By \ThmRef{affine-propagation}, $M_{\sigma}$ with $\sigma(x) = wx$ can be composed with $\parf{A}$ and $\parf{B}$ for arbitrary $A,B \in \linbij{3}$. Observe that $\parf{A}$ propagates through the Feistel network (see \FigRef{modifying-feistel}:
+$$
+\parf{B} \circ M_{\sigma} \circ \parf{A} = \parf{B\times A} \circ M_{A^{-1}\times \sigma \times A}.
+$$
+Setting $B = A^{-1}$ proves that $\sigma$ can be replaced by any similar linear mapping. The fact that using another maps for $\sigma$ does not lead to an APN permutation can be verified experimentally exhaustively.
+
+\FigTex{modifying-feistel.tex}
+
+Since multiplication by $w$ works, it follows that multiplication by $w^2$ and $w^4$ work too, as all these are similar linear maps. In the finite field $\fielde{3} \simeq \field{}[w']/(w'^3+w'^2+1)$, such constants form the set $\pset{w'^3, w'^5, w'^6}$. Observe that all this elements can be identified unambiguously with $\Tr{c} = 0,c \ne 0$. There are no other irreducible polynomials of degree 3 over $\field{}$.
+\end{proof}
+
+Besides modifying the Feistel function and composing $\parf{B}$ from one side, for arbitrary $B \in \linbij{3}$, there are another ways of modifying the central linear layer without breaking the APN property. We performed an exhaustive search over all invertible matrices $L \in \linbij{6}$, optimized by exploiting the equivalence classes given by \ThmRef{affine-propagation}. By analyzing the results, we deduced that the branch swap function $\Swap$ can be appended and/or prepended to the linear layer $L$ without breaking the APN property. However, on the contrast with transformations from \ThmRef{affine-propagation}, inserting these swaps results in APN permutations from different affine-equivalence classes. Though, all such APN permutations lie in the same CCZ-equivalence class. The 4 resulting affine-inequivalent APN permutation classes are represented in \FigRef{affine-classes}.
+
+\begin{observation}
+\Label{obs:swaps}
+Let $M \in \linbij{6}$ be defined as in \ThmRef{main}. Then the permutation $S_{M'}$ of $\field{6}$ given by
+$$
+S_{M'} \eqdef \TI^{-1} \circ M' \circ \TI
+$$
+is APN if 
+$$
+M' \in \pset{M, \Swap \circ M, M \circ \Swap, \Swap \circ M \circ \Swap}.
+$$
+\end{observation}
+
+\FigTex{affine-classes.tex}
+
+\Todo{-EA-equiv of swaps}
+
+
+\SubSecDef{replace-inv}{Modifying the Inverse Mapping}
+
+In previous sections I showed how flexible is the linear layer in the decomposition. It is left to show how the nonlinear part, i.e. the finite field inverse function, can be modified without breaking the APN property. The following proposition shows that, in fact, any 3-bit APN permutation can be used instead.
+
+\begin{proposition}
+Let $A,B$ be 3-bit APN permutations. Let $V_A, V_B$ be permutations of $\field{6}$ defined by
+\begin{align*}
+    V_A(x,k) &\eqdef (A^{-1}(x \oplus B(k)), k),\\
+    V_B(x,k) &\eqdef (B^{-1}(x \oplus B(k)), k).
+\end{align*}
+Let $M$ be any linear map from Observation~\Ref{obs:swaps}. Then the permutation $S_{A,B}$ of $\field{6}$ given by
+$$
+S_{A,B} = V_B^{-1} \circ M \circ V_A
+$$
+is APN.
+\end{proposition}
+\begin{proof}
+This proposition relies on the fact that all 10752 APN permutations of $\field{3}$ are all pairwise affine-equivalent, established experimentally. By \ThmRef{affine-propagation}, we can compose $M$ with $\parf{C}$ for arbitrary $C \in \affbij{3}$. Let $\mu, \eta \in \affbij{3}$ be such that $$
+B = \eta \circ \inv \circ \mu.
+$$
+It follows that
+$$
+\parf{\eta} \circ \TI^{-1} \circ \parf{\mu}(x,k) = \proundd{
+\eta\circ\inv\circ\mu(x) \oplus \eta\circ\inv\circ\mu(k), \eta\circ\mu(k)
+} = R \circ V_B^{-1},
+$$
+where $R \in \affbij{6},~R(x,k)\eqdef(x,\eta\circ\mu\circ(k))$.
+By applying the same method to $V_A$, we show that $S_{A,B}$ is affine-equivalent to $S_{\inv}$ and is an APN permutation. 
+\end{proof}

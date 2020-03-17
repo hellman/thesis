@@ -1,0 +1,69 @@
+\newcommand\chapdir{DUMMY1}
+\newcommand\chapprefix{DUMMY2}
+
+\newcommand\ChapterImport[2]{
+    {
+        % \ChapLabel{#1}
+        \renewcommand\chapprefix{#1}
+        \renewcommand\chapdir{#2}
+        
+        \import{#2/}{0.tex}
+    }
+}
+
+\newcommand\Path[1]{\chapdir/#1}
+\newcommand\PathFig[1]{\chapdir/figures/#1}
+\newcommand\FigTex[1]{\subimport{}{figures/#1}}
+
+% label / ref
+\newcommand\Label[1]{\label{\chapprefix.#1}}
+\renewcommand\Ref[1]{\ref{\chapprefix.#1}}
+
+\newcommand\PartDef[2]{\part{\label{part:#1}#2}}
+\newcommand\PartLabel[1]{\label{part:#1}}
+\newcommand\PartRef[1]{Part~\ref{part:#1}}
+
+\newcommand\ChapDef[2]{\chapter{\label{chap:#1}#2}}
+\newcommand\ChapLabel[1]{\label{chap:#1}}
+\newcommand\ChapRef[1]{Chapter~\ref{chap:#1}}
+
+\newcommand\ChapSecRef[2]{Section~\ref{#1.sec:#2}}
+
+\newcommand\SecDef[2]{\section{#2}\label{\chapprefix.sec:#1}}
+\newcommand\SecLabel[1]{\label{\chapprefix.sec:#1}}
+\newcommand\SecRef[1]{Section~\ref{\chapprefix.sec:#1}}
+\newcommand\SecShortRef[1]{Sec.~\ref{\chapprefix.sec:#1}}
+
+\newcommand\SubSecDef[2]{\subsection{#2}\label{\chapprefix.sec:#1}}
+\newcommand\SubSubSecDef[2]{\subsubsection{#2}\label{\chapprefix.sec:#1}}
+
+% ===========
+
+\newcommand\FigDef[2]{\caption{\label{\chapprefix.fig:#1}#2}}
+\newcommand\FigLabel[1]{\label{\chapprefix.fig:#1}}
+\newcommand\FigRef[1]{Figure~\ref{\chapprefix.fig:#1}}
+
+\newcommand\TabDef[2]{\caption{\label{\chapprefix.tab:#1}#2}}
+\newcommand\TabLabel[1]{\label{\chapprefix.tab:#1}}
+\newcommand\TabRef[1]{Table~\ref{\chapprefix.tab:#1}}
+
+\newcommand\AlgDef[2]{\caption{\label{\chapprefix.alg:#1}#2}}
+\newcommand\AlgLabel[1]{\label{\chapprefix.alg:#1}}
+\newcommand\AlgRef[1]{Algorithm~\ref{\chapprefix.alg:#1}}
+
+
+\newcommand\ThmLabel[1]{\label{\chapprefix.thm:#1}}
+\newcommand\ThmRef[1]{Theorem~\ref{\chapprefix.thm:#1}}
+
+\newcommand\LemLabel[1]{\label{\chapprefix.lem:#1}}
+\newcommand\LemRef[1]{Lemma~\ref{\chapprefix.lem:#1}}
+
+\newcommand\PropLabel[1]{\label{\chapprefix.prop:#1}}
+\newcommand\PropRef[1]{Proposition~\ref{\chapprefix.prop:#1}}
+
+\newcommand\DefLabel[1]{\label{\chapprefix.def:#1}}
+\newcommand\DefRef[1]{Definition~\ref{\chapprefix.def:#1}}
+
+\newcommand\EqLabel[1]{\label{\chapprefix.eq:#1}}
+\newcommand\EqRef[1]{Equation~\ref{\chapprefix.eq:#1}}
+

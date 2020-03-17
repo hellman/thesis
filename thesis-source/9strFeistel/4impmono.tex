@@ -1,0 +1,100 @@
+\section{Lower-degree Artifacts in Feistel Networks}
+\SecLabel{impmono}
+
+In previous section it was shown that the HDIM is a very convenient tool for attacking affine encodings. Affine encodings have rather low entropy and thus provably absent monomials of degree $2n-1$ in a Feistel Network provide enough equations to recover the encodings. However, much more equations are needed to recover a Feistel function. A straightforward direction is to consider lower-degree monomials as well, possibly at the cost of attacking fewer rounds. This has an extra benefit of finding more efficient integral distinguishers, since the data complexity of an integral distinguisher is exponential in the degree of the corresponding absent monomial in the ANF. In this section I use the generalization of the HDIM-ANF relation described in \SecRef{gen-hdim-anf} in order to prove absence of lower degree monomials in Feistel networks. The method is quite similar to the method used for proving type-I distinguishers in \SecRef{hdim-feistel}. The main idea is to replace the sum variable in the expression to an intermediate state and thus split the structure in two halves.
+
+The monomials in the ANF of Feistel Networks can be classified by the degree on the left input branch and on the right input branch. Clearly, all monomials in the same class have equivalent possibility of appearing in the ANF, since such monomials can be interchanged by composing Feistel functions with bit permutations.
+
+\begin{definition}[($(w_l,w_r)$-monomials]
+Let $u_l,u_r \in \field{n}$ and let $u \eqdef (u_l, u_r) \in \field{2n}$.
+The monomial $x^u$ is said to be a $(w_l,w_r)$-monomial if $\wt(u_l) = w_l$ and $\wt(u_r) = w_r$. $u$ is then said to be a $(w_l,w_r)$-exponent.
+\end{definition}
+
+\begin{theorem}
+\Label{thm:low-nbij}
+Let $S \in \nbij{r}{d}$ and let $f = \inprod{e_i, S}, n < i \le 2n,$ be any coordinate of the right output branch of $S$.
+Let $u$ be a $(w_l,w_r)$-exponent. Then $\coef{u}{f} = 0$ if there exists an integer $r', 0 \le r' < r$ such that
+$$
+(n - w_l)\cdot\maxdegnbij{r'+1}{d} + (n - w_r)\cdot\maxdegnbij{r'}{d} + \maxdegnbij{r-r'}{d} < 2n.
+$$
+
+Similar result applies for $S \in \bij{r}{d}$ by using $\maxdegbij{r}{d}$.
+\end{theorem}
+\begin{proof}
+Let $(a, b) \in \field{2n}$ denote the intermediate state of $S$ after $r'$ rounds. Let $(x_l,x_r) \in \field{2n}$ be the two input branches of $S$ as functions of $(a,b)$; $(y_l,y_r) \in \field{2n}$ be the two output branches of $S$ as functions of $(a,b)$. By Proposition~\Ref{prop:anf-alternative},
+$$
+\coef{u}{f} = \bigoplus_{z \in \field{2n}}
+    (\lnot x_l)^{\lnot u_l} 
+    (\lnot x_r)^{\lnot u_r} 
+    \inprod{e_i, y_r},
+$$
+where $u_l,u_r \in \field{n}$ are the two halves of $u$.
+$(x_l,x_r)$ can be computed using an $r'$-round Feistel Network and $(y_l,y_r)$ can be computed using an $(r-r')$-round Feistel Network. Further note that $\wt(\lnot u_l) = n - \wt(u_l)$ and $\wt(\lnot u_r) = n - \wt(u_r)$. The degree bounds follow:
+\begin{itemize}
+    \item $\deg{(\lnot x_l)^{\lnot u_l} } \le (n - w_l)\maxdegbij{r'+1}{d}$,
+    \item $\deg{(\lnot x_r)^{\lnot u_r} } \le (n - w_r)\maxdegbij{r'}{d}$,
+    \item $\deg{y_r} \le \maxdegbij{r - r'}{d}$.
+\end{itemize}
+The theorem follows by summing the degree bounds and comparing to the full degree $2n$.
+\end{proof}
+
+A trick for bijective Feistel functions can be applied similarly to Theorem~\Ref{thm:bij}.
+
+\begin{theorem}
+\Label{thm:low-bij}
+Let $S \in \bij{r}{d}$ and let $f = \inprod{e_i, S}, n < i \le 2n$ be any coordinate of the right output branch of $S$.
+Let $u$ be a $(w_l,w_r)$-exponent. Then $\coef{u}{f} = 0$ if there exists an integer $r', 0 \le r' < r - 3$ such that
+$$
+\max(d,\dinv) \cdot \proundd{
+    (n - w_l)\cdot\maxdegbij{r'}{d} +
+    (n - w_r)\cdot\maxdegbij{r'-1}{d} +
+    \maxdegbij{r-r'-2}{d}
+} < 2n.
+$$
+\end{theorem}
+\begin{proof}
+The variables chosen are $(a,c)$ instead of $(a,b)$ (see \FigRef{mitmproof}), where $(a,b)$ denotes the intermediate state of $S$ after $r'$ rounds, and $c = f_{r'+1}(b) \oplus a$. In this case $b$ can be expressed as $f_{r'+1}^{-1}(a \oplus c)$, and the degree of $b$ as a function of $(a,c)$ is upper bounded by $\dinv$.
+
+Let $x_l,x_r$ be the two input branches of $S$ as functions of $(a,c)$; $y_l,y_r$ be the two output branches of $S$ as functions of $(a,c)$.
+Similarly to previous proofs, the following bounds are derived:
+\begin{itemize}
+    \item $\deg{x_l} \le \max(d,\dinv)\cdot \maxdegbij{r'}{d}$,
+    \item $\deg{x_r} \le \max(d,\dinv)\cdot \maxdegbij{r'-1}{d}$,
+    \item $\deg{y_l} \le \max(d,\dinv)\cdot \maxdegbij{r-r'-1}{d}$, 
+    \item $\deg{y_r} \le \max(d,\dinv)\cdot \maxdegbij{r-r'-2}{d}$.
+\end{itemize}
+For Proposition~\Ref{prop:anf-alternative}, the following bounds are needed:
+\begin{itemize}
+    \item $\deg{(\lnot x_l)^{\lnot u_l} } \le (n - w_l)\maxdegbij{r'}{d}$,
+    \item $\deg{(\lnot x_r)^{\lnot u_r} } \le (n - w_r)\maxdegbij{r'-1}{d}$,
+    \item $\deg{y_r} \le \maxdegbij{r - r' - 2}{d}$.
+\end{itemize}
+The theorem follows by summing the degree bounds.
+\end{proof}
+
+\begin{corollary}
+Let $S \in \bij{4}{n-1}$ and let $f = \inprod{e_i, S}, n < i \le 2n$ be any coordinate of the right output branch of $S$. Then the following monomials classes are absent in the ANF of $f$ (in total $2^n+n^2+n$ monomials):
+{
+\enumroman{}
+\begin{enumerate}
+    \item $(n-1,n-1)$,
+    \item $(n-1,n)$,
+    \item $(n,k)$ for any $0 \le k \le n$.
+\end{enumerate}
+}
+\end{corollary}
+\begin{proof}
+Set $r' = 0$ in Theorem~\Ref{thm:low-bij}. Note that in this extreme case the term $\dinv \cdot (n - w_r)\cdot\maxdegbij{r'}{d}$ for $r'=0$ can be replaced by $(n - w_r)$, since the right input branch clearly has degree 1 on the chosen variables. For case $(i)$ the condition becomes
+$$ 1 + (n-1) \pround{
+1\cdot\maxdegbij{1}{n-1} +
+\maxdegbij{1}{n-1}
+} \le 2n-1 < 2n.$$
+For case $(ii)$ the condition becomes
+$$ 0 + (n-1) \pround{
+1\cdot\maxdegbij{1}{n-1} + \maxdegbij{1}{n-1}
+} \le 2n-2 < 2n.$$
+For case $(iii)$ the condition becomes
+$$ (n-k) + (n-1) \pround{
+0 + \maxdegbij{1}{n-1}
+} \le 2n-1-k < 2n.$$
+\end{proof}

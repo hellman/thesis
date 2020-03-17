@@ -1,0 +1,305 @@
+\SecDef{decomposition}{Decomposition of the 6-bit APN permutation}
+
+Let $S_0$ be the APN permutation of $\field{6}$ proposed in \cite{DillonAPN}. The look-up table of $S_0$ is given in \TabRef{dillon}.
+
+\FigTex{dillon.tex}
+
+\subsection{TU-decomposition}
+
+\FigTex{lats.tex}
+
+The first step to the decomposition of $S_0$ completely resembles the reverse-engineering of the GOST S-Box. We start by looking at the visualization of the LAT of $S_0$ (see \FigRef{dillon-lat}). In the same way, there are 7 special columns and their indices (i.e., the linear masks defining the coordinates of $S_0$) together with $\hex{00}$ form a 3-dimensional linear subspace $V \subseteq \field{6}$:
+$$
+V = \pset{\hex{00},\hex{04},\hex{0a},\hex{0e},\hex{10},\hex{14},\hex{1a},\hex{1e}} = \Span(\hex{04},\hex{0a},\hex2{10}).
+$$
+Following the same path as in \ChapRef{kuz}, we compose $S_0$ with a linear map to ``move'' the special lines to the left. Let $\eta\in \linbij{6}$ be such that
+\begin{align*}
+& \eta(\hex{01}) \eqdef \hex{04}, \eta(\hex{02}) \eqdef \hex{0a}, \eta(\hex{04}) \eqdef \hex{10}, \\
+& \eta(\hex{08}) \eqdef \hex{01}, \eta(\hex{10}) \eqdef \hex{02}, \eta(\hex{20}) \eqdef \hex{20},\\
+\end{align*}
+where the first 3 values correspond to the basis of $V$ and the last 3 values were chosen arbitrarily to complete the map to bijection. As a result, the special columns are aligned to the left in the LAT of $\eta^{\top} \circ S_0$, see \FigRef{eta-dillon-lat}. Furthermore, a clear square-based structure emerged in the LAT. Note that in the case of the GOST S-Box, the lines of the LAT had also to be reordered, and the inverse of the same linear mapping accidentally could be used to do it. Here, only the output of the S-Box has to be composed with a linear map. Indeed, already a white $8\times 8$ square is observed in the top-left corner. In the decomposition of the GOST S-Box, it suggested multiset properties which led to the high-level TU-decomposition. The same decomposition is obtained for $S_0$ as well.
+
+\begin{proposition}[TU-decomposition of $\eta^{\top}\circ S_0$]
+There exist 16 permutations $T_{\hex{0}},\ldots, T_{\hex{7}},U_{\hex{0}},\ldots, U_{\hex{7}}$ of $\field{3}$ such that for all $l,r \in \field{3}$
+$$
+\eta^{\top}\times S_0(l,r) = \pround{U_{T_r(l)}(r), T_r(l)}.
+$$
+The codebooks of the keyed permutations $T$ and $U$ are given in \FigRef{tu}.
+\FigTex{tu.tex}
+\end{proposition}
+
+The algebraic degrees of the functions $(x,k) \mapsto T_k(x)$ and $(x,k) \mapsto T_k^{-1}(x)$ are 3 and 2 respectively. For $U$, the respective degrees are 2 and 3. This observation suggests that $U$ and $T^{-1}$ should be easier to decompose and that these keyed permutations may be related. We applied the linear equivalence algorithm from~\cite{LinAffEQ} to the mappings $(x,k) \mapsto (T_k^{-1}(x),k)$ and $(x,k) \mapsto (U_k(x),k)$ and found that they are linearly related. 
+
+\begin{proposition}[Linear Equivalence of $T^{-1}$ and $U$]
+Let $T,U$ be permutations of $\field{6}$ given by
+$$
+T(x,k) \eqdef (T_k(x),k), U(x,k) \eqdef (U_k(x), k).
+$$
+Let $M_U,M_U' \in \linbij{8}$ be given by
+$$
+M_U \eqdef \matb{
+0 & 1 & 1 & 0 & 1 & 0 \\
+1 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 1 & 0 & 1 & 1 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1 & 1 \\
+},~~ M_U' \eqdef \matb{
+1 & 1 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 1 & 0 \\
+1 & 0 & 1 & 1 & 1 & 1 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1 & 1 \\
+}.
+$$
+Then
+$$
+U = M_U' \circ T^{-1} \circ M_U.
+$$
+\end{proposition}
+
+Since $T^{-1}$ and $U$ are linear-equivalent, it is enough to decompose one of them. Since the linear layer $\eta^{\top}$ was applied at the output side, it could ``obfuscate'' some algebraic structure in $U$. Therefore, we choose to decompose $T^{-1}$. Afterwards, the two decompositions will be joined and the linear layer in between will be simplified.
+
+
+\subsection{Decomposition of $T^{-1}$}
+
+\FigTex{simplify-t.tex}
+
+\textbf{Step 1.}
+Similarly to the decomposition process of the GOST S-Box, we ``detach'' a Feistel function from $T$ in order to obtain a new keyed permutation $T'$ such that $T'_k(0) = 0$ for all $k \in \field{3}$. Detaching such function at the input and at the output of $T^{-1}$ leads to the Feistel functions $t$ and $\hat{t}$ respectively, a permutations of $\field{3}$ given by
+$$
+t(k) \eqdef T_k(0),~~  \hat{t}(k) \eqdef T_k^{-1}(0).
+$$
+$t$ is linear and $\hat{t}$ has algebraic degree 2. We conclude that detaching $t$ at the input of $T^{-1}$ leads to simpler decomposition. Let $T'_{\hex{0}},\ldots,T'_{\hex{7}}$ be permutations of $\field{3}$ given by, for any $k \in \field{3}$,
+$$
+T'_k(x) \eqdef T_k(x) \oplus t(k).
+$$
+The result of this step is shown in \FigRef{simplify-t-a}.
+
+\textbf{Step 2.}
+Due to the algebraic nature of the S-Box, we may expect an algebraic structure. We consider the field
+$$
+\fielde{3} \simeq \field{}[\WW]/(\WW^3+\WW+1),
+$$
+The primitive element $\WW$ will be used to express field elements. As was noted in \ChapRef{prelim}, from now on the isomorphism between $\field{3}$ and $\fielde{3}$ will be implicit.
+
+\FigTex{tp-inter.tex}
+
+We now apply Lagrange interpolation method to each permutation $T'^{-1}_k$ to obtain its polynomial representation, see \TabRef{tp-inter}. It is clear that the coefficients of the nonlinear part (i.e. the coefficients of $x^3, x^5, x^6$) are independent of $k$ for each $T'^{-1}_k$. This leads to the following proposition, illustrated in \FigRef{simplify-t-b}.
+
+\begin{proposition}
+Let $N$ be a permutation of $\field{3}$ given by its polynomial representation in $\fielde{3}$:
+$N(x) \eqdef \WW^3x^6 + \WW^1x^5 + \WW^6x^3.$
+Let $L_{\hex{0}},\dots,L_{\hex{7}}$ be permutations of $\field{3}$ given by
+$$
+L_k(x) \eqdef T'^{-1}_k(x) \oplus N(x).
+$$
+Then for any $k\in \field{3}$, $L_k$ is linear.
+\end{proposition}
+
+\textbf{Step 3.}
+We continue by simplifying the nonlinear function $N$. We do so by composing a linear bijection of our choice with $N$ and $L_k$. Its inverse will then merge to the outer linear layer. It turns out that $N$ can be transformed into the finite field inverse function, which we denote $\inv\colon \field{3} \to \field{3}$. Its polynomial representation is
+$$
+\inv(x) = x^6.
+$$
+
+\begin{proposition}
+Let $p \in \linbij{3}$ be given by its $\fielde{3}$-polynomial
+$$
+p(x) \eqdef \WW^2x^4 + x^2 + x.
+$$
+Then
+$$
+p(N(x)) = x^6 = \inv(x)
+$$ is the inversion in the finite field, and also for all $k \in \field{3}$
+$$
+p(L_k(x)) = l_2(k+\WW)x^2 + l_4(k+\WW)x^4,
+$$
+where $l_2,l_4 \in \linbij{3}$ are given by
+\begin{align*}
+l_2(x) &\eqdef \WW x^4 + \WW^2x^2 + x, \\
+l_4(x) &\eqdef x^4 + \WW^4x^2 + \WW x.
+\end{align*}
+\end{proposition}
+
+Note that $k+\WW$ was used because $L_{\hex{2}} = 0$ ($\WW$ corresponds to $\hex{2}$), so that $l_2$ and $l_4$ are linear. The composition of $p$ with $N$ and $L_k$ is illustrated in \FigRef{simplify-t-c}.
+
+\textbf{Step 4.}
+The next step is to simplify the linear bijections $l_2$ and $l_4$. By composing $l_2$ with an arbitrary linear bijection $q \in \linbij{3}$, an arbitrary linear bijection may be obtained. However, $l_4$ has to be composed with the same linear map $q$. Therefore, $q$ should simplify both $l_2$ and $l_4$. By exhaustive search of $q$, we found $q$ such that
+$l_2(q(x)) = x^4, ~~l_4(q(x)) = x^2$. These expressions lead to a simple expression for $p\circ L_k$, as it is shown by the following proposition.
+
+\begin{proposition}
+\PropLabel{t-eq}
+Let $q \in \linbij{3}$ be given by its $\fielde{3}$-polynomial:
+$$
+q(x) \eqdef \WW^3x^4 + \WW^5x^2 + \WW^3x.
+$$
+Then, for all $x \in \fielde{3}$,
+\begin{equation}
+    \EqLabel{pinvTinv}
+    p(T'^{-1}_{k}(x))
+        = x^6 + x^2k'^4 + x^4k'^2 
+        = (x + k')^6 + k'^6,
+\end{equation}
+where $k' = q^{-1}(k + \WW)$.
+\end{proposition}
+\begin{proof}
+Recall that
+$$
+p(T'^{-1}_{k}(x)) = x^6 + l_2(k+\WW)x^2 + l_4(k+\WW)x^4,
+$$
+where
+$$
+l_2(k+\WW) = l_2(q(q^{-1}(k+\WW))) = (q^{-1}(k+\WW))^4 = k'^4.
+$$
+Similarly,
+$l_2(k+\WW) = k'^2$.
+\end{proof}
+
+The graphical representation of the effect of this proposition is shown in \FigRef{simplify-pl}.
+
+\FigTex{simplify-pl}
+
+\textbf{Step 5}.
+The final step is to simplify the affine layers. The application of $q'$ and the addition of $\WW$ can be moved from the Feistel function into the input and output linear layers of $T'^{-1}$. The output affine layer of $T'^{-1}$ can be omitted, since it corresponds to an S-Box affine-equivalent to $S_0$. The simplification process is illustrated in \FigRef{simplify-t-linear}.
+
+\FigTex{simplify-t-linear}
+
+\begin{proposition}[Decomposition of $T'^{-1}$]
+For all $x,k \in \fielde{3}$,
+$$
+T^{-1}_k(x) = p^{-1}(k'^6 + (x + k'')^6),
+$$
+where 
+\begin{align*}
+    & k' =  q^{-1}(k) \oplus \WW^6,\\
+    & k'' = z(q^{-1}(k)) \oplus \WW^6,\\
+    & z\in \linbij{3}, z(y) \eqdef t(q(y)) + y.
+    & q \in \linbij{3}, q(y) \eqdef \WW^3y^4 + \WW^5y^2 + \WW^3y.
+\end{align*}
+\end{proposition}
+\begin{proof}
+Recall that
+$$
+T^{-1}_k(x) = T'^{-1}_k(x \oplus t(k)).
+$$
+Together with \PropRef{t-eq}, it is enough to have
+$$
+k'' = k' \oplus t(k).
+$$
+This is true, because
+\begin{align*}
+k' &= q^{-1}(k \oplus \WW) = q^{-1}(k) \oplus \WW^6, \\
+k'' &= z(q^{-1}(k))\oplus \WW^6 = t(k) \oplus q^{-1}{k} \oplus \WW^6.
+\end{align*}
+\end{proof}
+
+
+\subsection{Combining $T$ and $U$}
+
+We can now obtain a decomposition of full $S_0$. Recall that
+$$
+U = M_U' \circ T^{-1} \circ M_U.
+$$
+The decomposition of $T$ follows from the decomposition of $T^{-1}$ by inverting $q$ in the middle. We omit all outer affine maps and merge the inner linear maps into one linear transformation of $\field{6}$. The resulting structure is given in \FigRef{middle-affine-a}, \FigRef{middle-affine-b}.
+
+\FigTex{middle-affine.tex}
+
+\newcommand\TI{V}
+\begin{proposition}
+\PropLabel{middle-simplified}
+The APN permutation $S_0$ is affine-equivalent to the structure given in \FigRef{middle-affine-b}. Formally, let $\TI$ be the permutation of $\field{3}\times\field{3}$ given by
+$$
+\TI(x,k) = (\inv(x \oplus \inv(k)), k),
+$$
+and let $M \in \linbij{6}$ be given by its matrix:
+$$
+M = \matb{
+1 & 0 & 1 & 1 & 1 & 1 \\
+1 & 1 & 0 & 0 & 1 & 0 \\
+0 & 0 & 1 & 1 & 1 & 0 \\
+1 & 1 & 0 & 1 & 0 & 1 \\
+1 & 1 & 1 & 1 & 1 & 0 \\
+1 & 0 & 1 & 0 & 0 & 1 \\
+}.
+$$
+Then the permutation $S_M$ of $\field{6}$ defined as $S_M \eqdef \TI^{-1} \circ \xorf{5,5} \circ M \circ \xorf{5,5} \TI$ is APN and is affine-equivalent to $S_0$.
+\end{proposition}
+\begin{proof}
+The proposition follows form the TU-decomposition of $S_0$, decomposition of $T^{-1}$ and linear relation between $T^{-1}$ and $U$. Furthermore, $M$ is obtained through composition including linear maps $q$, $q^{-1}$, $z$ and $M_U$.
+\end{proof}
+
+We further studied how the middle affine layer can be changed while preserving the APN property. It turns out that, for affine layers $a,b\colon \field{3} \to \field{3}$, applying $a$ to both branches before $M$ and applying $b$ to both branches after $M$ always leads to an APN permutation affine-equivalent to $S_0$. This is formally stated and proved in \SecRef{affine-propagation}.
+
+We observe that removing the constant addition (i.e. $\xorf{5,5}$) from the structure does not break the APN property. Therefore, it is left to simplify the linear map $M$. By exhaustive search over linear maps $a,b \in \linbij{3}$ we found that $M$ can be transformed into a $2\times 2$ matrix over $\fielde{3}$. 
+
+\begin{proposition}
+Let $\TI$ be defined as in \PropRef{middle-simplified}. Let $M' \in \linbije{2}{3}$ be given by:
+$$
+M' \eqdef \matb{
+\WW, \WW^6, \\
+1, \WW
+}.
+$$
+Then the permutation $S_{M'}$ of $\field{6}$ defined by
+$$
+S_{M'} \eqdef \TI^{-1} \circ M \circ \TI
+$$
+is APN.
+\end{proposition}
+\begin{proof}
+Let $a,b\in \linbij{3}$ be given by $\fielde{3}$-polynomials:
+\begin{align*}
+    a(x) &= \WW x^4 + \WW x^2 + \WW^2 x,\\
+    b(x) &= \WW x^4 + \WW^3 x^2 + \WW x,\\
+\end{align*}
+Then, 
+$$
+M' = \parf{b} \circ M \circ \parf{a}.
+$$
+According to \ThmRef{affine-propagation}, $S_{M'}$ is APN.
+\end{proof}
+
+Observe that $M'$ happens to be an involution, making $S_{M'}$ an involution too due to its symmetric structure. Furthermore, $M'$ can be decomposed as a two-round Feistel Network with multiplication by $\WW$ as the Feistel function. The following theorem finalizes our decomposition, which is illustrated in \FigRef{final-decomposition}.
+
+\newcommand\TJ{W}
+\begin{theorem}[Decomposition of $S_0$]
+\ThmLabel{main}
+Let $\TJ,\Swap$ be permutations of $\field{3}\times\field{3}$ given by their bivariate $\fielde{3}$-polynomials:
+\begin{align*}
+    \TJ(x,k) = ((x + \WW k)^6 + k^6, k),~~ \Swap(x,k) = (k, x).
+\end{align*}
+Then the permutation $S_{\inv}$ of $\field{6}$ given by
+$$
+S_{\inv} \eqdef \TJ \circ \Swap \circ \TJ^{-1}
+$$
+is an APN involution and is affine-equivalent to $S_0$:
+$$
+S_0(x) = B(S_{\inv}(A(x) \oplus \hex{9}) \oplus \hex{4},
+$$
+where $A,B \in \linbij{6}$ are given by
+$$
+A = 
+\begin{bmatrix}
+1 & 1 & 0 & 1 & 0 & 1 \\
+1 & 1 & 1 & 1 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 1 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 & 1 & 0 \\
+\end{bmatrix},
+\hspace{1em}
+B = 
+\begin{bmatrix}
+0 & 1 & 1 & 1 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 1 & 1 & 1 & 0 \\
+0 & 0 & 0 & 1 & 1 & 1 \\
+0 & 0 & 1 & 0 & 1 & 0 \\
+1 & 0 & 1 & 1 & 0 & 1 \\
+\end{bmatrix}.
+$$
+\end{theorem}
+
+\FigTex{final-decomposition.tex}

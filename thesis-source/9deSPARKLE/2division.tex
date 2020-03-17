@@ -1,0 +1,189 @@
+\SecDef{division}{Division Property Analysis}
+
+\subsection{Division Property of the ARX-box Structure}
+
+I performed MILP-aided bit-based division property analysis~\cite{division,divisionbit} on the ARX-box structure. The MILP encoding is rather straightforward. For the modular addition operation I used the following method.
+
+\paragraph{Addition modulo $2^{32}$.}
+Let us encode the modular addition by encoding the carry propagation. For any $a,b,c \in \bField{}$, let $c' = maj_3(a,b,c) \in \bField{}$ and $y = a \oplus b \in \bField{}$, where $maj_3$ is the majority function. Then, all possible such 5-tuples $(a,b,c,c',y) \in \bField{5}$ can be characterized by the two following integer inequalities:
+\begin{enumerate}
+    \item $-a -b -c + 2c' + y \ge 0$,
+    \item $a + b + c -2c' -2y \ge 1$.
+\end{enumerate}
+For any bit position, summing the input bits $a,b$ with the input carry $c$ results in the output bit $y$ and the new carry $c'$. 
+In my experiments, these two inequalities applied per each bit position generated precisely the correct division property table of addition modulo $2^n$ for $n$ up to 7. There were some redundant transitions though, which do not affect the result.
+
+First, I evaluated the general algebraic degree of the ARX-box structure based on the division property.
+The $5^{th}$ and $6^{th}$ rounds rotation constants were chosen as the $1^{st}$ and $2^{nd}$ rounds rotation constants respectively, as this will happen when two ARX-boxes will be chained. The inverse ARX-box structure starts with $4^{th}$ round rotation constants, then $3^{rd}$, $2^{nd}$, $1^{st}$, $4^{th}$, etc.
+The minimum and maximum degree among coordinates of the ARX-box structure and its inverse are given in Table~\ref{tab:min-max-arx-degree}.
+\begin{table}
+    \centering
+    {
+    \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+    \begin{tabular}{C{2cm}|cccc|C{2cm}|ccccc}
+    \toprule
+       ARX-Box rounds & 1 & 2 & 3 & 4  & ARX-Box inverse rounds & 1 & 2 & 3 & 4 \\
+       \midrule
+        min & 1  & 10 & 42 & 63    & min & 1 & 2 & 32 & 46  \\
+        max & 32 & 62 & 63 & 63    & max & 32 & 62 & 63 & 63 \\
+        \bottomrule
+    \end{tabular}
+    }
+    \caption{The upper bounds on the minimum and maximum degree of the coordinates of the ARX-box and its inverse.}
+    \label{tab:min-max-arx-degree}
+\end{table}
+Even though these are just upper bounds, I expect that they are close to the actual values, as the division property was shown to be rather precise~\cite{divisionbit}. Thus, the ARX-box structure may have full degree in all its coordinates, but the inverse of the ARX-box has a coordinate of degree 46.
+
+The block-size level division property of the ARX-box is such that, for any $1 \le k \le 62$,
+$\DP{64}{k}$ maps to $\DP{64}{1}$ after two rounds, and $\DP{64}{63}$ maps to $\DP{64}{2}$ after two rounds and to $\DP{64}{1}$ after three rounds. The same holds for the inverse of the ARX-box.
+
+The longest integral characteristic found with bit-based division property is for 6-round ARX-box, where the input has 63 active bits and the inactive bit is at the index 44 (i.e., there are 44 active bits from the left and 19 active bits from the right), and in the output 16 bits are balanced:
+\begin{align*}
+& \text{input active bits:}\\
+& \text{\texttt{11111111111111111111111111111111,11111111111101111111111111111111}},\\
+& \text{balanced bits after 6-round ARX-box:}\\
+& \text{\texttt{????????????????????????BBBBBBBB,?????????BBBBBBBB???????????????}}.
+\end{align*}
+The inactive bit can be moved to indexes $45,46,47,48$ as well, the balanced property after 6 round stays the same. For the 7-round ARX-box we did not find any integral distinguishers.
+
+For the inverse ARX-box, the longest integral characteristic is for 5 rounds:
+\begin{align*}
+& \text{input active bits:}\\
+& \text{\texttt{11111111111111111111111111101111,11111111111111111111111111111111}},\\
+& \text{balanced bits after 5-round ARX-box inverse:}\\
+& \text{\texttt{???????????????????????????????B,???????BBBBBBBBB????????????????}}.
+\end{align*}
+For ARX-box inverse with 6-rounds we did not find any integral characteristic. 
+
+As a conclusion, even though a single ARX-box has integral characteristics, for two chained ARX-boxes there are no integral characteristics that can be found using the state-of-the-art division property method.
+
+
+\subsection{Division Property of the SPARKLE Permutations}
+
+I performed MILP-aided bit-based division property analysis~\cite{division,divisionmilp} on the \aCipher{} permutation family.
+
+For the MILP encoding of the linear layer, I used the original simple method from~\cite{divisionmilp}. Note that in \cite{divisionlinear} it was shown that this method is imprecise and may result in extra trails and weaker distinguisher. The linear layer of \aCipher{} can be viewed as 16 independent linear layers of dimensions from $16 \times 16$ in \aCipherSmall{} to $32 \times 32$ in \aCipherLarge{}. For these dimensions it may be possible to apply the precise encoding method from \cite{divisionlinear}. However, due to the large state size, I found it to be still infeasible.
+
+I performed bit-based division property evaluation of the reduced-round \aCipher{} permutations. Let there be $b-1$ active bits with the inactive bit at index $44$ or $44+b/2$, as offset 44 results in the best bit-based integral characteristic for the ARX-box structure. Furthermore, the branch choice for the inactive bit does not affect the result, due to the rotational branch symmetry (inside each half of the state). The best integral characteristic I found is for 4 steps and an extra ARX-box layer, for all three $\aCipher{}$ versions. Let us encrypt the half of the codebook, such that one bit in the left half of the input is constant and all other bits are taking all possible values. Then, after 4 steps and the ARX-box layer from the 5-th step, the right half of the state is balanced (i.e. sums to zero). I state and prove this characteristic using structural division property and show that, in fact, fewer active input bits are required. Namely, $64\cdot\branches+65$ active bits instead of $2\cdot64\cdot \branches$.
+
+\begin{proposition}
+\label{prop:integral-4.5steps}
+Consider a $\aCipher{}$-like permutation of $\bField{2h}$, with arbitrary bijective ARX-Boxes permuting $\bField{m}$, arbitrary linear Feistel function and at least 4 branches, i.e. $\branches = 2h / m \ge 4$. Then, the following division property transition is satisfied over 4 steps and an extra ARX-box layer:
+$$
+\DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0,1,m),(m,\ldots,m)} \xlongrightarrow[]{A\circ(L\circ A)^4}
+\DP{(h),(h)}{(1),(0)} \cup \DP{(h),(h)}{(0),(2)},
+$$
+where $A$ denotes the ARX-box layer and $L$ denotes the linear layer. In other words, the right half of the output sums to zero.
+\end{proposition}
+\begin{proof}
+Without loss of generality, we assume that there is no rotation of branches. Indeed, any permutation of branches inside a half is equivalent to reordering ARX-boxes inside halves and to modifying the Feistel linear layer, which is not constrained in this proposition.
+
+\begin{itemize}
+    \item[Step 1.]
+    The properties $\DP{m}{1}$ and $\DP{m}{m}$ are retained through the ARX-boxes. The right half is fully active, therefore the linear layer does not have mixing effect yet. The following division trail is unique:
+    $$
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0,1,m),(m,\ldots,m)} \xlongrightarrow[]{A}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0,1,m),(m,\ldots,m)}
+    \xlongrightarrow[]{L}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(m,\ldots,m),(0,\ldots,0,1,m)}.
+    $$
+    
+    \item[Step 2.]
+    The ARX-box layer does not change anything again. The linear layer allows multiple division trails. Note that at most $(\branches - 1)m-1$ active bits can be transferred through the Feistel linear function until the right half is saturated to fully active. Therefore, at least $m+1$ bits remain active in the left half. In particular, at least two branches remain active. As we will show, this is the only requirement to show the proposed balanced property. We reduce active bits to these two in order to cover all possible trails and simplify the proof. Up to permutation of branches inside the state halves,
+    $$
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(m,\ldots,m),(0,\ldots,0,1,m)} \xlongrightarrow[]{A}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(m,\ldots,m),(0,\ldots,0,1,m)}
+    \xlongrightarrow[]{L}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0,\ldots,0)}.
+    $$
+    
+    \item[Step 3.]
+    The two active branches remain active through the third step, since there is no mixing between them:
+    $$
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0,\ldots,0)} \xlongrightarrow[]{A}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0,\ldots,0)}
+    \xlongrightarrow[]{L}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0,\ldots,0),(0,\ldots,0)}.
+    $$
+    
+    \item[Step $4+A$.]
+    Similarly, the two active branches stay active after the ARX-box layer of the fourth step:
+    $$
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0\ldots,0),(0,\ldots,0)}
+    \xlongrightarrow[]{A}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0\ldots,0),(0,\ldots,0)}.
+    $$
+    In the linear layer, there are several possibilities. The two active bits from the left half can be transferred to a single branch in the right half by the Feistel function. Then $\DP{(h),(h)}{(2),(0)}$ is obtained that is mapped through the final ARX-box layer to $\DP{(h),(h)}{(1),(0)}$, i.e., the left half is possibly not balanced. If one of the active bits is transferred by the linear layer, then $\DP{(h),(h)}{(1),(1)}$ is obtained, which is covered by the previous case. Otherwise, two active branches remain after the linear layer and after the final ARX-box layer. The output division property in this case is $\DP{(h),(h)}{(0),(2)}$.
+    The following trails cover all possible trails up to branch permutations in each half:
+    \begin{align*}
+    & \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0\ldots,0),(0,\ldots,0)}
+    \xlongrightarrow[]{L}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(2,0,\ldots,0),(0,0,\ldots,0)},
+    \xlongrightarrow[]{A}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,0,\ldots,0),(0,0,\ldots,0)}
+    \implies \DP{(h),(h)}{(1),(0)}, \\
+    & \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0,\ldots,0),(0,\ldots,0)}
+    \xlongrightarrow[]{L}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0,\ldots,0)},
+    \xlongrightarrow[]{A}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0,\ldots,0)}
+    \implies \DP{(h),(h)}{(0),(2)}.
+    \end{align*}
+\end{itemize}
+It follows that the following division trail is impossible:
+$$
+\DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0,1,m),(m,\ldots,m)} \xlongrightarrow[]{A\circ(L\circ A)^4} \DP{(h),(h)}{(0),(1)}
+$$
+Therefore, the right output half is balanced.
+\end{proof}
+
+Note that in the proof, a lot of active bits were omitted for simplicity, in order to cover all possible trails by a single one. However, as the bit-based division property analysis suggests, a more careful analysis does not yield any longer integral characteristic.
+
+I evaluated also the inverses of the $\aCipher{}$ permutations. Similarly, the bit-based division property with only one inactive bit (at offset 27 in the left or in the right half) suggested only a general structural distinguisher, similar to the one from Proposition~\ref{prop:integral-4.5steps}.
+
+\begin{proposition}
+\label{prop:integral-inverse-4steps}
+Consider a $\aCipher{}$-like permutation as in Proposition~\ref{prop:integral-4.5steps}. The following division property transition is satisfied over 4 steps in the reverse direction:
+$$
+\DP{(m,\ldots,m),(m,\ldots,m)}{(m,\ldots,m),(0,\ldots,0,1,m)} \xlongrightarrow[]{(A^{-1}\circ L^{-1})^4}
+\DP{(h),(h)}{(2),(0)} \cup \DP{(h),(h)}{(0),(1)}.
+$$
+\end{proposition}
+\begin{proof}
+In a similar way to the Proposition~\ref{prop:integral-4.5steps}, the following division trail covers all division trails:
+\begin{align*}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(m,\ldots,m),(0,\ldots,0,1,m)}
+    &\xlongrightarrow[]{L^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0,1,m),(m,\ldots,m)}
+    \xlongrightarrow[]{A^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0,1,m),(m,\ldots,m)} \\
+    &\xlongrightarrow[]{L^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0,\ldots,0),(0,\ldots,0,1,m)}
+    \xlongrightarrow[]{A^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0,\ldots,0),(0,\ldots,0,1,m)} \\
+    &\xlongrightarrow[]{L^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0\ldots,0)}
+    \xlongrightarrow[]{A^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0\ldots,0)},
+\end{align*}
+And in the last step the same cases take place as in Proposition~\ref{prop:integral-4.5steps}.
+\begin{align*}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0\ldots,0)}
+    &\xlongrightarrow[]{L^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(2,0,\ldots,0)},
+    \xlongrightarrow[]{A^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,0,\ldots,0)}
+    \implies \DP{(h),(h)}{(0),(1)}, \\
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(0,\ldots,0),(1,1,0\ldots,0)}
+    &\xlongrightarrow[]{L^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0,\ldots,0),(0,\ldots,0)},
+    \xlongrightarrow[]{A^{-1}}
+    \DP{(m,\ldots,m),(m,\ldots,m)}{(1,1,0,\ldots,0),(0,\ldots,0)}
+    \implies \DP{(h),(h)}{(2),(0)}.
+\end{align*}
+The following trail is impossible:
+$$
+\DP{(m,\ldots,m),(m,\ldots,m)}{(m,\ldots,m),(0,\ldots,0,1,m)} \xlongrightarrow[]{(A^{-1} \circ L^{-1})^4} \DP{(h),(h)}{(1),(0)}
+$$
+Therefore, the left output half is balanced.
+\end{proof}

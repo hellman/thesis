@@ -1,0 +1,89 @@
+\renewcommand\F{\mathbb{F}}
+\newcommand\Q{\mathbb{Q}}
+% \newcommand\field[1]{\mathbb{F}_2^{#1}}
+% \newcommand\OO{\mathcal{O}}
+\newcommand\LS{\mathsf{LS}}
+% \newcommand\gen{\mathsf{TrGen}}
+% \newcommand\rec{\mathsf{Recovery}}
+% \newcommand\odd{\mathrm{odd}_{3+}}
+% \newcommand\Span{\mathrm{span}}
+% \newcommand\rank{\mathrm{rank}}
+\newcommand\AI{\mathrm{AI}}
+\newcommand\AN{\mathrm{AN}}
+\newcommand\fsum[2]{\Psi_{#1}^{#2}}
+\newcommand\ZS[3]{\mathrm{ZS}_{#1 \times #2}^{#3}}
+\newcommand\matzs[1]{\mathbb{M}_{#1}}
+\newcommand\matl[1]{\widehat{\mathbb{M}_{#1}}}
+\newcommand\minzs[2]{F(#1,#2)}
+\newcommand\diag{\mathrm{diag}}
+
+\newcommand\wildcard\star
+\newcommand\xrow[1]{x_{#1,\wildcard}}
+\newcommand\lxrow[1]{(Lx)_{#1,\wildcard}}
+\newcommand\xcol[1]{x_{\wildcard,#1}}
+\newcommand\yrow[1]{y_{#1,\wildcard}}
+\newcommand\ycol[1]{y_{\wildcard,#1}}
+
+\newcommand{\ExtInd}[1]{\widehat{\mathbbm{1}}_{#1}}
+\newcommand{\MatInd}[1]{\mathbbm{1}_{#1}}
+\renewcommand{\Ind}{\mathbbm{1}}
+
+% \newcommand\cor{\mathrm{cor}}
+% \newcommand\imb{\mathrm{Imb}}
+% \newcommand\supp{\mathrm{supp}}
+% \newcommand\wt{\mathrm{wt}}
+% \newcommand\cprob{\mathbf{c}}
+% \newcommand\cipher{\mathsf{E}}
+
+% \newcommand\erroreq[1]{\stackrel{#1}{=}}
+\renewcommand\BF[2]{\mathcal{BF}_{#1,#2}}
+% \newcommand\BBF[2]{\mathcal{B}_{#1,#2}}
+% \newcommand\BWF[3]{\mathcal{B}_{#1,#2,#3}}
+
+
+\newcommand{\EM}{Even-Mansour}
+
+
+
+% matrices
+\newcommand\rowtwo[2]{
+\psquare{
+\begin{array}{c|c}
+     #1 & #2
+\end{array}
+}}
+\newcommand\rowthree[3]{
+\psquare{
+\begin{array}{c|c|c}
+     #1 & #2 & #3
+\end{array}
+}}
+\newcommand\coltwo[2]{
+\psquare{
+\begin{array}{c}
+     #1 \\ \hline #2 \\
+\end{array}
+}}
+\newcommand\colthree[3]{
+\psquare{
+\begin{array}{c}
+     #1 \\ \hline #2 \\ \hline #3 \\
+\end{array}
+}}
+\newcommand\coltworaw[2]{
+\begin{array}{c}
+     #1 \\ \hline #2 \\
+\end{array}
+}
+\newcommand\colthreeraw[3]{
+\begin{array}{c}
+     #1 \\ \hline #2 \\ \hline #3 \\
+\end{array}
+}
+\newcommand\zeromat{
+\begin{array}{c}
+     0\ldots0 \\
+     \vdots \\
+     0\ldots0 \\
+\end{array}
+}

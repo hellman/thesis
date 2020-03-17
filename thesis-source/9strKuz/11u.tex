@@ -1,0 +1,65 @@
+\subsection{Decomposition of U}
+\SecLabel{u}
+
+Let $\alpha\colon \field{4} \to \field{4}$ be given by
+$$
+\alpha(x) \eqdef U_{x}(0)
+$$
+and let $U'_{\hex{0}},\ldots,U'_{\hex{f}}$ be permutations of $\field{4}$ given by
+$$
+U'_k(x) \eqdef U_k(x) \oplus \alpha(k).
+$$
+It follows that for all $k \in \field{4}$, $U'_k(0) = 0$. The codebook of $U'$ is given in \FigRef{up}.
+
+\FigTex{up-m.tex}
+
+In~\cite{LinAffEQ}, Biryukov~\etal{} propose efficient algorithms for checking affine and linear equivalence of permutations. Applying these algorithms to the permutations $U'_i$ shows that all $U'_i$ are pairwise linear equivalent. Furthermore, they differ only by a linear layer in the output. Formally, let $M_{\hex{0}}, \ldots, M_{\hex{f}}\colon \field{4} \to \field{4}$ be given by
+$$
+M_k(x) \eqdef U'_k(x) \circ U'^{-1}_{\hex{0}}(x).
+$$
+Then, each $M_i$ is linear. The codebook of $M$ is given in \FigRef{m}.
+
+\begin{remark}
+In the hindsight, it could be trivially checked that $U_i \circ U_j^{-1}$ is linear for all $i,j \in \field{4}$. However, it is not always clear which properties or relations can be expected. For this reason, the linear/affine equivalence algorithms from~\cite{LinAffEQ} and their improved variants by Dinur~\cite{LinAffEQ2} are very useful tools for S-Box reverse-engineering.
+\end{remark}
+
+The next step is to observe that the functions $M_i$ have two interesting properties:
+\begin{enumerate}
+    \item the functions $M_i$ have orders $1,3,5,15$; those with order $15$ generate all $M_i$;
+    \item the functions $M_i$ are linearly related: they are contained in linear subspace of dimension 4;
+\end{enumerate}
+These properties point towards a finite field structure. Let $b \eqdef M_{\hex{0}} \oplus M_{\hex{5}}$. Then $b$ is \emph{linear-similar} to the multiplication by $X$ in the finite field
+$$
+\fielde{4} \simeq \field{}[X]/(X^4 + X^3 + 1).
+$$
+By ``linear-similar'' it is meant that
+$$
+b = l \circ (\cdot~\fmult X) \circ l^{-1}
+$$
+for some linear bijection $l \in \linbij{4}$, where $(\cdot~\fmult X)$ denotes the multiplication in the finite field by $X$. In this case, $l = l' = \swaplsb$, where
+$$
+\swaplsb\colon \field{4} \to \field{4}, \swaplsb(x_1,x_2,x_3,x_4) \eqdef (x_1,x_2,x_4,x_3).
+$$
+Among all choices of $b$ and the field defining polynomial, this choice results in the simplest mapping $l$.
+
+Note that similarity is preserved for powers, i.e. $b^i = \swaplsb \circ (\cdot~\fmult X^i) \circ \swaplsb$. It follows that for all $k \in \field{4}$, $\swaplsb \circ M_k \circ \swaplsb$ is the finite field multiplication by the power of $X$ equal to the discrete logarithm of $M_k$ base $b$. More precisely, let $\gamma\colon \field{4} \to \field{4}$ be such that 
+$$
+\gamma(k) \eqdef (\swaplsb \circ M_k \circ \swaplsb)(1).
+$$
+Furthermore, let $\beta\colon \field{4} \to \field{4}$ be given by
+$$
+\beta(x) \eqdef U'_{\hex{0}}(\swaplsb(x)) \oplus \hex{c}.
+$$
+Then $U$ can be decomposed as follows:
+$$
+U_k(x) = \alpha(k) \oplus \beta(\gamma(k) \fmult \swaplsb(x)) \oplus \hex{c}.
+$$
+
+Note that $\alpha$ is affine such that $\alpha \oplus \hex{c}$ is linear:
+$$
+\alpha(x_1,x_2,x_3,x_4) = (1, x_2 \oplus 1, x_1, 0).
+$$
+The constant part of $\alpha$ cancels with the constant from $\beta$ and the linear part can be merged with the outer linear encoding $L$. 
+The graphical representation of the final decomposition of $U$ and the codebooks of $\alpha, \beta, \gamma$ and $\swaplsb$ are given in \FigRef{final-u}.
+
+\FigTex{final-u.tex}

@@ -1,0 +1,101 @@
+\section{Decomposition Attack using Impossible Monomials}
+\SecLabel{monoattack}
+
+\newcommand\func{f}
+
+In this section I describe how large enough classes of impossible monomials can be used to mount a recovery attack on the last round's Feistel function.
+
+The high level idea is the following. Consider a 5-round $2n$-bit Feistel Network with bijective Feistel functions, i.e. let $S^5 \in \bij{5}{n-1}$. Let $S^4 \in \bij{4}{n-1}$ be the Feistel Network consisting of the first 4 rounds of $S^5$ and let $\func\colon \field{n} \to \field{n}$ be the Feistel function used in the last round.
+From Theorem~\Ref{thm:low-bij}, for any $k$, any $(n,k)$-monomial is not present in the ANFs of the right output branch of $S^4$. However, in the following 5-th round the output of the last Feistel function is xored into this branch and becomes the left output branch of $S^5$. This result now may or may not contain the $(n,k)$-monomials. By observing the presence of such monomials in the ANFs of the left branch of $S^5$, we can deduce some information about the last Feistel function in the form of linear equations. If the number of impossible monomials is large enough, an equivalent of the Feistel function $f$ can be recovered. For an illustration see \FigRef{impmono-explanation}, where the 5-th round of a Feistel Network with 3-bit branches is shown. $a_u$ denotes the ANF coefficient of a monomial that is impossible in the right branch of a 4-round Feistel Network.
+
+\FigTex{impmono-explanation.tex}
+
+More formally, observe that by the Feistel structure 
+$$(\LB \circ S^5) \oplus (f \circ \RB \circ S^5) = \RB \circ S^4.$$
+Consider an arbitrary coordinate position $i, 1 \le i \le n$. For any monomial $x^u$ that is impossible in $\RB \circ S^4$ (e.g. any $(n,k)$-monomial),
+$$
+\coef{u}{\inprod{e_i, \LB \circ S^5}} \oplus
+\coef{u}{\inprod{e_i, \func \circ \RB \circ S^5}} = 
+0.
+$$
+By decomposing $\func$ through its ANF,
+$$
+\coef{u}{\inprod{e_i, \LB \circ S^5}} =
+\bigoplus_{v \in \field{n}} \coef{u}{
+    \coef{v}{\inprod{e_i, \func}}
+    (\RB \circ S^5)^v}.
+$$
+Since $S^5$ is known, this can be considered as a linear equation on the unknown ANF coefficients of $\inprod{e_i, \func}$. In total, there are $2^n-1$ equations (from $2^n$ impossible $(n,k)$-monomials, except the $(n,n)$-monomial) and $2^n-1$ unknowns (the constant is excluded). More equations can be obtained by considering the other classes of impossible monomials from Theorem~\Ref{thm:low-bij}. Therefore, it can be expected that the system will have (close to) full rank with high probability and the solution will be unique. The algorithm of the attack is given in Algorithm~\Ref{alg:recovery}.
+
+\begin{algorithm}
+    \caption{Feistel Function Recovery Attack}
+    \Label{alg:recovery}
+    
+    \begin{algorithmic}[1]
+        \Require the full codebook of a function $S \in \nbij{r}{d}, S\colon \field{2n} \to \field{2n}$; a set $U \subseteq \field{2n}\}$.
+        
+        \Ensure a function $f\colon \field{n} \to \field{n}, \deg{f} \le d$ if exists, such that 
+        \Statex for all $u \in U$ and for all $i,1 \le i \le n$,~ $\coef{u}{\inprod{e_i, \RB \circ R_f \circ S}} = 0$.
+        
+        \State $V \gets \pset{v \in \field{n} \mid 1 \le \wt(v) \le d}$
+        
+        \State $M \gets$ a $|U|\times|V|$ matrix indexed by $U$ and $V$
+        \ForAll{$i \in \seg{1}{n}$}
+            \State $b^i \gets$ a $|U|$-bit vector indexed by $U$
+        \EndFor
+        \ForAll{$u \in U$}
+            \ForAll{$v \in V$}
+                \State $M_{u,v} \gets \bigoplus_{x \preceq u}
+                    (\RB \circ S(x))^v$
+            \EndFor
+            \ForAll{$i \in \seg{1}{n}$}
+                \State $b^i_u \gets \bigoplus_{x \preceq u} \inprod{e_i, \LB \circ S(x)}$
+            \EndFor
+        \EndFor
+
+        \ForAll{$i \in \{1, \ldots, n\}$}
+            \State $a \gets$ a solution of $M\times a = b^i$
+            \State $f_i \gets \pround{x \mapsto \oplus_{v \in V} a_v x^v}$
+        \EndFor
+        \State \Return $f = (f_1, \ldots, f_n)$
+    \end{algorithmic}
+\end{algorithm}
+
+% ===============================================================
+
+\subsection{On the Assumptions}
+
+In the decomposition attack it is assumed that the equation system will have full or close to full rank. Then the correct Feistel function $f$ will be among one of the few system's solutions.
+
+One reason for a possible rank deficiency is that the low-degree monomials in the ANF of the Feistel function $f$ may not generate the high-degree 4-round impossible monomials. In such case the equations generated from the high-degree 4-round impossible monomials provide no information about the low-degree monomials of $f$. In particular, Theorem~\Ref{thm:bij} proves that linear monomials of $f$ can not generate $(n,n-1)$ monomials when composed with the right output branch of a 5-round Feistel Network.
+
+To the best of my knowledge, there are no known ways to prove even a possibility of presence of any highest-degree monomials in, for example, a 5-round Feistel Network. Indeed, in general, proving lower bounds on the algebraic degree is a very difficult problem. 
+
+% ===============================================================
+
+\subsection{Instantiations}
+
+The attack is not restricted to the case of a 5-round Feistel Network with bijective functions. The requirement is to have enough impossible monomials, which can be obtained from Theorems~\Ref{thm:low-nbij},\Ref{thm:low-bij} or by another analysis methods. In practice, a cryptanalyst can generate random instances of the analyzed structure and empirically determine all impossible monomial classes with high probability. This analysis will not dominate the complexity.
+
+The described 5-round attack corresponds to the case of the type-II distinguisher. It exploits a large amount of impossible monomials in a 4-round network, i.e. the one that has the type-I distinguisher. I propose a conjecture on the generalization of this rule.
+
+\begin{conjecture}
+\Label{conj:impmono}
+Let $r$ be the maximum number of rounds such that all $S \in \nbij{r}{d}$ have the type-II distinguisher. Then the impossible monomial attack succeeds with high probability on all $S \in \nbij{r}{d}$, i.e. it outputs a negligible number of candidates for the last Feistel function, and the correct one is always among them.
+\end{conjecture}
+
+\paragraph{Experiment.} I have implemented the attack in~Sage~\cite{sage} and performed a few experiments on small values of the branch size $n$. For all $n \in \pset{3,4,5,6,7}$ and $d \in \pset{2,3,n-1,n}$, I generated 100 random instances of $\nbij{r}{d}$ (and $\bij{r}{n-1}$) for maximum $r$ such that the structure has the type-II distinguisher. Then for the first $r-1$ rounds I empirically evaluated all impossible monomial classes. Using these classes, I generated the equation system of the impossible monomial attack for each of the 100 instances. I computed the average rank of the system and the system's dimension, i.e. the number of unknowns. In addition, I verified that the actual last round Feistel function satisfies the equations. The results of the experiment are given in \TabRef{impmonorank}.
+
+\FigTex{impmonorank.tex}
+
+The results show that the rank is close to the maximum on average. It means that there are only a few solutions on average and the impossible monomial attack succeeds in the analyzed cases. The rank deficiency is larger for cases with $n=3$ and decreases fast with the growth of $n$. Furthermore, the results confirm the conjecture on the analyzed cases.
+
+% ===============================================================
+
+\subsection{Relation with Integral Attack from~\cite{LeoFeistel}}
+
+An integral distinguisher was already used to mount a Feistel function recovery attack by~Biryukov~\etal{}~\cite{LeoFeistel}. They show that, for a 5-round Feistel Network, a 4-round integral distinguisher provides a linear equation on the \emph{values} of the last Feistel function.
+The impossible monomial attack described in this section considers the same equation system but in the \emph{monomial basis}. That is, the unknown variables are the monomial coefficients in the ANFs of the coordinates of the Feistel function. Since the ANF coefficients can be computed by summing the function over particular sets, this is a change of basis (in other words, the \Mobius{} transform is linear).
+The advantage of the monomial basis is that an upper bound on the degree of the Feistel functions can be used to decrease the number of unknowns.
+
+\Todo{Implementation of full decomposition? maybe a subsection here. Experiments (how large n?) Link to published source code.}

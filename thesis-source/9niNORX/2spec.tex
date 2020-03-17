@@ -1,0 +1,56 @@
+\SecDef{spec}{Description of NORX}
+
+NORX has a sponge structure and is based on the monkeyDuplex construction. It uses ARX-like (Addition/Rotation/XOR) operations. More specifically, it is inspired by the ChaCha stream cipher, where the addition operation is replaced by its 1-st order approximation: $x \oplus y \oplus ((x \& y) \ll 1)$.
+
+The original submission~\cite{NORX} proposes versions of NORX with 32- and 64-bit words called respectively NORX32 and NORX64. Subsequently two more versions were proposed, with 8- and 16-bit words called resp. NORX8 and NORX16~\cite{aumasson2015norx8}. The word size is denoted by $w$. The internal state of all NORX variants is composed of 16 words organized as a $4 \times 4$ matrix.
+
+The basic building block of NORX is a permutation $F$ of $\field{b} \simeq (\field{w})^{16}$, where $b = r + c = 16w$ is called the {\it width}, $r$ is the {\it rate} and $c$ is the {\it capacity}. $F$ is also called a {\it round}, and $F^{l}$ is an $l$-fold iteration of $F$. The recommended instances of NORX use $l = 4$ or $l = 6$ rounds. The initialization phase is always followed by a data processing phase and as a result the state effectively goes through $F^{2l}$ before any absorption. NORX allows parallelization but we consider only the sequential construction (the parameter $p=1$). The parameter combinations of the NORX variants are given in \TabRef{parameters}. The full scheme is depicted on \FigRef{sponge}.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{c|c|ccc|c|c|c}
+    \toprule
+    
+    word size & rounds & rate & capacity & state size & nonce & key & tag \\
+    ($w$) & ($l$) & ($r$) & ($c$) & ($b$) & ($N$) & ($K$) & ($t$) \\
+    
+    \midrule
+    
+    8  & 4 or 6 & 40 & 88 & 128     & 32 & 80 & 80 \\
+    16 & 4 or 6 & 128 & 128 & 256   & 32 & 96 & 96 \\
+    32 & 4 or 6 & 768 & 256 & 1024  & 128 & 128 & 128 \\
+    64 & 4 or 6 & 1536 & 512 & 2048 & 256 & 256 & 256 \\
+    
+    \bottomrule
+    \end{tabular}
+    \TabDef{parameters}{Parameters of the NORX instances.}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[height=2.8cm]{\PathFig{v3layout.png}}
+    \FigDef{sponge}{The NORX v3.0 AE scheme with parallelization parameter $p = 1$. $K$ and $N$ denote a key and a nonce resp., $A$ and $Z$ denote a header and a trailer resp., $M_i$ and $C_i$ denote plaintext and ciphertext blocks resp., $T$ is the authentication tag. (credits: NORX specification~\cite{NORX})}
+\end{figure}
+
+$F$ is composed of the \emph{column step} denoted by $\col\colon (\field{w})^{16} \to (\field{w})^{16}$ followed by the \emph{diagonal step} denoted by $\diag\colon (\field{w})^{16} \to (\field{w})^{16}$:
+$$
+F = \diag \circ \col.
+$$
+Let $G(a,b,c,d)$ be the permutation of $(\field{w})^4$ represented by the circuit shown in \FigRef{G}. The column step $\col$ applies $G$ in parallel to each of the 4 columns. The diagonal step $\diag$ applied $G$ in parallel to each of the 4 main diagonals. These steps are illustrated in \FigRef{coldiag}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.32]{\PathFig{Gcircuit.png}}
+    \FigDef{G}{The $G$ circuit used in NORX. (credits: NORX specification~\cite{NORX})}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.80]{\PathFig{norx-gfun-col-dia.eps}}
+    \FigDef{coldiag}{The $G$ circuit applied to the columns (left) and diagonals (right) of the state. (credits: NORX specification~\cite{NORX})}
+\end{figure}
+
+The security of each of the four versions of NORX is limited by the key size and the tag size. The designers require unique nonces and abort on verification failure. In addition, at most $2^e$ messages are allowed to be processed with a single key, where $e$ is equal to 24, 32, 64, 128 respectively for NORX8, NORX16, NORX32, NORX64.
+
+For a more detailed description of NORX I refer the reader to the specification~\cite{NORX}.
+

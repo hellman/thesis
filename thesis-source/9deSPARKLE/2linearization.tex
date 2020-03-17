@@ -1,0 +1,323 @@
+\SecDef{lineariz}{Linearization of ARX-boxes}
+
+In recent attacks against Keccak instances \cite{KeccakLin1,KeccakLin2} the S-Box linearization technique is used. The idea is to find a subset of inputs (often an affine subspace), such that the S-Box acts linearly on this set. I attempted to linearize the ARX-boxes by finding all inputs, for which all four modular additions inflict no carry bits and thus are equivalent to \txor{}. For the addition of two random independent 32-bit words, the probability of having all carry bits equal to zero is equal to $(3/4)^{31}$. Indeed, for each bit position, if no carry comes in, then the outgoing carry will occur only if both input bits are equal to 1. Furthermore, the carry bit from the most significant bits is ignored. Assuming independence of the additions in an ARX-box, $2^{64}(3/4)^{124}\approx 2^{12.5}$ inputs are expected to satisfy the linearization trail. In order to find all such inputs, a quadratic equation system has to be solved.
+
+\subsection{Quadratic Equation System}
+
+The following proposition formalizes the linearization of addition modulo $2^n$.
+\begin{proposition}
+\PropLabel{linearize-add}
+For any $x, y \in \field{n}$, the addition $(x+y)\mod{2^n}$ is equal to the \txor{} $x\oplus y$ if and only if $x_i y_i = 0$ for all $i \in \seg{2}{n}$. In particular, 
+$$
+\Pr_{x,y\in\field{n}}[(x+y)\mod{2^n} = x\oplus y] = \pround{\frac{3}{4}}^{n-1}.
+$$
+\end{proposition}
+\begin{proof}
+By induction for $i$ from $n$ to $1$, $x_i \land y_i = 0$ implies that there are no carries, except maybe the carry after the addition of $x_1$ and $y_1$. For the other direction, observe that a single carry for any $i \ge 2$ would necessarily modify at least one bit. Furthermore, all positions are independent, since the carries are fixed, and the probability $3/4$ is simply multiplied.
+\end{proof}
+
+In order to find all inputs satisfying the linearization in all four rounds, we have to solve a system of quadratic equations. Indeed, for the first round with inputs $x,y \in \field{32}$, we obtain 31 quadratic bit equations from \PropRef{linearize-add}. Since the conditions ensures that the output of the first round is linear, similar quadratic equations are obtained for the second round, except that $x$ and $y$ are replaced by the corresponding linear functions. In total we obtain 124 quadratic equations of the form
+$$
+l(x,y) \cdot r(x,y) = 0,
+$$
+where $l,r\colon (\field{32})^2 \to \field{}$ are affine.
+
+The linear functions $l(x,y),r(x,y)$ can be simplified by changing the basis of the equation system. Let $x, y \in \field{32}$ denote the branches of the state before the second constant addition (see~\FigRef{arxboxmid}). In order to perform computations from $x,y$, the first two modular additions must be replaced by modular \emph{subtractions}. The linearization of subtraction is formalized by the following proposition.
+
+\FigTex{arxboxmid.tex}
+
+\begin{proposition}
+\PropLabel{linearize-sub}
+For any $x, y \in \field{n}$, the subtraction $(x-y)\mod{2^n}$ is equal to the \txor{} $x\oplus y$ if and only if $(x_i \oplus 1) y_i = 0$ for all $i \in \seg{2}{n}$.
+\end{proposition}
+\begin{proof}
+Observe that
+$$
+x-y = 2^n-1 - (2^n-1 - x+y) = \lnot( (\lnot x) + y).
+$$
+As we want to ensure $x-y = x\oplus y$, we get
+$$
+(\lnot x) + y = \lnot (x\oplus y) = (\lnot x) \oplus y.
+$$
+Therefore, the subtraction constraints are equivalent to the addition constraints for $(\lnot x) + y$. The result follows from~\PropRef{linearize-add}.
+\end{proof}
+
+The two modular subtractions and the two modular additions provide the following 124 equations for an ARX-box $A_c$.
+
+\begin{proposition}
+Consider the ARX-box $A_c$ with a constant $c \in \field{32}$. All four its modular additions are equivalent to \txor{}s if and only if the intermediate values $x,y\in \field{32}$ as shown in~\FigRef{arxboxmid} satisfy the following 124 equations:
+\begin{align*}
+(1 \oplus c_{2+i} \oplus x_{2+i} \oplus x_{32+i} \oplus y_{17+i}) \cdot (c_{11+i} \oplus x_{11+i} \oplus x_{18+i} \oplus x_{9+i} \oplus y_{26+i} \oplus y_{3+i}) = 0, \\
+(1 \oplus x_{2+i}) \cdot (x_{32+i} \oplus y_{17+i}) = 0, \\
+(c_{2+i} \oplus x_{2+i}) \cdot (y_{2+i}) = 0, \\
+(x_{2+i} \oplus y_{2+i}) \cdot (c_{11+i} \oplus x_{11+i} \oplus y_{10+i} \oplus y_{11+i}) = 0,
+\end{align*}
+where $i \in \seg{0}{31}$.
+\end{proposition}
+
+
+\subsection{Guess and Determine Algorithm}
+
+\subsubsection{Hardness of the Equation Type}
+
+All the quadratic equations are of the form
+$$
+l(x,y) \cdot r(x,y) = 0,
+$$
+which is equivalent to any of the two implications
+\eq{
+l(x,y) \Rightarrow r(x,y)\oplus 1,
+r(x,y) \Rightarrow l(x,y)\oplus 1.
+}
+If all $l,r$ were single variables, then the system would be equivalent to a 2-SAT problem and would be efficiently solvable. However, due to $l,r$ being linear functions of the secret variables, it is NP-complete.
+\begin{proposition}
+The problem of finding $x \in \field{n}$ such that $l_i(x) \cdot r_i(x) = 0$ for all given affine functions $l_i,r_i\colon \field{n} \to \field{}$ is NP-complete.
+\end{proposition}
+\begin{proof}
+Let us reduce a general 3-SAT instance to this problem. It is sufficient to show en encoding of a 3-SAT clause $(a \lor b \lor c)$. Let us introduce a new variable $v_{bc}$ such that it should be equal to $b \lor c$. This can be ensured by two implications:
+$$(b \Rightarrow v_{bc}) \land (v_{bc} \oplus c \Rightarrow b).$$
+Then the following encodings are equivalent:
+\eq{
+(a \lor b \lor c) ~\Leftrightarrow~ &
+    (a \lor v_{bc}) \land
+    (b \Rightarrow v_{bc}) \land
+    (v_{bc} \oplus c \Rightarrow b) ~\Leftrightarrow~ \\
+    ~\Leftrightarrow~ &
+        (\lnot a \cdot \lnot v_{bc} = 0) \land
+        (b \cdot \lnot v_{bc} = 0) \land
+        ((v_{bc} \oplus c) \cdot \lnot b = 0) ).
+}
+\end{proof}
+Due to sparsity of the affine maps $l,r$ in the linearization problem, the guess-and-determine approach may work well enough.
+
+\subsubsection{Generating More Equations}
+
+In order to improve the efficiency, we first generate more equations of the same form by combining the equations in the following way. For each affine map $l_i$ (or $r_i$) used in the equations, we attempt to find an affine function $\alpha$ and a subset of equations $\pset{l_j(x,y)\cdot r_j(x,y) = 0}_{j \in J}$ such that the function
+$$
+l_i' \eqdef \alpha \cdot l_i \oplus \bigoplus_{j \in J} l_j \cdot r_j
+$$
+has algebraic degree 1. This can be done using a basic linear algebra. We then obtain a new equation $$
+l_i'(x,y) \cdot r(x,y) = \alpha(x,y) \cdot l(x,y) \cdot r(x,y) = 0.
+$$
+\begin{example}
+Let $c_{2} = 0$ and consider the equations
+$$
+x_2 \cdot y_2 = 0,~~ (1\oplus x_2) \cdot (x_{32} \oplus y_{17}) = 0.
+$$
+Let $\alpha = x_{32} \oplus y_{17}$, and let the subset of equations consist of the second equation. Then
+$$
+\alpha \cdot x_2 \oplus (1\oplus x_2) \cdot (x_{32} \oplus y_{17}) = (x_{32} \oplus y_{17}) \cdot x_2 \oplus (1\oplus x_2) \cdot (x_{32} \oplus y_{17}) = x_{32} \oplus y_{17}.
+$$
+We obtain a new equation
+$$
+(x_{32} \oplus y_{17})\cdot y_2 = 0.
+$$
+\end{example}
+
+The number of generated equations depends on the chosen round constant $c$ and in our case varies from 36 to 75 for the constants used in \aCipher, and 186 generated equations for the zero constant. The exact numbers are reported in \TabRef{arxlin-results}.
+
+\subsubsection{Guess-and-Determine Approach}
+
+Due to the implicational nature of equations, guess-and-determine method may work reasonably well. Our approach is based on two ideas. The first idea is to choose an order in which variables will be guessed by using a simple heuristic. The second idea is to verify the consistency of each current guess by checking the consistency of all linear equations that appear once some $l_i$ or $r_i$ becomes equal to one in the equation $l_i \cdot r_i = 0$. Finally, when only linear equations are left, the solutions are easily enumerated by basic linear algebra methods. Using these simple ideas, I managed to exhaustively find all solutions to the equation systems for several ARX-boxes. The algorithm implementation runs in an hour on a modern laptop, for a single ARX-box.
+
+First, I describe the guessing order heuristic. Consider the equations $l_i \cdot r_i = 0$ where both $l_i,r_i$ are non-constant. Let $t_1$ denote the minimum number of variables involved in such a function $l_i$ or $r_i$. Let $t_2$ denote the second minimum such number, $t_3$ denote the third minimum such number, etc. Then, each variable $x_j$ is assigned a vector $C_j = (c_1, c_2, c_3, \ldots)$  where $c_k$ is the number of considered functions $l_i$ or $r_i$  involving $t_k$ variables including $x_j$. Then the variable $x_j$ with the largest such vector is selected, where the comparison is done lexicographically. The selected variable is added to the guess order, eliminated from equations and the process repeats until all variables are eliminated.
+
+\begin{example}
+Assume that we consider equations
+$$
+(x_1) \cdot (x_2)=0,
+(x_1 \oplus 1) \cdot (x_1 \oplus x_2) = 0,
+(x_2) \cdot (x_2 \oplus x_3) = 0,
+(x_1 \oplus x_3 \oplus x_4 \oplus x_5) \cdot (x_3 \oplus 1) = 0.
+$$
+Initially, we get
+$$
+C_1 = (2, 1, 1), C_2 = (2, 2, 0), C_3 = (1, 1, 1), C_4 = (0, 0, 1), C_5 = (0, 0, 1).
+$$
+We select $x_2$ as the first variable to guess. After elimination, we obtain that the first and the third equations are removed, because $x_2$ becomes constant. Next, we get
+$$
+C_1 = (2, 0, 1), C_3 = (1, 0, 1), C_4 = (0, 0, 1), C_5 = (0, 0, 1).
+$$
+We select $x_1$ as the second variable to guess. 
+After the elimination, only the last equation remains, and $x_3$ is selected as the last variable to guess. We do not need to guess $x_4,x_5$ as the system at this point will be linear.
+\end{example}
+% ===================
+% 1 (x_1) 
+% 1 (x_2)
+
+% 1 (x_1 \oplus 1) 
+% 2 (x_1 \oplus x_2)
+
+% 1 (x_2) 
+% 2 (x_2 \oplus x_3)
+
+% 3 (x_1 \oplus x_3 \oplus x_4) 
+% 1 (x_3 \oplus 1)
+
+% x_1: 1,1,2,3 -> 2,1,1
+% x_2: 1,2,1,2 -> 2,2,0
+% x_3: 2,3,1   -> 1,1,1
+% x_4: 3       -> 0,0,1
+% ===================
+% 1 (x_1 \oplus 1) 
+% 1 (x_1) ::: was x_1 + x_2
+
+% 3 (x_1 \oplus x_3 \oplus x_4) 
+% 1 (x_3 \oplus 1)
+
+% x_1: 1,1,3 -> 2,0,1
+% x_3: 3, 1  -> 1,0,1
+% x_4: 3     -> 0,0,1
+% ===================
+% 2 (x_3 \oplus x_4) 
+% 1 (x_3 \oplus 1)
+
+% x_1: 1,1,3 -> 2,0,1
+% x_3: 3, 1  -> 1,0,1
+% x_4: 3     -> 0,0,1
+% ===================
+
+The full approach is described in \AlgRef{gnd}.
+
+\begin{algorithm}
+    \AlgDef{gnd}{Guess-and-Determine algorithm for ARX-box Linearization.}
+    \begin{algorithmic}[1]
+    \Require a system $E$ of equations $\pset{l_i(x)\cdot r_i(x) = 0},$
+    \Statex~~~~~~where $l_i,r_i\colon \field{n} \to \field{}$ are affine;
+    \Ensure all solutions $x\in \field{n}$ to the system.
+    
+    \Statex
+    \LeftComment{generate more equations:}
+    \ForAll{$(l_i,r_i) \in E$, $(r_i,l_i) \in E$}
+        \State $L \gets \Span(x_1\cdot l_i,\ldots,x_n\cdot l_i, l_i)$
+        \State $E \gets E \cup \pset{l'\cdot r_i=0 \mid l' \in L/E, \deg{l'} \le 1}$ \Comment{Linear algebra}
+    \EndFor
+    
+    \Statex
+    \LeftComment{compute a guessing order heuristically:}
+    \State $order \gets []$
+    \State $E' \gets E$
+    \While{$E'$ is not linear}
+        \State $C_j \gets \proundd{\pabs{\pset{
+            (l_i,r_i) \in E' ~\text{or}~(r_i,l_i) \in E'
+            \mid
+            \deg{l_i} = \deg{r_i} = 2,
+            \pabs{l_i} = t,
+            x_j \in l_i
+        }}}_{t \in \ZZplus}$,
+        \Statex ~~~~~~~~~~~~where $\pabs{l_i}$ is the number of variables in $l_i$,
+        \Statex ~~~~~~~~~~~~~~~~~~~~~$x_j \in l_i$ means that $x_j$ is involved in $l_i$
+        \State $j \gets \argmax_{j \in \seg{1}{n},j \notin order} C_j$
+        \State $E' \gets E'\big|_{x_j=0}$ \Comment{elimination of $x_j$}
+        \State append $j$ to $order$
+    \EndWhile
+    
+    \Statex
+    \LeftComment{enumerate solutions:}
+    \Function{GuessAndDetermine}{$guessed,E$}
+        \State $i \gets order_{\pabs{guessed}}$
+        \ForAll{$v \in \pset{0, 1}$}
+            \State $E' \gets E\big|_{x_i = v}$
+            \State $L \gets$ all linear equations from $E'$
+            \If{$L = E'$}
+                \State yield solutions based on $guessed$ and $L$
+            \ElsIf{$L$ is consistent}
+                \State $GuessAndDetermine(guessed \cup \pset{x_i=v}, E')$
+            \EndIf
+        \EndFor
+    \EndFunction
+    \State $GuessAndDetermine(\pset{}, E)$
+    \end{algorithmic}
+\end{algorithm}
+
+% ==================================================================
+% ==================================================================
+
+\subsection{Generalization to Arbitrary Carry Patterns}
+
+Note that an ARX-box is linearized not only in the case when all carries are zero. In fact, it is sufficient that all carries are fixed. For an isolated modular addition, the fraction of inputs leading to a particular carry mask depends on the number of adjacent bits in the carry mask that are equal.
+
+\begin{proposition}
+Let $e \in \field{n}$.
+For any $x, y \in \field{n}$, the addition $(x+y)\mod{2^n}$ is equal to the \txor{} $x\oplus y \oplus e$ if and only if $e_{n} = 0$ and for all $i \in \seg{1}{n-1}$,
+$$
+e_i \oplus e_{i+1} = (x_{i+1} \oplus e_{i+1}) \cdot (y_{i+1} \oplus e_{i+1}).
+$$
+In particular, for any $e \in \field{n}$ with $e_n = 0$,
+$$
+\Pr_{x,y\in\field{n}}[(x+y)\mod{2^n} = x\oplus y \oplus e] = \frac{3^m}{4^{n-1}},
+$$
+where $m = \sum_{i=1}^{n-1} (e_i \oplus e_{i+1} \oplus 1)$ (the sum is over integers).
+\end{proposition}
+\begin{proof}
+Note that $e$ denotes the carry vector, and the addition simply \txor{}s the operands and the carry vector. It is left to ensure that the carry vector is correct. This requires only local constraints. The carry $e_i$ is computed as
+\begin{multline*}
+e_i = maj_3(e_{i+1}, x_{i+1}, y_{i+1}) = \\
+x_{i+1}y_{i+1} \oplus x_{i+1}e_{i+1}\oplus y_{i+1}e_{i+1} =
+(x_{i+1}\oplus e_{i+1})\cdot(y_{i+1}\oplus e_{i+1}) \oplus e_{i+1}.
+\end{multline*}
+where $maj_3$ is the majority function. 
+
+If $e_i \oplus e_{i+1} = 0$, we obtain a quadratic equation of the form $x_{i+1}\cdot y_{i+1}=0$, which has 3 solutions. If $e_i \oplus e_{i+1} = 0$, we obtain a quadratic equation of the form $x_{i+1}\cdot y_{i+1}=1$, which has 1 solution, and is equivalent to two linear equations $x_{i+1} = 1$ and $y_{i+1} = 1$. For all positions the constraints on $x,y$ are independent.
+\end{proof}
+
+\begin{example}
+The all-zero carry patterns are the most probable, and the probability is equal to $(3/4)^{n-1}$. The second most probable patterns are those with one adjacent difference, i.e. of the form $e = (1,1,\ldots,1,0,\ldots,0)$. Their probability is equal to $(3/4)^{n-1}/3$.
+\end{example}
+
+As observed in the proof, a difference in adjacent carry bits results in lower probability of linearization, and results in two linear equations instead of one quadratic equation. Therefore, carry patterns with more differences in adjacent bits should result in easier equation systems but also in a lower number of solutions. In general, an extra adjacent difference reduces the probability by a factor of 3.
+
+% ==================================================================
+% ==================================================================
+
+\subsection{Linearization Results}
+
+I implemented the algorithm in SageMath~\cite{sage} and applied it to all 8 constants used in the ARX-boxes in \aCipher. In addition, I ran the algorithm on the all-zero and the all-one constants. The results are given in \TabRef{arxlin-results}. For all constants except the all-one constant, the equation generation took a couple of minutes and the solving part took around an hour. The all-one constant had no extra equations and, due to an unusually large number of solutions, the computations have not finished even after 200 hours, yielding more than 4 millions of inputs. The evaluation was performed on a single core of a 2.8 GHz CPU on a laptop.
+
+% c_7: no equations + order heuristic: 6 hours
+% c_7: no equations + manual order: 15 hours
+
+\begin{table}[h!tb]
+    \centering
+    \begin{tabular}{ccccc}
+        \toprule
+        constant & hexadecimal & \# equations & \# inputs & example \\
+        \midrule
+        $c_0$ & \hext{b7e15162} & 199 & 13  & (\hext{05600000}, \hext{70000225}) \\
+        $c_1$ & \hext{bf715880} & 199 & 11  & (\hext{2a001990}, \hext{00188000}) \\
+        $c_2$ & \hext{38b4da56} & 196 & 18  & (\hext{1000c000}, \hext{144a0528}) \\
+        $c_3$ & \hext{324e7738} & 196 & 3   & (\hext{1000e620}, \hext{04270080}) \\
+        $c_4$ & \hext{bb1185eb} & 193 & 10  & (\hext{001c8181}, \hext{10808201}) \\
+        $c_5$ & \hext{4f7c7b57} & 160 & 340 & (\hext{08301013}, \hext{28265722}) \\
+        $c_6$ & \hext{cfbfa1c8} & 178 & 105 & (\hext{801d8000}, \hext{2fd10085}) \\
+        $c_7$ & \hext{c2b3293d} & 199 & 76  & (\hext{00220110}, \hext{20001804}) \\
+        $0$   & \hext{00000000} & 310 & 8   & (\hext{00000000}, \hext{40200080}) \\
+        $2^{32}-1$ & \hext{ffffffff} & 124 & $\ge 2^{22}$ & (\hext{0b11cc51}, \hext{72770942})\\
+        \bottomrule
+    \end{tabular}
+    \TabDef{arxlin-results}{The number of inputs for ARX-boxes inflicting no carries in all four rounds, for different round constants.}
+\end{table}
+
+The first interesting observation is that the number of solutions is much smaller than $2^{12.5}\approx 5900$ predicted under the round independence assumption. For 5 out of 8 used constants, the number of solutions is less than 20, and the maximum number of solutions among constants used in \aCipher{} is 340. The second observation is that, for the zero constant, the number of solutions is also extremely low. We find it rather counter-intuitive, since in absence of constants many low-weight vectors can be expected to pass through the ARX-box without inflicting any carries. We suggest that this happens due to strong choice of rotation amounts, leading to faster diffusion. Finally, it turns out that the all-one constant leads to a huge number of solutions. 
+
+I observed similar behaviour and verified correctness of the algorithm on 8-bit words, where an exhaustive search over all ARX-box inputs is feasible.
+
+I also applied the algorithm to a carry pattern with a single difference in adjacent carry bits, namely when the carry pattern in the first round is 
+$$
+e = (1, 1, \ldots, 1, 0) \in \field{32}
+$$
+and in other rounds the carry pattern is zero.
+I generated the equations and ran the guess-and-determine algorithm on ARX-boxes with constants $c_0$ and $c_5$. The two linear equations that appear due to the carry difference allow to generate much more quadratic equations. Note that the algorithm for generating equations can be further improved to use linear relations in various ways. For the ARX-box $A_{c_0}$, 301 total equations are obtained, whereas for $A_{c_5}$, the system contains 409 equations. Though, the running time was still about 1 hour. The results for this ARX-boxes and the described carry pattern are given in \TabRef{arxlin-results2}.
+
+\begin{table}[h!tb]
+    \centering
+    \begin{tabular}{ccccc}
+        \toprule
+        constant & hexadecimal & \# equations & \# inputs & example\\
+        \midrule
+        $c_0$ & \hext{b7e15162} & 301 & 41 & (\hext{1f5d7ff5}, \hext{b2d168b5}) \\
+        $c_5$ & \hext{4f7c7b57} & 409 & 6 & (\hext{7ed77b73}, \hext{a3dccee7}) \\
+        \bottomrule
+    \end{tabular}
+    \TabDef{arxlin-results2}{The number of inputs for ARX-boxes inflicting the carry pattern $(1,\ldots,1,0)$ in the first round an no carries in the other rounds, for round constants $c_0$ and $c_5$.}
+\end{table}

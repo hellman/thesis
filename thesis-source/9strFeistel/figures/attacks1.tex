@@ -1,0 +1,93 @@
+{
+    \renewcommand\arraystretch{1.1}
+    \setlength{\tabcolsep}{4pt}
+
+    \begin{table}
+        \centering
+        \begin{tabularx}{\textwidth}{cccXccc}
+            \toprule
+            
+            \textbf{Struc.} & \textbf{Method} & \textbf{Power} & \textbf{Restrictions} & \textbf{Time} & \textbf{Data} & \textbf{Ref.}  \\
+          
+            \midrule
+
+            \multirow{4}{*}{$\nbij{5}{d}$}
+                & differential & distin. & $f_i$ non-bij. & $2^{n}$ & $2^{n}$ & \cite{Feistel5Patarin} \\
+                
+                & SAT-based & recov. & $n \leq 7$ & practical & $2^{2n}$ & \cite{LeoRE} \\
+             
+                & yoyo & recov. & -- & $2^{2n}$ & $2^{2n}$ & \cite{LeoFeistel} \\
+                
+                & guess \& det. & recov. & -- & $2^{n2^{3n/4}}$ & $2^{2n}$ & \cite{LeoFeistel} \\
+
+            \midrule
+            
+            \multirow{4}{*}{$\bij{5}{d}$}
+                & imp. diff. & distin. & -- & $2^{2n}$ & $2^{n}$ & \cite{DEALA} \\
+
+                & div. prop. & distin. & -- & $2^{2n-1}$ & $2^{2n-1}$ & \cite{division} \\
+                
+                & HDIM & distin. & -- & $2^{2n-1}$ & $2^{2n-1}$ &  \SecShortRef{hdim-feistel} \\
+                
+                & integral & recov. & -- & $2^{2.8n}$ & $2^{2n}$ & \cite{LeoFeistel} \\
+                
+                & imp. monom. & recov. & -- & $2^{3n}$ & $2^{2n}$ & \SecShortRef{impmono} \\
+                
+            \midrule
+            
+            \multirow{3}{*}{$\nbij{r}{d}$}
+                & HDIM & distin. & $\thetanbij{r}{d}<2n$ & $2^{2n-1}$ & $2^{2n-1}$ & \SecShortRef{hdim-feistel} \\
+                
+                & div. prop. & distin. & algorithmic & $2^{2n-1}$ & $2^{2n-1}$ & \cite{division} \\
+                
+                & imp. monom. & recov. & Conj.~\Ref{conj:impmono} & $2^{3n}$ & $2^{2n}$ & \SecShortRef{impmono} \\
+            
+            \midrule 
+            
+            \multirow{3}{*}{$\bij{r}{d}$}
+                & HDIM & distin. & $\thetanbij{r-1}{d}<2n$, $\dinv\le d$ & $2^{2n-1}$ & $2^{2n-1}$ & \SecShortRef{hdim-feistel} \\
+                
+                & div. prop. & distin. & algorithmic & $2^{2n-1}$ & $2^{2n-1}$ & \cite{division} \\
+
+                & imp. monom. & recov. & Conj.~\Ref{conj:impmono} & $2^{3n}$ & $2^{2n}$ & \SecShortRef{impmono} \\
+            \midrule
+            
+            $\afabij{4}{d}'$ & LAT-based & recov.
+                & -- & $2^{6n}$ & $2^{2n}$ & \cite{OurKuz1} \\
+            
+            \midrule
+            
+            $\afanbij{r}{d}'$ & HDIM & recov.
+                & $\thetanbij{r+1}{d}<2n$ & $n2^{2n}$ & $2^{2n}$ & \SecShortRef{afa} \\
+            
+            $\ainvfanbij{r}{d}$ & HDIM & recov.
+                & $\thetanbij{r}{d}<2n$ & $n2^{2n}*$ & $2^{2n}$ & \SecShortRef{afa} \\
+            
+            $\afnbij{r}{d}$  & HDIM & recov.
+                & $\thetanbij{r}{d}<2n$ & $n2^{2n}$ & $2^{2n}$ & \SecShortRef{afa} \\
+            
+            \midrule 
+            
+            $\afabij{r}{d}'$ & HDIM & recov.
+                & $\thetanbij{r}{d}<2n$, $\dinv\le d$ & $n2^{2n}$ & $2^{2n}$ & \SecShortRef{afa} \\
+            
+            $\ainvfabij{r}{d}$  & HDIM & recov.
+                & $\thetanbij{r-1}{d}<2n$, $\dinv\le d$ & $n2^{2n}*$ & $2^{2n}$ & \SecShortRef{afa} \\
+                
+            $\afbij{r}{d}$  & HDIM & recov.
+                & $\thetanbij{r-1}{d}<2n$, $\dinv\le d$ & $n2^{2n}$ & $2^{2n}$ & \SecShortRef{afa} \\
+                
+            \bottomrule
+        \end{tabularx}
+        
+        \TabDef{attacks1}{
+            Structural attacks against Feistel Networks with $r \ge 5$ rounds. 
+            $n$ is the branch size, $d$ is the degree bound of the Feistel functions, $\dinv$ is the degree bound of their inverses. It is known that
+            $\thetabij{r}{d} \le \thetanbij{r}{d} \le d^{\floor{r/2}-1} + d^{\ceil{r/2}-1}$.
+            $\mathsf{A,A'}$ are secret affine transformations.
+            HDIM, division property, impossible monomial attack are all integral-based attacks.
+            Attacks from this chapter were published in~\cite{OurFeistel}.
+            $*$ assuming complexity of solving a system of $n^2$ quadratic equations is negligible.
+        }
+    \end{table}
+}

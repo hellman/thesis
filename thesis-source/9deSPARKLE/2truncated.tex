@@ -1,0 +1,274 @@
+\SecDef{truncated}{Truncated Differential Analysis of SPARKLE}
+
+We performed exhaustive search of all structural truncated trails in \aCipher{}, i.e. when each branch can be either active or inactive. Our approach consists of two steps. The first step is to generate the matrix of probabilities of all truncated transitions through the linear layer. I propose a new generic and precise method for this step. The second step is a simple iterative search, where for each round and for each truncated pattern at this round we keep the best truncated trail leading tho this pattern.
+
+
+\subsection{Generating Truncated Trail Matrix of a Linear Layer}
+I describe a generic method to generate the matrix of probabilities of truncated transitions from the binary matrix of the analyzed linear layer.
+
+\newcommand\alphabeta{\alpha \xrightarrow{L} \beta}
+\newcommand\exact{+}
+\newcommand\loose{*}
+
+\newcommand\VA{p(\alpha)}
+\newcommand\VB{p(\beta)}
+
+\begin{definition}
+Let $L: (\field{m})^t \to (\field{m})^t$ be a linear bijective mapping. An \emph{exact truncated transition} over $L$ is a pair of vectors from $\{0,\exact\}^t$. A \emph{loose truncated transition} over $L$ is a pair of vectors from $\{0, \loose\}^t$. A truncated transition $\alpha, \beta$ over $L$ is denoted $\alphabeta$.
+\end{definition}
+
+\begin{definition}[Support Sets]
+$ $\newline
+The \emph{support} of a symbol $\gamma_i \in \pset{0, \loose, \exact}$ is defined as the set
+$$
+p(\gamma_i) \eqdef
+\begin{cases}
+\{0\}, &\text{if}~ \gamma_i = 0, \\
+\field{m}, &\text{if}~ \gamma_i = \loose, \\
+\field{m}\setminus\{0\}, &\text{if}~ \gamma_i = \exact.
+\end{cases}
+$$
+The \emph{support} of a vector $\gamma \in \{0, \loose, \exact\}^t$ is defined as the set
+$$
+p(\gamma) \eqdef p(\gamma_0) \times \ldots \times p(\gamma_{t-1}).
+$$
+The \emph{support} of a truncated transition $\alphabeta$ is defined as the set
+$$
+p(\alphabeta) \eqdef \pset{(x,L(x)) | \mid x \in \VA, L(x) \in \VB} \subseteq (\field{mt})^2.
+$$
+\end{definition}
+
+\begin{definition}
+The \emph{cardinality} of a truncated transition $\alphabeta$ is defined as the cardinality of its support:
+$$
+|\alphabeta| \eqdef |p(\alphabeta)| = |L(\VA)\cap\VB|.
+$$
+The \emph{probability} of a truncated transition $\alphabeta$ is defined as 
+$$
+\Pr[\alphabeta] \eqdef \Pr_{x \in \VA}[L(x) \in \VB] = \frac{|\alphabeta|}{|\VA|}.
+$$
+\end{definition}
+
+\begin{remark}
+The cardinality is a property of the \emph{graph} of $L$, whereas the probability differentiates the input from the output. In particular, the problem of computing cardinalities of truncated transitions is equivalent to the problem of finding the number of codewords fitting the truncated mask $(\alpha, \beta) \in \field{2mt}$ in the linear code with the generator matrix $\matb{\idmat{mt} ~\mid~ L}$. The matrix of exact truncated transitions also trivially allows to compute the branching number of the matrix.
+\end{remark}
+
+Finally, the table of truncated transition probabilities can be formally defined.
+
+\newcommand\TTT[1]{\mathsf{TTT}_{#1}}
+\begin{definition}[TTT]
+Let $L\colon (\field{m})^t \to (\field{m})^t$ be a linear bijective mapping. The \emph{table of truncated transitions} (TTT) of $L$ is the $2^{t}\times 2^{t}$ matrix $\TTT{L}$ given by
+$$
+\TTT{L}[a,b] = \Pr{\alphabeta},
+$$
+where $a,b \in \field{t}$ are mapped naturally to $\alpha',\beta' \in \pset{0,\exact}^t$ respectively.
+\end{definition}
+
+Since $|\VA|$ is easy to compute, we focus on computing the cardinalities of loose and exact truncated transitions.
+
+% =============================================
+
+\paragraph{Cardinalities of Loose Transitions.}
+The first step is to compute the cardinalities of \emph{all} possible \emph{loose} truncated transitions over $L$. Let $\alphabeta$ be a loose transition over $L$. Observe that $p(\alpha),p(\beta)$ are linear subspaces of $\field{mt}$. 
+The cardinality $|\alphabeta| = L(\VA) \cap \VB$ can be computed as follows.
+
+A vector $b \in \ffield{m}{t}$ belongs to $\VB$ if and only if $\beta_i = 0$ implies $b_i = 0$ for all $i$. Let
+$$
+\pi_{\beta}(b)\colon \ffield{m}{t} \to \VB^{\bot}
+$$
+be the linear map returning the part of the vector $b$ consisting of all elements $b_i$ for which $\beta_i=0$. The dimension of the space $L(\VA)\cap \VB$ can be computed as the nullity of the linear map
+$$
+\phi\colon \VA \to \VB^{\top},~~~~\phi \eqdef \pi_{\beta} \circ L.
+$$
+
+Let $L$ be given as a block matrix $(L_{i,j})_{i,j\in\seg{1}{t}}$ with blocks of size $m \times m$. The vector space $L(\VA)$ is spanned by bit-columns of the submatrix $$
+(L_{i,j}), ~\text{where}~ i,j\in\seg{1}{t},\alpha_j=\loose.
+$$
+\newcommand\LSUB{L\big|_{\alpha=\loose,\beta=0}}
+Furthermore, the map $\pi_{\beta}$ simply truncates its input vector to positions where $\beta_i = 0$. It follows that $\phi \eqdef \pi_{\beta} \circ L$ can be given by the submatrix
+$$
+\LSUB \eqdef (L_{i,j})~\text{where}~ i,j\in\seg{1}{t},\beta_i=0,\alpha_j=\loose.
+$$
+Given the binary rank of this matrix, the nullity of $\phi$ is computed as
+$$
+\dim{\VA}-\rank{\LSUB}.
+$$
+We conclude that $|\alphabeta|$ can be computed as
+$$
+|\alphabeta| = 2^{\dim{p(\alpha)} - \rank{\LSUB}}.
+$$
+% \Todo{Grid image with example}
+
+\paragraph{Cardinalities of Exact Transitions.}
+The second step is to compute the probabilities of all \emph{exact} truncated transitions over $L$. Observe that a loose truncated truncated trail can be seen as a union of precise truncated trails. For example,
+\begin{align*}
+    &(\loose, 0) \xrightarrow{L} (0, \loose) 
+\end{align*}
+is equivalent to the following union of disjoint transitions:
+\begin{align*}
+        \pset{
+        (0, 0) \xrightarrow{L} (0, 0),~~~~
+        (0, 0) \xrightarrow{L} (0, \exact),~~~~
+        (\exact, 0) \xrightarrow{L} (0, 0),~~~~
+        (\exact, 0) \xrightarrow{L} (0, \exact)},
+\end{align*}
+i.e. the cardinalities are summed.
+
+\newcommand\alphabetap{\alpha' \xrightarrow{L} \beta'}
+\newcommand\alphabetaex{\alpha_{\exact} \xrightarrow{L} \beta_{\exact}}
+\newcommand\alphabetaexp{\alpha_{\exact}' \xrightarrow{L} \beta_{\exact}'}
+\newcommand\alphabetalo{\alpha_{\loose} \xrightarrow{L} \beta_{\loose}}
+
+\begin{lemma}
+\LemLabel{trunc-disjoint}
+Let $\alphabeta\ne\alphabetap$ be exact truncated transitions. Then their supports are disjoint.
+\end{lemma}
+\begin{proof}
+The lemma follows from the fact that $p(\exact)$ and $p(0)$ are disjoint. 
+\end{proof}
+
+\begin{definition}
+For any symbols/vectors/truncated transitions $\gamma,\gamma'$ let
+$$
+\gamma \preceq \gamma' ~\text{if and only if}~ p(\gamma) \subseteq p(\gamma').
+$$
+\end{definition}
+
+\begin{lemma}
+Let $\alphabetalo$ be a loose truncated transition. Then the set
+$$
+\mathbf{P}(\alphabetalo) \eqdef \pset{
+p(\alphabetaexp) \mid
+\alpha_{\exact}',\beta_{\exact}' \in \pset{0,\exact}^t,
+(\alphabetaexp) \preceq (\alphabetalo)
+}
+$$
+is a partition of $p(\alphabeta)$.
+\end{lemma}
+\begin{proof}
+It follows from \LemRef{trunc-disjoint} and the fact that $
+p(\loose) = p(\exact) \sqcup p(0),
+$
+where $\sqcup$ denotes the disjoint union. 
+\end{proof}
+
+\begin{corollary}
+Let $\alphabetaex$ be an exact truncated transition and let $\alphabetalo$ be the same transition, but with all symbols $\exact$ replaced by $\loose$. Then
+$$
+|\alphabetaex| = |\alphabetalo| - \sum_{
+\alpha_{\exact}',\beta_{\exact}' \in \pset{0,\exact}^t,
+(\alphabetaexp) \preceq (\alphabetalo)
+}
+|p(\alphabetaexp)|.
+$$
+\end{corollary}
+
+%Note that $|\alphabetaex|$ can be also expressed in terms of cardinalities of loose ``subtransitions'' of $\alphabetalo$, which were computed in the first step, by using the inclusion-exclusion principle. However, since we need to compute all cardinalities of all exact transitions, we can simply use the \emph{partition} into exact ``subtransitions'' given by Equation~\ref{eq:partition-trunc}. Indeed,
+This corollary gives an efficient way to compute cardinalities of all exact truncated transitions. By computing the cardinalities in the lexicographic order of transitions, we can ensure that all sub-transitions are processed before processing the current transition.
+
+Given the cardinalities of exact transitions, it is easy to compute the probabilities of exact transitions, and thus, the matrix $\TTT{L}$.
+
+\paragraph{Complexity.}
+The time complexity of the naive implementation is $\OO(4^t(tm)^3 + 4^t4^t))$, where the first term corresponds to the complexity of the rank computation for all block-aligned submatrices of $L$, and the second term corresponds to the complexity of the summing over ``subtransitions''. The latter step can be done in one extra pass in time $\OO(t \cdot 4^t)$ by an algorithm similar to the well-known algorithm for the \Mobius{} transform. Then the complexity becomes fully dominated by the rank computations: $\OO(4^t\cdot (tm)^3)$.
+The algorithm can be directly improved if a better algorithm for computing the ranks of all block-aligned submatrices exists.
+
+
+\subsection{Iterative Algorithm for Truncated Trail Search}
+
+The trails of truncated transitions that are the most useful for cryptanalysis, should have probabilities significantly higher than the probability of sampling the final truncated difference uniformly at random. Such trails may be used to distinguish the analyzed structure from an ideal primitive.
+
+\begin{definition}
+A truncated trail $\alpha_0 \xrightarrow{L} \ldots \xrightarrow{L} \alpha_r$ over $L: \ffield{m}{t} \to \ffield{m}{t}$ is said to be \emph{effective} if all $\alpha_i \ne 0$ and 
+$$
+\Pr\psquare{\alpha_0 \xrightarrow{L} \ldots \xrightarrow{L} \alpha_r} > 
+\Pr_{\delta \in \ffield{m}{t}\setminus\pset{0}} \psquare{\delta \in p(\alpha_r)} = p(\alpha_r)/(2^{mt}-1).
+$$
+where the trail probability is equal to the 
+\end{definition}
+
+Given the $\TTT{}$ a linear layer, it is easy to compute the best effective truncated trails in an iterative way. The method is based on dynamic programming. For each round $r$, we keep for each truncated output mask the best probability of reaching this mask from arbitrary input mask over $r$ rounds. Extension to $r+1$ rounds is done by enumerating best output masks for $r$ rounds and extending them using the $\TTT{}$. The algorithm sketch is given in \AlgRef{truncated-trail-search}.
+
+\begin{algorithm}
+    \AlgDef{truncated-trail-search}{Search for best truncated trails.}
+    \begin{algorithmic}[1]
+    \Require a binary matrix of $L: (\field{m})^t \to (\field{m})^t$, $\TTT{L}\colon \field{t} \times \field{t} \to \mathbb{Q}$;
+    \Ensure the map $\alpha_r \mapsto q$ for the best effective truncated trails $\alpha_0 \xrightarrow{L} \ldots \xrightarrow{L} \alpha_r$
+    
+    \State $d_0 \gets \pset{\alpha \mapsto 1 \mid \alpha \in \pset{0,\exact}^t\setminus(0,\ldots,0)}$
+    \ForAll{$r \in \seg{1}{}$}
+        \State $d_r \gets \pset{\alpha \mapsto 0 \mid \alpha \in \pset{0,\exact}^t}$
+        \State $effective \gets false$
+        \ForAll{$\alphabeta \in \TTT{L}$}
+            \State $d_r(\beta) \gets \max\pround{ d_r(\beta), d_{r-1}(\alpha) \cdot \Pr\psquare{\alphabeta}}$
+            \If{$d_r(\beta) > p(\beta)/(2^{mt}-1)$} \Comment{$p(\beta)$ is the support of $\beta$}
+                \State $effective \gets true$
+            \EndIf
+        \EndFor
+        \If{not $effective$}
+            \State \Return $d_r$ \Comment{Trail recovery can be added}
+        \EndIf
+    \EndFor
+    \end{algorithmic}
+\end{algorithm}
+
+Using precise arithmetics over rationals, the precise $\TTT{}$ can be computed. For example, consider the AES MixColumn matrix $L\colon \ffield{8}{4} \to \ffield{8}{4}$.
+The algorithm finds the following two-round effective trail:
+$$
+(+, 0, 0, 0) \xrightarrow{L} (+, +, +, +) \xrightarrow{L} (+, 0, 0, 0),
+$$
+which has probability
+$$
+1/16581375 \approx 2^{-23.983}
+$$
+which is greater than the probability of sampling the difference fitting $(+, 0, 0, 0)$ uniformly at random from all non-zero differences, which is equal to $$
+(2^8-1)/(2^{32}-1)=1/16843009\approx 2^{-24.006}.
+$$
+The position of active word in the initial and output masks does not matter. The first transition has probability one due to the fact that $L$ has branching number 5 (note that the algorithm was given only the binary matrix of $L$). The second transition is possible due to uneven distribution of weights of differences in the image of $p((+,+,+,+))$ under $L$. This is an interesting observation, though the difference between the probabilities is too small for exploiting it for the cryptanalysis purpose.
+
+
+\subsection{Truncated Trails in \aCipher{}}
+
+For most linear layers used in practice, the probabilities of truncated transitions over the linear layer are usually close to powers of 2 raised to the word size. The error term is ignored as insignificant. Indeed, since the S-Boxes are fixed, the assumed independence between sequential truncated transitions does not hold. 
+
+Consider the linear layer of \aCipher{} as a mapping of $\ffield{64}{\branches}$ to itself. For the analysis of \aCipher{}, we also utilize the assumption, as all the transition probabilities over the linear layer are very close to $2^{-64k}$ for some k. We strengthen the definition of an effective trail by requiring that the trail probability is higher than $2^{-64k+0.01}$, where $k$ is the number of inactive words in the output mask.
+
+For $\aCipher{256}$, the longest effective truncated differential trail covers two steps and has probability 1. It can be described as follows, where $\exact$ indicates an active branch and $0$ indicates an inactive branch:
+$$
+\begin{array}{ccccc}
+\text{input } : & 0 & 0 & 0 & \exact\\
+\text{step } 1: & \exact & 0 & 0 & 0\\
+\text{step } 2: & \exact & \exact & \exact & 0
+\end{array}.
+$$
+
+Another similar one can be obtained using the input $00\exact0$. When restricting the input difference to be only in the left branches (i.e., for the setting in \aeadversion{128}{128}), the longest effective truncated differential trail covers only one step (and probability 1):
+$$
+\begin{array}{ccccc}
+\text{input } : & \exact & 0 & 0 & 0\\
+\text{step } 1: & \exact & \exact & \exact & 0 
+\end{array}.
+$$
+
+For $\aCipher{384}$, the longest effective truncated differential trail also covers two steps and has probability 1:
+$$
+\begin{array}{ccccccc}
+\text{input } : & 0 & 0 & 0 & \exact & 0 & 0\\
+\text{step } 1: & 0 & 0 & \exact & 0 & 0 & 0\\
+\text{step } 2: & \exact & \exact & \exact & 0 & 0 & \exact
+\end{array}.
+$$
+
+Two similar ones can be obtained using inputs $0000\exact0$ and $00000\exact$.
+
+For $\aCipher{512}$, the longest effective truncated differential trail covers three steps and has probability close to $2^{-64}$: 
+$$
+\begin{array}{ccccccccc}
+\text{input } : & 0 & 0 & 0 & 0 & 0 & \exact & 0 & \exact\\
+\text{step } 1: & \exact & 0 & \exact & 0 & 0 & 0 & 0 & 0\\
+\text{step } 2: & 0 & \exact & 0 & \exact & \exact & 0 & \exact & 0\\
+\text{step } 3: & \exact & \exact & \exact & \exact & 0 & \exact & 0 & \exact\\
+\end{array},
+$$
+where we associate a probability of $2^{-64}$ for the transition between step 1 and step 2. 
+
+% Such truncated trails where two branches are active and activate only two outputs of the Feistel functions exist for all number of branches strictly greater than 4 and, in particular, for both \aCipher{384} and \aCipher{512}. The purpose of the rotation of the branches after the addition of the Feistel function in the linear layer is to prevent the iteration of such truncated trails. While they would pose no threat as such, they could serve as the template for high probability not-truncated differential trails.

@@ -1,0 +1,85 @@
+\SubSubSecDef{spec-arxbox}{The ARX-Box}
+ 
+The ARX-box $\arxbox$ is a 64-bit block cipher. It is specified in \AlgRef{arxbox} and depicted in \FigRef{arxbox}. It can be understood as a four-round iterated block cipher for which the rounds differ in the rotation amounts. After each round, the 32-bit constant (``the key'') is \txor{}ed to the left word. As the ARX-box has a simple Feistel structure, the computation of the inverse is straightforward.
+
+Its purpose is to provide non-linearity to the whole permutation and to ensure a quick diffusion within each branch --- the diffusion between the branches being ensured by the linear layer (\SecRef{spec-linear}). Its round constants ensure that the computations in each branch are independent from one another to break the symmetry of the permutation structure we chose. As the rounds themselves are different, we do not rely on the round constant to provide independence between them. 
+
+\begin{algorithm}
+  \AlgDef{arxbox}{The ARX-box $\arxbox_{c}$ \newline
+    \emph{Input/Output:}~ $(x, y) \in \ftwo^{32} \times \ftwo^{32}$
+  }
+  \begin{algorithmic}
+  \State $x  \gets x + (y \ggg 31)$ 
+  \State $y  \gets y \oplus (x \ggg 24)$
+  \State $x \gets x \oplus c$
+  
+  \State $x  \gets x + (y \ggg 17)$ 
+  \State $y  \gets y \oplus (x \ggg 17)$
+  \State $x \gets x \oplus c$
+  
+  \State $x  \gets x + (y \ggg 0)$ 
+  \State $y  \gets y \oplus (x \ggg 31)$
+  \State $x \gets x \oplus c$
+  
+  \State $x  \gets x + (y \ggg 24)$ 
+  \State $y  \gets y \oplus (x \ggg 16)$
+  \State $x \gets x \oplus c$
+  
+    \State{\Return $(x, y)$}
+  \end{algorithmic}
+\end{algorithm}
+
+\FigTex{arxbox.tex}
+
+
+\SubSubSecDef{spec-linear}{The Diffusion Layer}
+
+The diffusion layer has a structure which draws heavily from the one used in \textsc{Sparx-128}~\cite{OurSPARX}. We denote it $\mathcal{L}_{\branches}$. It is a Feistel round with a linear Feistel function $\linFeist{\halfbranches}$ which permutes $\big(\ftwo^{64} \big)^{\halfbranches}$, where $\halfbranches = \frac{\branches}{2}$.
+Formally, $\linFeist{\halfbranches}$ is defined as follows.
+
+\begin{definition}
+  \DefLabel{L}
+  Let $w \in \ZZplus$. We denote $\linFeist{w}$ the permutation of $(\wordSpace)^w$ such that
+  \begin{equation*}
+    \linFeist{w}\big( (x_{0},y_{0}), \dots, (x_{w-1},y_{w-1}) \big)
+    ~=~
+    \big( (u_{0},v_{0}), \dots, (u_{w-1}, v_{w-1}) \big)
+  \end{equation*}
+  where the branches $(u_{i}, v_{i})$ are obtained via the following equations
+  \begin{equation}
+    \label{eq:definition-L}
+    \begin{split}
+      t_y &\gets \bigoplus_{i = 0}^{w-1} y_{i} ~,~ t_x \gets \bigoplus_{i = 0}^{w-1} x_{i} ~, \\
+      u_{i} &\gets x_{i} \oplus \ell(t_y), ~\forall i \in \{ 0,...,w-1 \} ~, \\
+      v_{i} &\gets y_{i} \oplus \ell(t_x), ~\forall i \in \{ 0,...,w-1 \} ~,
+    \end{split}
+  \end{equation}
+  where the indices are understood modulo $w$, and where $\ell : \wordSpace \to \wordSpace$ is a permutation defined by
+  \begin{equation*}
+    \ell(x) = (x \lll 16) \oplus (x \land \hex{0000ffff}).
+  \end{equation*}
+  Note in particular that, if $y$ and $z$ are in $\ftwo^{16}$ so that $(y, z) \in \wordSpace$, then
+  \begin{equation*}
+    \ell(y, z) = (z, y \oplus z).
+  \end{equation*}
+\end{definition}
+
+The diffusion layer $\mathcal{L}_{\branches}$ then applies the corresponding Feistel function $\linFeist{\halfbranches}$ and swaps the left branches with the right branches. However, before the branches are swapped, we rotate the branches on the right side by 1 branch to the left. This process is pictured in \FigRef{step}. 
+As an example, an algorithm describing the linear diffusion layer of \aCipher{384} is given in \AlgRef{spec-linear}
+
+\begin{algorithm}
+  \AlgDef{spec-linear}{The Linear Layer $\mathcal{L}_6$ \newline
+    \emph{Input/Output:}~ $\big((x_0, y_0),\dots,(x_5,y_5)\big) \in (\ftwo^{32} \times \ftwo^{32})^6$
+  }
+  \begin{algorithmic}
+    \State{} \Comment{Feistel round}
+    \State $(t_x,t_y) \gets \big(x_0 \oplus x_1 \oplus x_2, ~ y_0 \oplus y_1 \oplus y_2)$
+    \State $(t_x,t_y) \gets \big((t_x \oplus (t_x \ll 16)) \lll 16, ~ (t_y  \oplus (t_y \ll 16)) \lll 16\big)$
+    \State $(y_3,y_4,y_5) \gets (y_3 \oplus y_0 \oplus t_x, ~y_4 \oplus y_1 \oplus t_x, ~y_5 \oplus y_2 \oplus t_x)$
+    \State $(x_3,x_4,x_5) \gets (x_3 \oplus x_0 \oplus t_y, ~x_4 \oplus x_1 \oplus t_y, ~x_5 \oplus x_2 \oplus t_y)$
+    \State{} \Comment{Branch permutation}
+    \State $(x_0,x_1,x_2,x_3,x_4,x_5) \gets (x_4,x_5,x_3,x_0,x_1,x_2)$
+    \State $(y_0,y_1,y_2,y_3,y_4,y_5) \gets (y_4,y_5,y_3,y_0,y_1,y_2)$
+    \State{\Return $\big((x_0, y_0),\dots,(x_5,y_5)\big)$}
+  \end{algorithmic}
+\end{algorithm}

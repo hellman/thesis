@@ -1,0 +1,14 @@
+\myminitoc
+
+\subimport{}{macros.tex}
+
+In this chapter, I describe a suite of lightweight cryptographic algorithms. It includes the \aCipher{} cryptographic permutation family, the \hash{} hash function family, and the \aead{} authenticated encryption family. Together with my colleagues Christof Beierle, Alex Biryukov, Luan Cardoso dos Santos, Johann Gro{\ss}sch{\"a}dl, L\'eo~Perrin, Vesselin Velichkov and Qingju Wang, we designed and analyzed this suite. It is submitted to the recent NIST call for lightweight algorithms~\cite{NISTlight}. I describe briefly the specification of the algorithms, and the analysis of the suite that I performed. It includes an evaluation of resistance against several cryptanalysis methods, and also attacks on round-reduced versions of the \aead{} authenticated encryption family.
+
+\subimport{}{0intro.tex}
+\subimport{}{10spec.tex}
+\subimport{}{2linearization.tex}
+% \subimport{}{2invariants.tex}
+\subimport{}{2truncated.tex}
+\subimport{}{2division.tex}
+\subimport{}{5cryptanalysis.tex}
+

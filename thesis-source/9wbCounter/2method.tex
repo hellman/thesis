@@ -1,0 +1,31 @@
+\SecDef{method}{Protection Components}
+
+The attacks described in \ChapRef{wba} significantly narrow down the space of masking schemes useful for white-box obfuscation. We deduce the following main constraints:
+
+\begin{enumerate}
+    \item The number of shares should be high enough to avoid combinatorial attacks. Moreover, the minimum number of shares that correlate with the reference circuit values should be high as well.
+    
+    \item There should be no low-degree decoders in order to prevent the algebraic attack. 
+    
+    \item The circuit must not admit analysis that allows to locate shares of the same values.
+    
+    \item The integrity of pseudorandom shares must be protected.
+\end{enumerate}
+
+The aim of this chapter is to analyze the possibility of using masking schemes with \emph{relatively small} number of shares for white-box cryptography. The complexity of combinatorial attacks splits into two parts: locating the shares and correlating them. If the number of shares is very high then the correlation part becomes infeasible. Possibly, in such case it is not even necessary to hide the location of shares. The downside is that designing such masking schemes is quite challenging and this direction leads into rather theoretical constructions like indistinguishability obfuscation~\cite{iOcand} from fully homomorphic encryption and other cryptographic primitives. We aim to find more practical obfuscation techniques. Therefore, we have to study obfuscation methods relying on hardness of locating shares inside the obfuscated circuit. Such obfuscation is a challenging problem. In the light of described attacks, we suggest a modular approach to solve this problem. We split the problem into two components:
+
+\begin{enumerate}
+    \item \emph{(Value Hiding)} Protection against generic passive attacks that do not rely on the analysis of the circuit.
+    \item \emph{(Structure Hiding)} Protection against circuit analysis and fault injections.
+\end{enumerate}
+
+\SubSecDef{vh}{Value Hiding}
+The first component basically requires designing a proper masking scheme. As we have shown, the requirements are much stronger than for the usual masking in the side-channel setting (e.g. the provably secure masking by Ishai \etal{}~\cite{PrivCircuits1}). To the best of our knowledge, this direction was not studied in the literature. However, there is a related notion: fully homomorphic encryption (FHE). Indeed, it can be seen as an extreme class of masking schemes. FHE encryption is a process of creating shares of a secret value and the FHE's evaluation functions allow to perform arbitrary computations on the ciphertexts (shares) without leaking the secret value. In fact, any secure FHE scheme would solve the ``Value Hiding'' problem (even though the adversary may learn the key from the decryption phase, the locations of intermediate shares should remain unknown due to structure-hiding protection and the scheme may remain secure). However, this direction leads to very inefficient schemes: typical FHE schemes have very large ciphertexts and complex circuits. This contradicts our goal to investigate schemes with reasonable number of shares.
+
+We suggest to further split the first component into two parts. The first part is protection against algebraic attacks. It is a nonlinear masking scheme without low-degree decoders. However, we allow the scheme to be imperfect: the computed values may correlate with the secret values. Though one has to be careful and avoid very strong correlation, otherwise the LPN-based variant of the algebraic attack may be applicable. The second part is protection against correlation attacks. It can be implemented using a provably secure linear masking scheme on top of the nonlinear masking from the first part. The two parts may be composed in the following way: the algebraically secure nonlinear masking scheme is applied to the reference circuit and afterwards the linear masking scheme is applied to the transformed circuit. 
+We investigate possibilities for the algebraically secure nonlinear masking in the next section. 
+
+\SubSecDef{sh}{Structure Hiding}
+The second component resembles what is usually understood by \emph{software obfuscation}. Indeed, the usual software obfuscation aims to obfuscate the control flow graph and hide important operations. Often such obfuscation includes integrity protections to prevent patching. The computed values are not hidden but merely blended among redundant values computed by dummy instructions. For circuits the problem is less obscure and ad hoc. In particular, an integrity protection scheme for circuits was proposed by Ishai \etal{} in~\cite{PrivCircuits2}. Though, formalizing the "protection against analysis" is not easy. Applying structure hiding protection on top of value hiding protection should secure the implementation from attacks described in Chapter~\ref{chap:wba}. We do not investigate structure hiding further in this work.
+
+We note that it is not possible to formally separate \VH{} from \SH{}. If we give the adversary computed vectors of values even in shuffled order, she can reconstruct the circuit in reasonable time and then analyze it. One possible direction is to mix the value vectors linearly by a random linear mapping before giving to the adversary. It may be a difficult problem for the adversary to recover the circuit or its parts from such input. However, such model makes the correlation DCA attack almost inapplicable, since a lot of values are unnaturally mixed up and the correlations are not predictable, even though it is perfectly possible that the original unmixed values have strong correlations with secret variables.

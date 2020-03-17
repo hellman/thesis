@@ -1,0 +1,49 @@
+\begin{algorithm}
+    \AlgDef{special}{Finding the best bound on the $\protect\MEDP{}$ of an SPN cipher \\ (for $\protect\MELC{}$ the matrix should be transposed).}
+    \begin{algorithmic}[1]
+    \Require number of rounds $r$; $w\times w$ matrix $M$ over $\pset{0,1,L}$, with at most one $1$ at each column; non-decreasing bounds on $\EDP{}$ (or $\ELC{}$) of the iterated S-Box $(P[1], \ldots, P[r])$ 
+    \Ensure upper bound on the $\MEDP{}$ (or $\MELC{}$)
+    \State{$S_0 \gets \{0,1\}^w \setminus \{0^w\}$ \Comment{0 - inactive, 1 - \lt{} of length 1}}
+    \State{$pr_0[s] = 1.0$ for all $s \in S_0$, $pr_0[s] = 0.0$ otherwise}
+    \ForAll{$i \in \seg{0}{r-1}$}
+        \State{$S_{i+1} \gets \pset{}$}
+        \ForAll{$s \in S_i$}
+            \ForAll{$(s', p') \in Extensions(s, pr_i[s])$}
+                \State{add $s'$ to set $S_{i+1}$}
+                \State{$pr_{i+1}[s'] \gets max(pr_{i+1}[s'], p')$}
+            \EndFor
+        \EndFor
+    \EndFor
+    \State{\Return $max(pr_r[s]$ for $s \in S_r)$}
+    \newline
+    \Function{Extensions}{s, p}
+        \State{$out\_states \gets []$}
+        \ForAll{$cancel \in \pset{false, true}^w$} %\Comment{May be implemented more efficiently via recursion}
+            \State{$s' \gets 0^w, p' \gets p$}
+            \ForAll{$o \in \seg{0}{w-1}$}
+                \State{$mask \gets ($if $s_i > 0$ then $M_{o,i}$ else $0$ for $i \in \seg{0}{w-1})$}
+                \If{$mask$ contains single $1$}
+                    \State{$i \gets$ index of $1$ in $mask$}
+                    \State{$s'[o] \gets s[i] + 1$}
+                    \State{$p' \gets p' + P[s[i]+1] - P[s[i]]$}  \Comment{Extending an \lt{}}
+                \ElsIf{$mask$ contains single $L$}
+                    \State{$s'[o] \gets 1$}  \Comment{An \lt{} is broken by the linear layer}
+                    \State{$p' \gets p' + P[1]$}
+                \ElsIf{$mask$ contains at least two nonzero elements}
+                    \If{cancel[o]}
+                        \State{$s'[o] \gets 0$} \Comment{Differences cancelled}
+                    \Else
+                        \State{$s'[o] \gets 1$}
+                        \State{$p' \gets p' + P[1]$}
+                        \Comment{Differences not cancelled}
+                    \EndIf
+                \EndIf
+            \EndFor
+            \If{$s' \ne 0^w$}
+                \State{append $(s',p')$ to $out\_states$}
+            \EndIf
+        \EndFor
+        \State{\Return $out\_states$}
+    \EndFunction
+    \end{algorithmic}
+\end{algorithm}

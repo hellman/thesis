@@ -1,0 +1,35 @@
+\SecDef{intro}{Introduction}
+
+S-Boxes are used to provide non-linearity in SPN-based block ciphers. They provide basic resistance against linear and differential cryptanalysis, and the rest of the structure ensures that many S-Boxes are activated in a linear or differential trail. The resistance of an S-Box can be quantified. The lower are the \emph{linearity} and the \emph{differential uniformity} of an S-Box, the more resistant it is. Everything else being equal, a stronger S-Box allows to use less rounds in the block cipher using it for the same security level.
+
+The differential uniformity is always even and at least equal to 2. When this bound is achieved, the S-Box is called \emph{Almost Perfect Non-linear (APN)}. The finite field cube function is APN in all field dimensions~\cite{Nyb94}. However, it is a permutation only in odd dimensions. This is a problem, since in most cases (e.g. an SPN block cipher) the S-Boxes are required to be bijective. For efficiency reasons, even-dimensional S-Boxes are preferable, especially powers of 2. And this is exactly the case, where the existence of APN functions is not established: bijective S-Boxes in even dimensions with differential uniformity 2, i.e. APN permutations of $\field{n}$ for $n$ even. For $n = 4$ there exist no APN permutations of $\field{n}$. For $n = 6$ this question was a long standing problem until Dillon~\etal{} presented a 6-bit APN permutation~\cite{DillonAPN,DillonPres} in 2009. Since then, no answers were obtained for even $n \ge 8$, despite many attempts~\cite{SubspaceProperty,Uniform4}. This remains a big open problem in the field of Boolean functions.
+
+The 6-bit APN permutation is found by a computer search, by transforming the 6-bit APN function, called the Kim mapping $\kim\colon \fielde{6} \to \fielde{6}$:
+$$
+\kim(x) \eqdef \VV x^{24} + x^{10} + x^3,
+$$
+where $v$ is a primitive element of $\fielde{6}$. Even though the Kim mapping is a trinomial function, the resulting APN permutation is an object without clear structure. For example, its polynomial form contains 52 monomials.
+
+Using the methods of S-Box reverse-engineering described in previous chapters (developed in~\cite{OurKuz1}), I and my coauthors managed to find a simple algebraic structure of the Dillon's APN permutation. We call this structure a ``Butterfly'' because of its graphical representation the way it changes by particular transformations. The decomposition is established in Theorem~\Ref{thm:main}, restated here:
+
+\textbf{Main theorem (A Family of 6-bit APN Permutations)}.
+The 6-bit permutation described by Dillon \etal{} in~\cite{DillonAPN} is affine equivalent to any involution built using the structure described in \FigRef{intro-decomp}, where $\fmult$ denotes multiplication in the finite field $\fielde{3}$, $\alpha \neq 0$ is such that $\tr(\alpha) = 0$ and $\mathcal{A}$ denotes any 3-bit APN permutation.
+\FigTex{intro-decomp.tex}
+
+\subsection{Notations}
+For any $f\colon \field{n} \to \field{n}$ let $\parf{f}\colon \field{2n} \to \field{2n}$ be the parallel application of $f$ given by
+$$
+\parf{f}(x,y) = (f(x), f(y)).
+$$
+For any $a,b \in \field{n}$ let $\xorf{f}\colon \field{2n} \to \field{2n}$ be parallel xor with constants $a,b$:
+$$
+\xorf{f}(x,y) = (x \oplus a, y \oplus b).
+$$
+The finite field trace function is denoted by $\Tr\colon \fielde{n} \to \field{}$, it is given by
+$$
+\Tr(x) \eqdef \sum_{e=0}^{n-1} x^e.
+$$
+
+\subsection{Outline}
+\SecRef{decomposition} explains the decomposition process of the APN permutation. In~\SecRef{properties} I describe new properties of the APN permutation that follow from the discovered structure. \SecRef{components} studies the flexibility of the structure, i.e. how can we modify the structure while preserving the APN property?
+In \SecRef{relations} I show new relations between the APN permutation, the Kim mapping, monomial functions and 3-round Feistel Network structure. Finally, I briefly conclude the chapter in \SecRef{conclusions}.

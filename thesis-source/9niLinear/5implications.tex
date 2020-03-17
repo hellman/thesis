@@ -1,0 +1,95 @@
+\SecDef{implications}{Implications for Degree-\texorpdfstring{$d$}{d} Sum-Invariant Matrices}
+
+In this section, I point out the implications of the above results on degree-$d$ sum-invariant matrices. The most interesting implication is that any bijective degree-$3$ sum-invariant matrix must be trivial. As the linear layer of a block cipher based on an LS-design certainly has to be bijective, this shows that one cannot extend the observation of Todo \etal. to invariants of degree higher than two.
+
+\begin{corollary}
+Let $L \in \F_2^{n \times n}$ be a degree-$d$ sum-invariant matrix for $d \geq 3$. Then $L$ must be a permutation matrix.
+\end{corollary}
+\begin{proof}
+Let us assume a degree-$3$ sum-invariant matrix $L \in \F_2^{n \times n}$ and let $\matl{L}$ be given by
+\[
+\arraycolsep=4pt\def\arraystretch{1}
+    \matl{L} = \left[\begin{array}{c|c} \idmat{n} & L\end{array}\right] \in \F_2^{n\times 2n}\;.
+\]
+By \PropRef{inner_product} the columns of $\matl{L}$ occurring an odd number of times correspond to a degree-3 zero-sum set $S \subseteq \F_2^n$. Note that the unit columns of $\idmat{n}$ do not repeat inside $\idmat{n}$. Therefore, after removing the even occurrences of each column, the number of columns left in $\idmat{n}$ will be not smaller than the number of columns left in $L$. It follows that $\rank(S) \ge |S|/2$. From Corollary\Ref{cor:Fn3},
+$$
+|S|\ge F(\rank(S), 3) \ge 2 \cdot \rank(S) + 6
+$$
+Therefore, $S$ must be empty and thus $L$ is a permutation matrix.
+\end{proof}
+
+Consider a degree-$d$ sum-invariant matrix $L$ and consider the matrix $\matl{L}$ defined as in \PropRef{inner_product}:
+    \begin{equation}
+    \begin{cases}
+    \arraycolsep=4pt\def\arraystretch{1}
+    \matl{L} \coloneqq \left[\begin{array}{c|c} \idmat{n} & L\end{array}\right] \in \F_2^{n\times(m+n)},
+    & \text{~if~} m+n \text{~is even}; \\
+    \arraycolsep=4pt\def\arraystretch{1}
+    \matl{L} \coloneqq \left[\begin{array}{c|c|c} \idmat{n} & L & 0\end{array}\right] \in \F_2^{n\times(m+n+1)},
+    & \text{~if~} m+n \text{~is odd},
+    \end{cases}
+    \end{equation}
+where it is shown that the columns of $\matl{L}$ occurring and odd number of times define a degree-$d$ zero-sum set. Because of the cancellations, the size and the rank of the zero-sum set may be lower. We deduce the following decomposition of sum-invariant matrices.
+
+\begin{proposition}
+Let $L \in \F_2^{n \times m}$ be a degree-$d$ sum-invariant matrix such that no column of $L$ is equal to zero. Then, up to permutations of rows and columns, $L$ can be expressed in the following form:
+
+\eql{invariant-matrix-form}{
+    L = \left[ \begin{array}{c|c|c|c} 
+    A &
+    \coltworaw{0}{I_k} &
+    M &
+    M 
+    \end{array} \right],
+}
+where $k,t$ are some integers, $M \in \F_2^{n \times t}$, $A \in \F_2^{n \times (m - 2t - k)}$, and the columns of $A$ do neither contain unit vectors nor repetitive columns. Such integers $k,t$ are unique. 
+Consider the matrix $\widehat{A}$:
+\begin{equation}
+    \begin{cases}
+    \arraycolsep=4pt\def\arraystretch{1}
+    \widehat{A} \coloneqq\left[
+    \begin{array}{c|c} \coltworaw{I_{n-k}}{0} & A\end{array}
+    \right] \in \F_2^{n\times(m+n-2t-2k)},
+    & \text{~if~} m+n \text{~is even}; \\
+    \arraycolsep=4pt\def\arraystretch{1}
+    \widehat{A} \coloneqq \left[
+    \begin{array}{c|c|c} \coltworaw{I_{n-k}}{0} & A & 0\end{array}\right
+    ] \in \F_2^{n\times(m+n-2t-2k+1)},
+    & \text{~if~} m+n \text{~is odd}.
+    \end{cases}
+\end{equation}
+The columns of the matrix $\widehat{A}$ are pairwise distinct and form a degree-$d$ zero-sum set.
+% Q: rank of ZS is rank of A???
+\end{proposition}
+\begin{proof}
+The columns of $\matl{L}$ occurring an odd number of times form a degree-$d$ zero-sum set. The columns of $\idmat{n}$ may only cancel with columns from $L$. Let $k$ be the number of unit vectors occurring an odd number of times in $L$. Let $A$ be the matrix consisting of the columns of $L$ that are repeated an odd number of times and which are not unit vectors. It follows that $L$ can be expressed in the form given in \EqRef{invariant-matrix-form}. Now consider the matrix $\matl{L}$. After removing even repetitions of columns, the matrix will be equal to $\widehat{A}$. It follows that the columns of $\widehat{A}$ define a degree-$d$ zero-sum set. 
+
+To show uniqueness of $k,t$, first recall that $A$ must not contain unit vectors. It follows that all columns of $L$ occurring an even number of times must be in $M$, and all columns occurring an odd number of times must be either in $A$ or in $I_k$ depending only on the column weight.
+
+\end{proof}
+
+% =====================================
+
+\subsection{Minimum Expansion Rate}
+We have shown that for $d \ge 3$, there exist no bijective degree-$d$ sum-invariant matrices. However, there exist rectangular degree-$d$ sum-invariant matrices resulting in expanding linear mappings. 
+A natural problem would be to find a degree-$d$ sum-invariant matrix with a minimum expansion rate.
+
+
+
+\begin{definition}[Expansion Rate]
+The \emph{expansion rate} of a matrix $L \in \F_2^{n\times m}$ is the ratio $\frac{m}{n}$.
+\end{definition}
+
+Note that, given a degree-$d$ sum-invariant matrix $L \in \F_2^{n \times m}$, we can always build a a degree-$d$ sum-invariant matrix in $\F_2^{(n+1)\times(m+1)}$ of the form
+\[ \left[\begin{array}{cc} L & 0 \\
+0 & 1\end{array}\right]\;.\]
+Therefore, by repetitively extending any matrix $L$ by unit vectors in the above way, we can construct a matrix with an expansion rate arbitrarily close to $1$. Indeed, the permutation matrices have an expansion rate of exactly $1$. Therefore, by the \emph{minimum expansion rate} for a degree-$d$ sum-invariant matrix of fixed $d$, we refer to the minimum expansion rate over all degree-$d$ sum-invariant matrices that do not contain a unit vector as a column.
+
+It is clear that for $d=2$ the minimum expansion rate is $1$ and is achieved by orthogonal matrices. For $d \ge 3$ the minimum expansion rate is an open problem. It corresponds to the minimum value of $\frac{F(n,d)}{n}-1$. Among the established values of $F(n,d)$ the minimum expansion rate is achieved for $F(d+2,d)=2^{d+1}$, i.e. by the matrices from the construction given in \PropRef{expanding-linear-high-degree}. We conjecture that this is indeed the optimal expansion rate.
+
+\begin{conjecture}
+\Label{conj:minimum-expansion}
+Let $d \ge 3$. The minimum expansion rate of a degree-$d$ sum-invariant matrix is equal to $\frac{2^{d+1}-d-2}{d+2}$.
+\end{conjecture}
+
+

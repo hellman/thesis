@@ -1,0 +1,219 @@
+\section{High-Degree Indicator Matrix}
+\SecLabel{hdim}
+
+In~\cite{LeoRE} Perrin and Biryukov suggested looking at the visual representation of the LAT of an S-Box with the goal of finding non-random patterns. The suggested representation is a heatmap of the LAT matrix and was named "a Jackson Pollock representation" of the LAT, after the famous abstract expressionist painter. The success of this method is illustrated in this chapter.
+
+Consider a 4- and 5-round Feistel Network. For a tiny branch size (for example, 3 bits) it is possible to generate the whole codebook and compute the LAT and its visualization. Figure~\Ref{fig:lat8motiv} shows the Pollock representations of the LAT of Feistel Networks with randomly generated bijective round functions with 3-bit branches (6-bit block size), taken modulo 8.
+
+\FigTex{lat-mod-4.tex}
+
+The images yield a lot of patterns. The patterns are even more clear when observed on multiple random instances of the Feistel Network. In particular, the 4-round structure always yields LAT consisting of $8\times8$ single-colored squares. The 5-round structure still has a visible square structure, but not all squares are single-colored. The topmost leftmost square is always white, the topmost (resp. leftmost) squares consist of horizontal (resp. vertical) lines. Furthermore, linear patterns can be noticed: many columns/rows are inverted versions of other columns/rows, and many columns/rows can be expressed as sums of other columns/rows (modulo 8). The 6-round structure still has linear patterns but no clear squared structure.
+
+After studying these patterns, we observed that the LAT modulo 8 is a bilinear form directly related to the monomials of degree $n-1$ in the ANF of the analyzed $n$-bit permutation. This is formally stated and proved in the following section.
+
+% ======================================
+
+\subsection{Relation between HDIM, LAT and ANF}
+
+\begin{definition}[HDIM]
+Let $S\colon \field{n} \to \field{m}$ and $\deg{S}\le n-1$. The HDIM of $S$ is the $m\times n$ matrix $\HDIM{S}$ over $\field{}$ given by
+$$
+\HDIM{S}[i,j] \eqdef \bigoplus_{x \in \field{n}} \inprod{e_i, S(x)}\inprod{e_j, x}.
+$$
+\end{definition}
+
+\begin{proposition}[HDIM and ANF]
+\Label{hdim-anf}
+$\HDIM{S}[i,j] = 1$ if and only if the ANF of the $i$-th coordinate of $S$ contains the monomial $\prod_{k \ne j}x_k=x_1\ldots x_n/x_j$.
+\end{proposition}
+\begin{proof}
+The sum over $\field{n}$ is equal to 1 if and only if the summed expression contains the monomial $x_1\ldots x_n$. Since no coordinate of $S$ has term of degree $n$, $\HDIM{S}[i,j] = 1$ is equivalent to $\inprod{e_i,S(x)}$ having the monomial $x_1\ldots x_n/x_j$.
+\end{proof}
+
+Proposition~\Ref{hdim-anf} shows that a known value of a cell of the HDIM corresponds to a known ANF coefficient, i.e. an integral distinguisher. The following theorem describes the relation between the HDIM and the LAT of a function.
+
+\begin{theorem}[HDIM and LAT]
+Let $S\colon \field{n} \to \field{m}, n \ge 3$ be a balanced function. Then
+$$(\LAT{S}(a,b) \mod{8})/4 = b^\top \times \HDIM{S} \times a.$$
+\end{theorem}
+\begin{proof}
+By linearity of the inner product,
+$$
+b^\top \times \HDIM{S} \times a = \bigoplus_{x\in \field{n}} \inprod{b,S(x)}\inprod{a,x}.
+$$
+On the other hand, using $(-1)^z = 1-2z$ for $z\in\field{}$ we obtain:
+$$
+\LAT{S}(a,b) =
+\sum_{x\in \field{n}}(-1)^{\inprod{a,x} \oplus \inprod{b,S(x)}} =
+\sum_{x\in \field{n}} (1-2\inprod{a,x})(1-2\inprod{b,S(x)}).
+$$
+Observe that
+$$
+\sum_{x\in\field{n}}\inprod{a,x} = 2^{n-1} = \sum_{x\in\field{n}}\inprod{b,S(x)},
+$$
+where the last equality holds because $S$ is balanced.
+It follows that
+$$
+\LAT{S}(a,b) =
+4\sum_{x\in\field{n}}\inprod{a,x}\inprod{b,S(x)} - 2^n
+$$
+and, for $n \ge 3$, $\LAT{S}(a,b) \equiv 4\sum_{x\in \field{n}}\inprod{a,x}\inprod{b,S(x)}\pmod{8}$.
+\end{proof}
+
+The HDIM serves as an interesting link between the algebraic normal form and the linear approximation table of a function. It captures all the information in the LAT modulo 8 and explains the (bi)linear patterns. However, the square patterns in \FigRef{lat8motiv} are artifacts of the 3- and 4-round Feistel Network structure. These patterns have a simple expression in terms of the HDIM. They will be formalized and proved in \SecRef{hdim-feistel}.
+
+\Todo{algorithm for HDIM $\OO(n2^n)$}
+
+% ======================================
+
+\subsection{Properties of the HDIM}
+
+The HDIM inherits some properties from the LAT. In particular, taking the inverse of a permutation or composing a function with affine mappings has a simple effect on the HDIM.
+
+\begin{proposition}
+Let $S$ be a permutation of $\field{n}$. Then $$\HDIM{S^{-1}} = \HDIM{S}^{\top}.$$
+\end{proposition}
+\begin{proof}
+It follows from the fact that $\LAT{S^{-1}} = \LAT{S}^{\top}$.
+\end{proof}
+
+\begin{proposition}
+\Label{prop:hdim-linear-effect}
+Let $S\colon \field{n} \to \field{m}$, and let $\mu$ and $\eta$ be linear permutations of $\field{n}$ and $\field{m}$ respectively. Let $T=\eta \circ S \circ \mu$. Then
+$$
+\HDIM{T} = \eta \times \HDIM{S} \times (\mu^{\top})^{-1}.
+$$
+\end{proposition}
+\begin{proof}
+\begin{align*}
+\HDIM{T}[i,j] & = e_i^{\top} \times \HDIM{T} \times e_j = \\
+& = \bigoplus_{x\in \field{n}} \inprod{e_i,\eta(S(\mu(x)))} \inprod{e_j,x} = \\
+& = \bigoplus_{z\in \field{n}} \inprod{e_i,\eta(S(z))} \inprod{e_j,\mu^{-1}\times z} = \\
+& = \bigoplus_{z\in \field{n}} \inprod{\eta^{\top}\times e_i,S(z)} \inprod{(\mu^{\top})^{-1}\times e_j, z} = \\
+& = (e_i^{\top} \times \eta) \times \HDIM{S} \times ((\mu^{\top})^{-1} \times e_j).
+\end{align*}
+The proposition follows.
+\end{proof}
+
+% ======================================
+
+\subsection{Generalization of the LAT-ANF link}
+\SecLabel{gen-lat-anf}
+
+For the rest of the chapter, the link between the HDIM and the LAT will not be used. However, I would like to note a generalization of this link for congruences of the LAT modulo higher powers of 2, for example, modulo 16, 32, etc. The link connects \emph{sums} of the Walsh transform over subspaces with ANF coefficients of lower degree. It is based on the following theorem that relates the sum of a Boolean function $f$ over a linear subspace $V\subseteq\field{n}$ with the sum of the Walsh transform of $f$ over the orthogonal complement of $V$. The first quantity is directly related to the ANF of $f$.
+
+\begin{theorem}[Poisson Summation,{\cite[p.147]{LehmerPoisson}}]
+Let $f\colon \field{n} \to \field{}$ and let $V\subseteq \field{n}$ be a linear subspace. Then
+$$
+\sum_{a \in V}\walsh{f}(a) = 2^n-2^{\dim{V}+1}\sum_{x \in V^{\bot}}f(x).
+$$
+\end{theorem}
+\begin{proof}
+Observe that
+$$
+\sum_{a \in V}\walsh{f}(a) =
+\sum_{a \in V}\sum_{x \in \field{n}}(-1)^{\inprod{a,x}\oplus f(x)} =
+\sum_{x \in \field{n}}(-1)^{f(x)} \sum_{a \in V} (-1)^{\inprod{a,x}}.
+$$
+If $x \in V^{\bot}$, then $\sum_{a\in V}(-1)^{\inprod{a,x}}=|V|$. Otherwise, $\inprod{a,x}=1$ exactly for half of $V$ and therefore, $\sum_{a\in V}(-1)^{\inprod{a,x}}=0$. It follows that
+$$
+\sum_{a \in V}\walsh{f}(a) =
+|V|\sum_{x \in V^{\bot}}(-1)^{f(x)} = 
+|V|\pround{|V^{\bot}|-2\sum_{x \in V^{\bot}}f(x)} = 
+2^n-2^{\dim{V}+1}\sum_{x \in V^{\bot}}f(x).
+$$
+\end{proof}
+
+\begin{corollary}
+Let $f\colon \field{n} \to \field{}$ be balanced. For any linear subspace $V \subseteq \field{n}$
+$$
+2^n - \sum_{a \in V}\walsh{f}(a)
+\equiv
+2^{\dim{V}+1} \pround{\bigoplus_{x\in \field{V^{\bot}}} f(x)} \pmod{{2^{\dim{V}+2}}}.
+$$
+In particular, the link between the LAT and the ANF established using HDIM follows for $n\ge 3$:
+$$
+\pround{\walsh{f}(e_j) \mod{8}}/4 = \bigoplus_{x \in \field{n},\inprod{e_j,x}=0} f(x),
+$$
+where the last expression is the ANF coefficient of the monomial $x_1\ldots x_n/x_j$.
+\end{corollary}
+
+\begin{example}
+Consider the monomial $x^u = x_3x_4\ldots x_{n}$ of degree $n-2$. The corresponding coefficient $a_u$ in the ANF of $f$ can be expressed as (for $n \ge 4$):
+$$
+a_u = \frac{1}{8}\proundd{\pround{
+\walsh{f}(e_{1})+\walsh{f}(e_{2})+\walsh{f}(e_{1}+e_{2})
+} \mod{16}}.
+$$
+\end{example}
+
+\Todo{check with code}
+
+% ======================================
+
+\subsection{Generalization of the HDIM-ANF link}
+\SecLabel{gen-hdim-anf}
+
+The HDIM-ANF link provides an expression for a coefficient of the monomial $x_1\ldots x_n/x_j$ in the ANF of a balanced Boolean function $f\colon \field{n} \to \field{}$,
+$$
+a_u = \bigoplus_{x \in \field{n}} f(x) \cdot \inprod{e_j, x},
+$$
+where $1 \le j \le n$ and $u \in \field{n}$ is such that $u_i = 1$ if and only if $i \ne j$. This idea can be generalized for monomials of lower degrees:
+
+\begin{proposition}
+\PropLabel{anf-alternative}
+Let $f\colon \field{n} \to \field{}$ and $u \in \field{n}$. Then the coefficient $a_u$ of the monomial $x^u \eqdef x_1^{u_1}\ldots x_n^{u_n}$ can be computed as:
+$$
+a_u = \bigoplus_{x \in \field{n}} f(x) \cdot (\lnot x)^{\lnot u},
+$$
+where $(\lnot x)^{\lnot u} \eqdef (x_1 \oplus 1)^{u_1 \oplus 1}\ldots (x_n \oplus 1)^{u_n \oplus 1}$.
+\end{proposition}
+\begin{proof}
+The term $(\lnot x)^{\lnot u}$ is equal to one if and only if $x_i = 0$ for all $i$ such that $u_i = 0$, or, equivalently, $x \preceq u$. It follows that the equation from the proposition is equivalent to
+$$
+a_u = \bigoplus_{x\preceq u} f(x),
+$$
+which is exactly the expression of the ANF coefficient $a_u$ obtained from the \Mobius{} inversion formula.
+\end{proof}
+
+\begin{remark}
+The Boolean function $f$ can be replaced by a coordinate $\inprod{e_i, S}$ of vectorial Boolean function $S$.
+\end{remark}
+
+\begin{remark}
+The HDIM expression involves $\inprod{x, e_i} = x^e_i = x^{\lnot u}$. Since $f$ is balanced (i.e. \txor{}s to zero), it is indeed equivalent to $(\lnot x)^{\lnot u}$. For degrees lower than $n-1$, this is not true in general.
+\end{remark}
+
+The generalization of the HDIM-ANF link can be used to directly prove a useful general composition bound by Boura and Canteaut~\cite[Corollary~2]{influence}.
+
+\begin{proposition}
+\PropLabel{deficiency}
+Let $F$ be a permutation of $\field{n}$ and let $g\colon \field{n} \to \field{}$. Then
+$$
+\deg{g\circ F} \le n - \ceil{\frac{n- \deg{g}}{\deg{F^{-1}}}}.
+$$
+\end{proposition}
+\begin{proof}
+By \PropRef{anf-alternative}, the coefficient $a_u$ of the monomial $x^u$ in the ANF of $g \circ F$ can be computed as
+$$
+a_u = \bigoplus_{x\in \field{n}} g(F(x)) \cdot (\lnot x)^{\lnot u} = \bigoplus_{z \in \field{n}} g(z) \cdot (\lnot F^{-1}(z))^{\lnot u}.
+$$
+If follows that $a_u = 0$ if
+$$
+\deg{\pround{g(z) \cdot (\lnot F^{-1}(z))^{\lnot u}}} < n,
+$$
+which is definitely true if
+$$
+\deg{g} + (n - \wt(u)) \cdot \deg{F^{-1}} < n.
+$$
+Equivalently, $a_u = 0$ if
+$$
+\wt(u) > n - \frac{n-\deg{g}}{\deg{F^{-1}}}.
+$$
+It follows that
+$$
+\deg{g\circ F} \le n - \frac{n-\deg{g}}{\deg{F^{-1}}} \le n - \ceil{\frac{n-\deg{g}}{\deg{F^{-1}}}}.
+$$
+
+I remark that strict inequality from Corollary~2 from~\cite{influence} is equivalent to this inequality by switching the rounding up to the rounding down.
+\end{proof}

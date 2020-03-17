@@ -1,0 +1,12 @@
+\myminitoc
+
+\subimport{}{macros.tex}
+
+In this chapter, I describe an analysis of the core permutation $F$ of NORX~\cite{NORX}, one of the fifteen authenticated encryption algorithms that have reached the third round of the CAESAR competition~\cite{CAESAR}. I show that it has rotational symmetries on different structure levels. This yields simple distinguishing properties for the permutation, which propagate with very high probability or even probability one. The stronger symmetry was independently discovered by Chaigneau~\etal{} in~\cite{NORXfse} and was used to attack a previous version of NORX. The latest version of NORX is not susceptible to the attack. I describe three attacks on slightly modified variants of NORX exploiting the discovered symmetries.
+
+I also propose an algorithm to prove absence of low-degree nonlinear invariants based on the cycle decomposition of a permutation. I use it to prove that there are no nonlinear invariants of a low degree in the 32-bit permutation $G$ used in NORX8.
+
+\subimport{}{1intro.tex}
+\subimport{}{2spec.tex}
+\subimport{}{3symmetries.tex}
+\subimport{}{4invariants.tex}

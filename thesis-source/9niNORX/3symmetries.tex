@@ -1,0 +1,211 @@
+\SecDef{symmetries}{Rotational Invariants in NORX}
+
+In this section I describe rotational symmetries in the permutation $F$ of NORX. They exist both on the word level (inherited from $G$) and on the state level (structural).
+
+\subsection{State Invariants}
+
+We can see a 4x4 NORX state $S$ as a list of 4 columns: $S = (c_1, c_2, c_3, c_4)$. 
+
+\begin{definition}[Columns Rotation]
+For an integer $n$ denote by $R_n$ the function rotating of the columns left by $n$ positions. For example $R_1(c_1, c_2, c_3, c_4) = (c_2, c_3, c_4, c_1)$ for arbitrary $c_1, c_2, c_3, c_4 \in (\field{w})^4$.
+\end{definition}
+
+The following proposition shows that the permutation $F$ is column rotation-symmetric.
+
+\begin{proposition}
+The permutations $R_n$ and $F^l$ commute for any integers $n$ and $l \ge 1$:
+$$
+F^l \circ R_n = R_n \circ F^l.
+$$
+\end{proposition}
+\begin{proof}
+Clearly, the rotation of columns does not affect the column step $\col$, since it transforms each column separately: $\col \circ R_n = R_n \circ \col$. Such rotations do not break the diagonals as well, because the diagonals are simply reordered. Therefore, $\diag \circ R_n = R_n \circ \diag$. It follows that $F$ commutes with $R_n$ and thus $F^l$ commutes with $R_n$ too.
+\end{proof}
+
+\begin{definition}
+A state $s \in (\field{w})^{16}$ is said to be \emph{column $n$-rotation invariant} if
+$$
+R_n(s) = s.
+$$
+\end{definition}
+
+Let $s \in (\field{w})^{16}$ be a column $n$-rotation invariant state for a fixed positive integer $n$. Observe that
+$$
+R_n(F(s)) = F(R_n(s)) = F(s),
+$$
+i.e. $F(s)$ is also column $n$-rotation invariant. It follows that the property of a state being column $n$-rotation invariant is an invariant of the round function $F$. It is easy to see that this invariant corresponds to an invariant subspace.
+
+\begin{proposition}
+For a fixed integer $n, 1 \le n \le 3$, the set of all column $n$-rotation invariant states is a linear subspace of $(\field{w})^{16}$.
+For $n = 1$ or $n = 3$ this is the same subspace of dimension $4w$,
+for $n = 2$ the invariant subspace has dimension $8w$.
+\end{proposition}
+\begin{proof}
+    If $n=1$ or $n=3$, then for any $c_1, c_2, c_3, c_4 \in (\field{w})^4$
+    $$
+    (c_1, c_2, c_3, c_4) = (c_2, c_3, c_4, c_1)
+    $$
+    and it follows that all columns are equal: $c_1 = c_2 = c_3 = c_4$. There are $2^{4w}$ out of $2^{16w}$ such states. The designers of NORX noted these states in~\cite{DBLP:conf/latincrypt/AumassonJN14}. A constraint $c_i = c_j$ consists of $4w$ linear equations $c_{i,y,x} \oplus c_{j,y,x} = 0$, where $1 \le y \le 4, 1 \le x \le w$. Therefore, these constraints define a linear subspace of dimension $16w - 3\cdot 4w = 4w$.
+
+    If $n = 2$, then for any $c_1, c_2, c_3, c_4 \in (\field{w})^4$ $$
+    (c_1, c_2, c_3, c_4) = (c_3, c_4, c_1, c_2)
+    $$
+    and it follows that the two pairs of columns are equal: $c_1 = c_3$ and $c_2 = c_4$. There are $2^{8w}$ out of $2^{16w}$ such states. Similarly, these constraints define a linear subspace of dimension $8w$.
+\end{proof}
+
+Hitting such a special state even for the case $n=2$ is not easy under the NORX security claims. However, $2^{8w}$ is a more serious fraction of states than the $2^{4w}$ weak states which were known to the designers. To illustrate possible dangers of such properties, I refer to the forgery attack~\cite{NORXfse} on the previous version of NORX exploiting this invariant, and I also describe two hypothetical attacks on NORX8~\cite{aumasson2015norx8}, a NORX version with 8-bit words for low-end devices. I remark that NORX8 is not a part of the CAESAR submission.
+
+The fist attack shows a weak-key set, which could be exploited if the domain separation constants were rotation-invariant. The weak-key set is relatively small, $2^{32}$ keys out of $2^{80}$. The second attack is a state/key recovery attack in a known plaintext scenario. It succeeds with probability $2^{-64}$ for each two consequent known-plaintext blocks, and the total time complexity is $2^{72}$ to recover an 80-bit key. Note that the designers restrict the data per single key to $2^{24}$ message blocks, therefore, the attack can break a concrete key with probability only $2^{-40}$.
+
+Both attacks are independent of the number of rounds $l$ used in the permutation.
+
+\subsection{Hypothetical Weak-key Attack on NORX8 Initialization}
+The initial state of NORX8 is given by
+\begin{equation}
+\begin{pmatrix}
+    n_1 & n_2 & n_3 & n_4 \\
+    k_1 & k_2 & k_3 & k_4 \\
+    k_5 & k_6 & k_7 & k_8 \\
+    k_9\oplus w & k_{10}\oplus l & u_{15}\oplus p  & u_{16}\oplus t \\
+\end{pmatrix} \in (\field{8})^{16},
+\end{equation}
+where $n_i$ and $k_i$ denote bytes of the nonce and the key respectively, $u_i$ are constants and $w,l,p,t$ are constants encoding parameters of NORX. It is possible to construct valid initial states with two equal halves, i.e. a column 2-rotation invariant state. Indeed, let us fix the four key bytes $(k_3, k_4, k_7, k_8)$ arbitrarily and let us choose the two nonce bytes $(n_3, n_4)$ arbitrarily. Then we can set the left half of the state equal to the right half, i.e.
+\eq{
+(n_1, n_2) &= (n_3, n_4),\\
+(k_1, k_2) &= (k_3, k_4),\\
+(k_5, k_6) &= (k_7, k_8),\\
+(k_9, k_{10}) &= (u_{14} \oplus p \oplus w, u_{15} \oplus t \oplus l).
+}
+There are $2^{32}$ weak keys out of $2^{80}$ and $2^{16}$ nonces that result in such a weak state. The column 2-rotation invariant of such state is preserved through arbitrary number of rounds of $F$. However, after the first $F^l$ rounds the domain separation constant will be added to the last word of the state (see~\FigRef{sponge2}). This constant is not column 2-rotation invariant and therefore it will break the property. Therefore, we consider a slightly modified version of NORX8 where the domain separation constant is column 2-rotation invariant. For example, the original constant may be added not only to the last word, but to all words of the state or to all words in the last row. In such case the invariant is preserved through the next $F^l$ rounds and the rate part of the state is then observed by an adversary. This leads to a simple distinguisher: the adversary simply compares the left and right halves of the exposed part of the state. In NORX8 the rate part consists of only 5 bytes. It allows to check only the topmost 4 words with error probability $2^{-16}$. By using a few more encryptions with another weak nonces the error probability can be decreased to negligible.
+
+I remark that the weak key space is very small and the attack requires symmetric domain separation constants. On the other hand, it is powerful in that it is independent of the number of rounds. The attack illustrates possible dangers of having such strong invariants in the permutation.
+
+
+\subsection{State Recovery Attack on NORX8} 
+
+The column $2$-rotation invariant can be used to mount a state/key recovery attack on NORX8, though exceeding the data usage limit defined by the designers.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[height=2.8cm]{\PathFig{layout.png}}
+    \FigDef{sponge2}{The NORX v2.0 AE scheme with parallelization parameter $p = 1$. NORX8 and NORX16 follow this scheme. (credits: NORX specification~\cite{NORX})}
+\end{figure}
+
+Assume that we have a two-block known-plaintext message. That is, we know the rate part before and after a call to the NORX8 core permutation $F^l$. Denote the input rate part by $a$ and the output rate part by $b$. Recall that the rate in NORX8 is 40 bits, which is five 8-bit words. With probability $2^{-16}$ we will observe $a_1 = a_3, a_2 = a_4$. Then there are two cases:
+\begin{enumerate}
+    \item The whole state is column rotation-2 invariant. The probability of this is equal to  $2^{-6\cdot8}=2^{-48}$, given the observed rate part. Indeed, a uniformly random state is column 2-rotation invariant with probability $2^{-64}$. In this case the output state will be also column rotation-2 invariant with probability 1 and we will observe $b_1 = b_3, b_2 = b_4$.
+    
+    \item The whole state is not column rotation-2 invariant. Then with probability $2^{-16}$ we will observe $b_1 = b_3, b_2 = b_4$ as a false positive.
+\end{enumerate}
+As a result, when we observe both $a_1 = a_3, a_2 = a_4$ and $b_1 = b_3, b_2 = b_4$, the probability of the state being column rotation-2 invariant is equal to $2^{-32}$ and in the other cases it is a false positive. In the first case the state before the call to $F^l$ contains 5 unknown words $x_1,\ldots,x_5 \in \field{8}$:
+$$
+\begin{pmatrix}
+    a_1 & a_2 & a_3=a_1 & a_4=a_2 \\
+    a_5 & x_1 & a_5 & x_1 \\
+    x_2 & x_3 & x_2 & x_3 \\
+    x_4 & x_5 & x_4 & x_5 \\
+\end{pmatrix}.
+$$
+We can exhaustively check all $2^{40}$ possibilities for $x_1, \ldots, x_5$ by encrypting through $F^l$ and obtaining extra filter with probability $2^{-24}$ from $b$. The remaining $2^{16}$ candidates can be checked by decrypting the state up to the initial state and matching the constants and further verifying the tag.
+
+As a result, with probability $2^{-64}$ two consequent known-plaintext blocks allow to recover the full state and the secret key. The initial filter has strength $2^{-32}$ and the time complexity of checking a block pair is $2^{40}$. Note that the designers set a limit to $2^{24}$ data, therefore the attack succeeds for a concrete key only with probability around $2^{-40}$.
+
+
+\subsection{Word Invariants}
+
+\newcommand\rr{\mathbf{r}}
+A similar rotational symmetry exists on the word level too. 
+Let $G'$ be the permutation of $(\field{w})^4$ to itself obtained from $G$ by replacing the four left shift operations by left rotations.
+
+\begin{proposition}
+\PropLabel{GprimeG}
+$G' = G$ is conditioned by 4 bit equations, where each equation holds with probability $3/4$.
+\end{proposition}
+\begin{proof}
+The left shift by one inserts a zero in the least significant bit of the result. If the most significant bit of the input is equal to 0, then the left shift is equivalent to the left rotation. There are 4 left shifts in $G$, each yields such bit equation. The input of a left shift in $G$ is simply an AND of two state bits, which are uniformly distributed.
+\end{proof}
+
+\begin{observation}
+Experimentally, it is observed that $\Pr[G' = G]$ is close to $2^{-1.82}$, where the input is sampled uniformly at random, for all word sizes $w \in \{8,16,32,64\}$.
+\end{observation}
+
+Note that this observation shows the effect of dependency of the four quarter-steps in $G$. The probability that all these bits are equal to zero can be estimated as $(3/4)^4 \approx 2^{-1.66}$. However, the actual probability is lower due to the dependency of the equations. 
+
+\begin{definition}
+Let $r_n\colon \field{w} \to \field{w}$ be the mapping which rotates a word left by $n$ bits and let $\rr_n \colon (\field{w})^4 \to (\field{w})^4$ be defined as
+$$
+\rr_n(a,b,c,d) \eqdef (r_n(a), r_n(b), r_n(c), r_n(d)).
+$$
+\end{definition}
+
+\begin{proposition}
+\PropLabel{Gcommute}
+For any integer $n, 1 \le n < w$, $\rr_n$ commutes with $G'$:
+$$
+G' \circ \rr_n = \rr_n \circ G'.
+$$
+Furthermore, $\rr_n$ commutes with $G$ conditioned by 8 bit equations, each holding with probability $3/4$.
+\end{proposition}
+\begin{proof}
+First, it is easy to verify that all operations in $G'$ commute with $\rr_n$. For a binary operation to commute it is required that $\rr_n$ applied to both inputs is equivalent to $\rr_n$ applied to the output.
+
+The second claim follows by applying \PropRef{GprimeG} to the equation $G' \circ \rr_n = \rr_n \circ G'$ two times.
+\end{proof}
+
+\begin{observation}
+Experimentally, it is observed that $\Pr[G' \circ \rr_n = \rr_n \circ G']$ varies from $2^{-3.84}$ to $2^{-3.59}$ depending on the word size and rotation amount $n$. The rotation amounts corresponding to the smallest probabilities are $1$ and $w-1$.
+\end{observation}
+
+Similarly to the column $n$-rotation invariant, define the word $n$-rotation invariant.
+
+\begin{definition}
+A columns $c \in (\field{w})^4$ (resp. a state $s \in (\field{w})^{16}$) is said to be word $n$-rotation invariant if for each its word $c_i$ (resp. $s_i$) the following holds:
+$$
+r_n(c_i) = c_i~~(\text{resp.}~r_n(s_i) = s_i).
+$$
+\end{definition}
+
+\begin{proposition}
+The set of all word $n$-rotation invariant states is a linear subspace of dimension $16\cdot gcd(n, w)$.
+\end{proposition}
+\begin{proof}
+It is easy to see that a word $v \in \field{w}$ is word $n$-rotation invariant if and only if it is made of $w/gcd(n,w)$ copies of the same vector $u \in \field{gcd(n,w)}$. Clearly, all such words form a linear subspace of $\field{w}$ of dimension $gcd(n,w)$. As there are 16 words in the state, the proposition follows.
+\end{proof}
+
+Note that the property of a state or column being invariant requires only one approximation of $G$ by $G'$, i.e. it is approximately twice as more probable than the commutation. 
+
+\begin{proposition}
+Let $c \in (\field{w})^4$ be a word $n$-rotation invariant column. Then 
+$$
+\Pr[\rr_n(G(c)) = G(c)] \ge \Pr[G(c) = G'(c)],
+$$
+where the probabilities are taken over $c$ sampled uniformly at random from the set of all word $n$-rotation invariant columns.
+\end{proposition}
+\begin{proof}
+Consider the following equation:
+$$
+\rr_n(G(c)) \approx \rr_n(G'(c)) = G'(\rr_n(c)) = G'(c) \approx G(c).
+$$
+The two approximations are applied to the same input: $G(c) \approx G'(c)$, therefore the equation holds with probability at least $\Pr[G(c) = G'(c)]$.
+\end{proof}
+
+Experimentally, no difference is observed on $\Pr[G(c) = G'(c)]$ when $c$ is sampled uniformly at random from $(\field{w})^4$ and when it is sampled uniformly at random from the set of all word $n$-rotation invariant columns. Therefore, it can be expected that a word $n$-rotation invariant is preserved through $F$ with a probability approximately $(2^{-1.82})^8 = 2^{-14.56}$. The commutation of $F$ and the $n$-rotation of each word can be expected to happen with probability approximately $(2^{-3.59})^8 = 2^{-28.72}$ if $1 < n < w-1$.
+
+It is worth noting that the word $n$-rotation invariants can be seen as probabilistic invariant subspaces of $F$.
+
+
+\subsection{Hypothetical Attack on NORX128 v2.0}
+
+As the probability of $\rr_n$ commuting with $G'$ does not seem to depend on the word size, the distinguishing property is stronger for instances with larger words and key size. I consider an existential forgery attack similar to the one proposed in~\cite{NORXfse}. Similarly, I consider NORX v2.0 since NORX v3.0 breaks the attack by injecting the key in the finalization stage.
+
+\newcommand\rrr{\mathbf{r}}
+Consider the forgery attack scenario. The finalization stage of NORX consists of 8 iterations of $F$.
+Let us assume that the words in the rate part of the state before the finalization are $w/2$-rotation invariant. This happens with probability $2^{-2w}$. Then we can attempt a forgery by rotating each word in the last ciphertext block by $w/2$. Then, with probability approximately $(2^{-3.59})^{64} = 2^{-229.76}$ we expect the rotation to commute with the finalization:
+$$
+F^8(\rrr_n(s)) = \rrr_n(F^8(s)), 
+$$
+where $s$ is the state before the finalization stage. Since the tag is obtained by truncating the final state and we have observed the tag in the first encryption, we can expect the new tag to be equal to the word $w/2$-rotated version of the original tag.
+
+For NORX64, the probability of the rate to be $32$-rotation invariant is equal to $2^{-128}$. Unfortunately, the attack's success probability then is worse than for a generic attack (i.e. $2^{-256}$). For this reason, I suggest to increase the word size even more and to consider NORX128, a generalization of NORX64 by increasing the word size to 128 bits. In this hypothetical cipher, the full attack success probability is approximately $2^{-256}\cdot 2^{-229.76} < 2^{-512}$, i.e. it is better than a generic attack.
+
+This attack on the hypothetical instance of NORX shows the possibility of exploiting the word-level symmetries as well. The attack does not apply directly to main instances of NORX.

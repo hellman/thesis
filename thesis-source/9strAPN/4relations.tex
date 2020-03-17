@@ -1,0 +1,149 @@
+\SecDef{relations}{Relations with other Maps}
+
+\SubSecDef{butterfly}{Butterfly Structure}
+The structure discovered in the 6-bit APN permutation can be naturally generalized to arbitrary dimensions. In order to keep the algebraic properties, we restrict the nonlinear components to monomial functions in the finite field. 
+
+\begin{definition}[Butterfly Structure]
+  Let $n$ be an integer, $n \ge 3$, let $\alpha \in \fielde{n}$, $e$ be an integer such that $x \mapsto x^e$ is a permutation of $\fielde{n}$.
+  Let $r_{e,\alpha},R_{e,\alpha}$ be defined as
+  \eq{
+      &r_{e,\alpha}\colon \fielde{n} \times \fielde{n} \to \fielde{n},\\
+      &r_{e, \alpha}(x, k) = (x + \alpha k)^{e} + k^{e},\\
+      &R_{e,\alpha}\colon \fielde{n} \times \fielde{n} \to \fielde{n} \times \fielde{n},\\
+      &R_{e,\alpha}(x,k) = (r_{e,\alpha}(x,k), k).
+  }
+  We call \emph{Butterfly Structures} the mappings of $\fielde{n} \times \fielde{n}$ to itself defined as follows:
+  \begin{itemize}
+      \item the \emph{Open Butterfly} with branch size $n$, exponent $e$ and coefficient $\alpha$ is the permutation denoted $\openB{e}{\alpha}$ defined by:
+      \eq{
+        \openB{e}{\alpha} = R_{e,\alpha} \circ \Swap \circ R_{e,\alpha}^{-1}.
+      }
+      \item the \emph{Closed Butterfly} with branch size $n$, exponent $e$ and coefficient $\alpha$ is the function denoted $\closedB{e}{\alpha}$ defined by:
+      \eq{
+        \closedB{e}{\alpha}(x,y) = \proundd{
+            r_{e,\alpha}(x,y),r_{e,\alpha}(y,x)
+        }.
+      }
+  \end{itemize}
+  \FigTex{butterflies.tex}
+\end{definition}
+
+The butterfly structure was generalized and studied in consequent works~\cite{BflyGeneralized1,BflyGeneralized2,BflyGeneralized3}. Many instances of this structure are proved to be differentially 4-uniform, but no new APNs were found. Recently, Canteaut~\etal{} prove~\cite{BflyGeneralized9} that the generalized butterfly structure is never APN for $n > 6$. In this chapter I analyze only relations between the butterfly structure and other mappings in $\field{6}$.
+
+\begin{proposition}
+\PropLabel{ccz}
+For all $n,e,\alpha$, the structures $H\eqdef \openB{e}{\alpha}$ and $V \eqdef \closedB{e}{\alpha}$ are CCZ-equivalent.
+\end{proposition}
+\begin{proof}
+Let $\Gamma_H$ and $\Gamma_V$ be the graphs of $H$ and $V$ respectively. Let $R \eqdef R_{e,\alpha}, r \eqdef r_{e,\alpha}$. Observe that
+\eq{
+\Gamma_V &= \pset{\proundd{x, y, r(x,y), r(y,x)} \mid x,y \in \fielde{3}},\\
+\Gamma_H &= \pset{\proundd{r(y,x), x, r(x,y), y} \mid x,y \in \fielde{3}}.
+}
+Clearly, the graphs differ by a simple reordering of the 3-bit nibble and thus are linear-equivalent.
+\end{proof}
+
+
+\SubSecDef{relations-kim}{Relations with the Kim Mapping}
+
+Recall the Kim mapping $\kim\colon \fielde{6} \to \fielde{6}$:
+\eq{
+\kim(x) \eqdef \VV x^{24} + x^{10} + x^3,
+}
+where $v$ is a primitive element of $\fielde{6}$. It is CCZ-equivalent to the Dillon's APN permutation. It turns out that the Kim mapping is actually affine-equivalent to the closed butterfly $\closedB{6}{w}$, the closed version of $S_{\inv} = \openB{6}{w}$. This equivalence sheds light on the structure of the CCZ-transformation applied by Dillon~\etal{} to the Kim map in order to obtain the APN permutation. Indeed, it can be seen as ``opening'' the closed butterfly $\closedB{6}{w}$, in a particular field basis. Note that \PropRef{ccz} shows that $\closedB{6}{w}$ (a quadratic APN function) can be CCZ-transformed into $\openB{6}{w}$ (a degree-4 APN permutation) simply by reordering nibbles in the function's graph.
+
+\begin{observation}
+The functions $\closedB{6}{w}$ and $\kim$ are affine-equivalent:
+\eq{
+    \kim = B \circ \closedB{6}{w} \circ A,
+}
+where $A,B \in \linbij{6}$ are given by
+\eq{
+A = \matb{
+0 & 1 & 0 & 1 & 0 & 0 \\
+1 & 0 & 0 & 1 & 1 & 0 \\
+1 & 1 & 1 & 0 & 1 & 0 \\
+0 & 1 & 1 & 1 & 1 & 0 \\
+0 & 1 & 1 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 & 0 & 1 \\
+},~~
+B = \matb{
+0 & 1 & 0 & 0 & 1 & 0 \\
+1 & 0 & 1 & 0 & 0 & 1 \\
+0 & 1 & 1 & 1 & 1 & 0 \\
+0 & 1 & 0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 1 \\
+1 & 1 & 0 & 1 & 0 & 1 \\
+}.
+}
+\end{observation}
+
+An anonymous reviewer of~\cite{OurAPN} pointed out that the Kim mapping has the following property: for all $\lambda,x \in \fielde{3}$
+\eq{
+\kim(\lambda x) = \lambda^3 \kim(x).
+}
+The closed butterfly inherits this linear self-equivalence property, which is then expressed in a bivariate way. The following proposition describes this expression and generalizes the similar property of $S_{\inv}$ observed in \SecRef{properties}.
+
+\begin{proposition}[Linear Self-Equivalence of Butterflies]
+For any $n,e,\alpha$, the closed butterfly $\closedB{e}{\alpha}$ satisfies the following property: for all $\lambda,x,y \in \fielde{n}$
+\eq{
+\closedB{e}{\alpha}(\lambda x, \lambda y) = (\lambda^e , \lambda^e) \otimes \closedB{e}{\alpha}(x,y).
+}
+Furthermore, the open butterfly $\openB{e}{\alpha}$, when it is well-defined, satisfies the following property: for all $\lambda,x,y \in \fielde{n}$
+\eq{
+\openB{e}{\alpha}(\lambda^e x, \lambda y) = (\lambda^e, \lambda) \otimes \openB{e}{\alpha}(x,y).
+}
+\end{proposition}
+\begin{proof}
+The propagation of multiplications by $\lambda$ can be easily traced through the structures.
+\end{proof}
+
+
+\SubSecDef{feistel}{Relation with a 3-round Feistel Network}
+
+Consider butterfly structures with $e=1$. The open butterfly with $e=1$ (\FigRef{feistel-ob}) is functionally equivalent to a 3-round Feistel network with Feistel functions $x^e, x^{1/e}, x^e$ (\FigRef{feistel-fn}). The closed butterfly with $e=1$ (\FigRef{feistel-lm}) is an interesting structure similar to the Lai-Massey structure.
+
+\begin{definition}[The $\feistelB{e}$ structure]
+  Let $n \ge 1$, and let $e$ be an integer such that $x^e$ is a permutation of $\fielde{n}$. The structure $\feistelB{e}$ is defined as a $2n$-bit 3-round Feistel network with round functions $x^e, x^{1/e},x^e$, where $1/e$ is the multiplicative inverse of $e$ modulo $2^n-1$.
+\end{definition}
+
+\FigTex{feistel.tex}
+
+In~\cite{SboxFeistel} the authors notice that the 6-bit structure $\feistelB{3}$ is CCZ-equivalent to the monomial mapping $x^5$ of $\fielde{3}$ to itself. We noticed that the closed butterfly $\closedB{5}{1}$ is affine-equivalent to the monomial mapping $x^5$. From CCZ-equivalence of open and closed butterflies, we obtain a full proof of CCZ-equivalence of the monomial mapping $x^5$ and the Feistel network $\feistelB{3}$. We generalize these observations in the following theorem.
+
+\begin{theorem}
+  \ThmLabel{x5-affeq-cb}
+  Let $n \ge 3$ be an odd integer and $e = 2^{2k}+1$ for some positive integer $k$. Then the closed $2n$-bit butterfly $\closedB{e}{1}$ is linear-equivalent to the monomial mapping $x \mapsto x^e$ of $\fielde{2n}$.
+\end{theorem}
+\begin{corollary}
+  \Label{cor:x5-cczeq-f5}
+  Let $n \geq 3$ be an odd integer and $e = 2^{2k}+1$ for some $k \in \ZZplus$, such that the monomial $x \mapsto x^e$ defines a permutation of $\fielde{2n}$. Then the $2n$-bit Feistel Network $\feistelB{e}$ is CCZ-equivalent to this permutation.
+\end{corollary}
+\begin{proof}
+Let us represent an element $x$ of $\fielde{2n}$ by a linear polynomial $x = au + b$ over $\fielde{n}$ with multiplication modulo the irreducible polynomial $u^2 + u + 1$. Note that $u^2 = u + 1, u^4 = u, \ldots, u^{2^{2k}} = u, u^{2^{2k}+1} = u + 1$. Then, by linearity of $x \mapsto x^{e-1}$:
+    \begin{align*}
+        % x^e = (au + b)^e
+        %     &= a^{2^{2k}+1}u^{2^{2k}+1} + a^{2^{2k}}u^{2^{2k}}b + b^{2^{2k}}au + b^{2^{2k}+1}\\
+        %     &= (a^{2^{2k}+1} + a^{2^{2k}}b + ab^{2^{2k}})u + a^{2^{2k}+1} + b^{2^{2k}+1}\\
+        %     &= (b^{2^{2k}+1} + (a + b)^{2^{2k}+1})u + a^{2^{2k}+1} + b^{2^{2k}+1}.
+        x^e = (au + b)^e = (au+b)^{e-1}(au+b)
+            &= a^{e}u^{e} + a^{e-1}u^{e-1}b + aub^{e-1} + b^{e}\\
+            &= (a^{e} + a^{e-1}b + ab^{e-1})u + a^{e} + b^{e}\\
+            &= (b^{e} + (a + b)^{e})u + a^{e} + b^{e}.
+    \end{align*}
+    Note that $(au + b) \mapsto ((a + b)u + a)$ is a linear map. Therefore $(au+b) \mapsto (au+b)^e$ is linear-equivalent to 
+    %$$(a^{2^{2k}+1} + (a+b)^{2^{2k}+1})u + b^{2^{2k}+1} + (a+b)^{2^{2k}+1}.$$
+    $$(a^{e} + (a+b)^{e})u + b^{e} + (a+b)^{e}.$$
+    This expression is exactly the same as in the closed butterfly:
+    $$
+    \closedB{e}{1}(a, b) = (a^e + (a+b)^e, b^e + (a+b)^e)).
+    $$
+    Therefore, $\feistelB{e}$ is linear-equivalent to $\openB{e}{1}$. Finally, $\openB{e}{1}$ is CCZ-equivalent to $\closedB{e}{1}$, whenever $x \mapsto x^e$ defines a permutation.
+\end{proof}
+
+
+\Todo{- Bent Sub-components ?}
+\Todo{- Relations with Cube and Decomposing the cube function}
+\Todo{- observation on adding inverses -> $x^15$ ccz eq.}
+
+

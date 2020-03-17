@@ -1,0 +1,184 @@
+\section{Boolean Functions}
+
+\subsection{Binary Fields and Functions}
+Let $\field{}$ denote the finite field with two elements. For a positive integer $n$ let $\field{n}$ denote the vector space over $\field{}$ of dimension $n$. An $n$-bit \emph{Boolean function} is a function mapping $\field{n}$ to $\field{}$. The set of all $n$-bit Boolean functions is denoted by $\BF{n}$. The \emph{value vector} $\valvec{f}$ of a Boolean function $f$ is the vector of length $2^n$ consisting of the values of $f$ on all possible inputs in the lexicographic order.
+$\fzero,\fone$ denote the two constant functions.
+
+For $n \in \ZZplus$ let $\fielde{n}$ denote the field with $2^n$ elements. Such field is defined as the set of polynomials with coefficients from $\field{}$ and degree at most $n-1$. The field addition is the usual addition of polynomials, and the field multiplication is the multiplication of polynomials modulo a fixed irreducible polynomial of degree $n$. It can be summarized by the isomorphism
+$$
+\fielde{n} \simeq \field{}[X]/P(x),
+$$
+where $P(x)$ is an irreducible polynomial, i.e. $P(x)$ cannot be factored into polynomials of strictly lower degree.
+
+\subsection{Vectors and Weights}
+Elements in vectors are indexed starting from 1. For a vector $v$ from $\field{n}$ it is written $v = (v_1, \ldots, v_n)$. $|X|$ denotes the size of the vector/set $X$. The \emph{weight} of a vector $v$ is the number of nonzero entries in it and is denoted $\wt(v)$. \emph{Weight} of a Boolean function is the weight of its value vector. An $n$-bit Boolean function is said to be \emph{balanced}, if its weight is equal to $2^{n-1}$.
+
+The \emph{correlation} of a vector $v \in \field{t}$ is defined as
+\begin{align*}
+& \cor(v) \eqdef 2\cdot\wt(v)/t-1,~~ -1 \le \cor(v) \le 1.
+\end{align*}
+The \emph{correlation}
+of a Boolean function $f\colon \field{n} \to \field{}$ is defined as the correlation
+of its value vector $\valvec{f}$:
+$$\cor(f) \eqdef \cor(\valvec{f}) = \wt(f)/2^{n-1}-1.$$
+
+For any $n \in \ZZplus$, $\idvec{n} \in \field{n}$ denotes the all-one vector $(1,1,\ldots,1)$. For $j \in \ZZplus,1\le j \le n$, the $j$-th unit vector $e_j$ is the vector having 1 at position $j$ and 0 otherwise. $e_1, \ldots, e_n$ form a linear basis of $\field{n}$.
+
+
+\subsection{Bit-wise Arithmetic}
+Let $\land,\lor,\oplus,\lnot$ denote the Boolean operations \tand{}, \tor{}, \txor{} and \tnot{} respectively. The corresponding operations on $\field{n}$ are defined  component-wise, e.g.
+$$
+(x_1, \ldots, x_n) \land (y_1, \ldots, y_n) \eqdef (x_1 \land y_1, \ldots, x_n \land y_n).
+$$
+The operation of addition modulo $2^w$ is denoted $\boxplus$, and $w$ should be clear from the context; the bits in a vector are ordered in the decreasing order of significance (see~\SecRef{implicit}). The rotations a vector $x$ to the left and to the right are denoted by $\lll$ and $\ggg$ respectively. 
+
+For $x, y \in \field{n}$ the \emph{inner product} of $x$ and $y$ is defined as
+$$
+\inprod{x,y} \eqdef \bigoplus_{i=1}^n x_i y_i \in \field{}.
+$$
+This notion is generalized to more arguments. Let $x_1,\dots,x_d \in \field{n}$. Then define
+$$
+\inprod{x_1,\dots,x_d} \eqdef \bigoplus_{i=1}^{n} \prod_{j=1}^d x_{j,i} \in \field{}.
+$$
+
+For $x, y \in \field{n}$, $x^y$ is defined as (note $0^0 = 1$)
+$$
+x ^ y \eqdef x_1^{y_1}x_2^{y_2}\ldots x_n^{y_n} \eqdef 
+x \lor \lnot y = \idvec{n} \oplus y \land (x \oplus \idvec{n}) \in \field{}.
+$$
+
+Let $\preceq$ be the partial relation on $(\field{n})^2$ defined by $x \preceq y$ if and only if, for all $i \in \{1,\ldots,n\}$, $x_i \leq y_i$. I remark that
+$$
+x \preceq y ~\Leftrightarrow~
+y^x = 1 ~\Leftrightarrow~
+(\lnot x)^{\lnot y} = 1.
+$$
+
+
+\SubSecDef{implicit}{Implicit Isomorphisms}
+For any $n,m \in \ZZplus$, the vector spaces $\field{n+m}$ and $\field{n}\times \field{m}$ are considered to be the same with an implicit isomorphism splitting an $(n+m)$-bit vector $v \in \field{n+m}$ into two components: $n$ leftmost bits $l\in \field{n}$ and $m$ rightmost bits $r \in \field{m}$.
+
+For any $n \in \ZZplus$, the vectors from $\field{n}$ can be implicitly represented as integers, such that the leftmost bits correspond to the most significant bits. Let $v \in \field{n}$. Then, by abuse of notation, it can be written:
+$$
+v = (v_1, \ldots, v_n) \in \field{n},
+~~\Leftrightarrow~~
+v = \sum_{i=1}^n v_i2^{n-i} \in \ZZ_n.$$
+A hexadecimal vector notation may be used and indicated by a monospace font, for example
+$$
+163 \in \ZZn{256} = \hex{a3} \in \field{8} = (1, 0, 1, 0, 0, 0, 1, 1) \in \field{8}.
+$$
+
+Another implicit isomorphism is allowed between the vector space $\field{n}$ and the polynomial ring $\field{}[X]$:
+$$
+v = (v_1, \ldots, v_n) \in \field{n}
+~~\Leftrightarrow~~
+\sum_{i=1}^n v_i X^{n-i} \in \field{}[X].
+$$
+For example,
+$$
+\hex{a3} \in \field{8} = (X^7 + X^5 + X + 1) \in \field{}[X]
+$$
+Assuming that an irreducible polynomial $P(x)$ defining
+$$
+\fielde{n} \simeq \field{}[X]/(P(x))
+$$
+is clear from the context, the multiplication operation in the finite field is denoted $\fmult$. The division in the finite field is denoted by $\fdiv$. 
+
+
+\subsection{Algebraic Normal Form}
+Any Boolean function $f\colon \field{n} \to \field{}$ has a unique representation of the form
+$$
+f(x) = \bigoplus_{u \in \field{n}} a_u x^u,~
+f(x) \in \field{}[x_1,\ldots,x_n]/(x_1^2 + x_1, \ldots, x_n^2 + x_n)
+$$
+called the \emph{algebraic normal form (ANF)}. Here $x^u$ is a shorthand for $x_1^{u_1}\ldots x_n^{u_n}$ and such products are called \emph{monomials}. Let $\coef{u}{f}\in \field{}$ denote the coefficient of the monomial $x^u$ in the ANF of $f$. It can be computed by the \Mobius{} transform:
+$$
+\coef{u}{f} \eqdef a_u = \bigoplus_{z \in \field{n}, z \preceq u} f(z).
+$$
+
+The \emph{algebraic degree} of a Boolean function $f$ is the maximum Hamming weight of all $u$ such that $a_u=1$. Equivalently, it is the maximum degree of a monomial in the ANF of $f$.  It is denoted $\deg{f}$. The zero-function is said to have the algebraic degree $-\infty$. The set of all Boolean functions with $n$ input bits and degree at most $d$ is denoted by $\BF{n,d}$. A Boolean function of algebraic degree at most 1 is called an \emph{affine} function. An affine Boolean function $f$ is said to be \emph{linear} if $f(0) = 0$. Any affine Boolean function $f\colon \field{n} \to \field{}$ can be expressed as $f(x) = \inprod{a,x} + c$ for unique $a\in \field{n}$ and $c \in \field{}$, where $c = 0$ if and only if $f$ is linear.
+
+
+\subsection{Derivatives}
+For a Boolean function $f\colon \field{n} \to \field{}$ and a vector $\alpha \in \field{n}$, I denote the function $\delta_\alpha f\colon \field{n} \to \field{}$ to be the \emph{derivative} of $f$ with respect to $\alpha$, given by
+$$
+\delta_\alpha f(x) \eqdef f(x) \oplus f(x\oplus \alpha).
+$$
+It is well known that $\deg{\delta_\alpha f} \le \max(-1, \deg{f} - 1)$ for any Boolean function $f$ and any $\alpha$, see~\cite{Lai1994}. The derivation can be iterated multiple times resulting in a \emph{higher-order derivative}. For $d$ linearly independent vectors $\alpha_1, \ldots, \alpha_{d} \in \field{n}$ it holds that
+$$
+\delta_{\alpha_1}\ldots \delta_{\alpha_{d}}f(x) = \bigoplus_{z \in \Span(\alpha_1, \ldots, \alpha_{d})} f(x \oplus z).
+$$
+If the vectors $\alpha_1, \ldots, \alpha_{d}$ are linearly dependent, then the derivative is equal to zero.
+
+
+\section{Vectorial Boolean Functions}
+A \emph{Vectorial} Boolean function $S$ is a function mapping $\field{n}$ to $\field{m}$ for some positive integers $n,m$. When $n$ is relatively small, such functions are often called \emph{S-Boxes}. Each output bit of a vectorial Boolean function naturally defines a Boolean function. The corresponding $m$ Boolean functions are called \emph{coordinates} of $S$. For any nonzero $a \in \field{m}$ the mapping $x \mapsto \inprod{a, S(x)}$ is called a \emph{component} of $S$ and is denoted by $S_a$. A component is a linear combination of coordinates of $S$. The function $S$ is said to be \emph{balanced}, if each $y \in \field{m}$ has exactly $2^{n-m}$ preimages. In particular, $S$ is a bijection if and only if $m = n$ and $S$ is balanced.
+
+A vectorial function $S\colon \field{n} \to \field{m}$ can be given by the vector of its values using the following notation:
+$$
+\lookup{S} \eqdef (S(0), S(1), \ldots, S(2^n-1)), ~\text{where}~ S(x) \in \field{m}.
+$$
+
+The \emph{algebraic degree} of a vectorial Boolean function is defined to be the maximum algebraic degree of its coordinates.
+
+For any $n \in \ZZplus$ the following maps are defined:
+\eq{
+    &\Left\colon \field{n} \times \field{n} \to \field{n},~~(a,b) \mapsto a,\\
+    &\Right\colon \field{n} \times \field{n} \to \field{n},~~(a,b) \mapsto b,\\
+    &\Swap\colon \field{n} \times \field{n} \to \field{n} \times \field{n},~~(a,b) \mapsto (b,a).
+}
+
+\subsection{Linear maps}
+The vectors from $\field{n}$ are considered as column vectors. The transpose of a vector or matrix $v$ is denoted $v^{\top}$. The $n\times n$ identity matrix is denoted $\idmat{n}$. 
+
+A vectorial Boolean function $S\colon \field{n} \to \field{m}$ is called \emph{linear} (resp. \emph{affine}) if all its coordinates are linear (resp. affine). If $S$ is affine, then it can be expressed as $S(x) = A \times x \oplus b$ for a unique $m \times n$ matrix $A$ over $\field{}$ and $b = S(0) \in \field{m}$, where $b = 0$ if and only if $S$ is linear.
+
+For $m,n \in \ZZplus$, the set of all $m \times n$ matrices over $\field{}$ is denoted $\linmap{n}{m}$. Any such matrix $M$ defines a linear map from $\field{n}$ to $\field{m}$, given by $x \mapsto M\times x$. The set of all bijective linear maps are denoted $\linbij{n} \subseteq \linmap{n}{n}$. The set of all bijective affine maps is denoted $\affbij{n}$.
+
+
+\subsection{Equivalence Notions}
+There are several important notions of \emph{equivalence} between vectorial Boolean functions. Let $S_1,S_2\colon \field{n} \to \field{m}$ be vectorial Boolean functions. Let
+$$\Gamma_1 = \pset{(x, S_1(x)) \mid x \in \field{n}} \subseteq \field{n+m},$$ 
+$$\Gamma_2 = \pset{(x, S_2(x)) \mid x \in \field{n}} \subseteq \field{n+m}$$
+be the functional graphs of $S_1$ and $S_2$ respectively.
+
+\begin{itemize}
+    \item $S_1, S_2$ are \emph{linear} (resp. \emph{affine}) equivalent if there exist linear (resp. affine) mappings $A,B$ such that $S_2 = B \circ S_1 \circ A$.
+    
+    \item $S_1, S_2$ are \emph{extended-affine} equivalent (EA-equivalent) if there exist affine mappings $A,B,C$ such that $S_2 = B \circ S_1 \circ A \oplus C$.
+    
+    \item $S_1, S_2$ are \emph{CCZ-equivalent} if there exists an affine mapping $L$ such that $\Gamma_2 = L(\Gamma_1) \eqdef \pset{L(x) \mid x \in \Gamma_1}$, i.e. the functional graphs of $S_1$ and $S_2$ are affine equivalent.
+\end{itemize}
+
+
+
+\section{Set Indicators and Subspaces}
+Let $V \subseteq \field{n}$. The \emph{indicator} of the set $V$ is defined as
+\begin{align*}
+& \Ind_V\colon \field{n} \to \field{},\\
+& \Ind_V(x) :=
+    \begin{cases}
+    1 &\text{if } x \in V, \\
+    0 &\text{if } x \notin V.
+    \end{cases}
+\end{align*}
+The \emph{degree} of the set $V$ is defined as the algebraic degree of its indicator:
+$$
+\deg{V} \eqdef \deg{\Ind_V}.
+$$
+In the case of \emph{multiset} over $\field{n}$, only the elements with an even multiplicity are considered.
+
+A set $V \subseteq \field{n}$ is said to be a \emph{linear subspace} if $V$ is closed under the addition in $\field{n}$ (i.e., under the \txor{} operation). A set $U \subseteq \field{n}$ is said to be an \emph{affine subspace} if there exists $a \in \field{n}$ such that $V \eqdef a \oplus U \eqdef \pset{a \oplus u \mid u \in U}$ is a linear subspace. It is then said that $U = a \oplus V$ is a \emph{coset} of the linear subspace $V$. Such $a$ may not be unique, but the corresponding linear subspace is unique.
+
+Let $U$ be any affine subspace. The \emph{dimension} of $U$ is the maximum number of linearly independent vectors in the linear part of $U$; it is denoted $\dim{U}$. Furthermore, $U$ has $2^{\dim{U}}$ elements. $U$ can be viewed a solution to a system of $k \eqdef n-\dim{U}$ linear equations defined by affine functions $l_1,\ldots,l_k$:
+$$
+U = \{x \in \field{n} \mid l_1(x) = 0, \ldots, l_k(x) = 0\}.
+$$
+It follows that the indicator of $U$ is affine equivalent to a monomial function of degree $n - \dim{U}$, i.e. it has the following form:
+$$
+\Ind_U(x) = (l_1(x)+1)\cdot \ldots \cdot (l_k(x)+1).
+$$
+
+Consider a Boolean function $f\colon \field{n} \to \field{}, f \ne 0$ and let $d = \deg{f}$. The minimum possible weight of $f$ is equal to $2^{n-d}$, i.e.
+$$\wt(f) \ge 2^{n-\deg{f}}.$$
+%The equality holds if and only if $f$ is an indicator of an affine subspace, i.e. is affine equivalent to a monomial function.

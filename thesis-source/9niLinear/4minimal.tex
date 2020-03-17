@@ -1,0 +1,372 @@
+\SecDef{minimal}{Minimal and Maximal Zero-Sum Sets}
+
+In this section we study zero-sum sets of particular rank $n$ and prove results on their existence. We are particularly interested in the smallest of such sets, defined in the following sense.
+\begin{definition}
+We denote by $\minzs{n}{d}$ the minimum number $m \in \ZZplus$ for which there exists an $S \in \ZS{n}{m}{d}$. We call a zero-sum set \emph{minimal} if it is contained in $\ZS{n}{\minzs{n}{d}}{d}$. Analogously, a zero-sum set $S \in \ZS{n}{m}{d}$ is called \emph{maximal} if $\ZS{n'}{m}{d} = \varnothing$ for all $n' > n$. 
+\end{definition}
+
+Note that $\minzs{n}{d}$ is only defined if $n > d$ as otherwise, the only degree-$d$ zero-sum set in $\F_2^n$ is the empty set. We first characterize the zero-sum sets of particular rank $n$ in terms of Boolean functions.
+
+
+\subsection{Relations between Zero-Sum Sets and Affine Annihilators of Boolean Functions}
+
+The first three existence results are presented in \PropRef{annihilator_construction}, \PropRef{annihilator_construction2} and \PropRef{max_annihilator_construction} and outline the link between zero-sum sets and the dimensions of degree-$1$ annihilator spaces of Boolean functions. 
+\begin{proposition}
+\PropLabel{annihilator_construction}
+There exists a degree-$d$ zero-sum set $S \in \ZS{n}{m}{d}$ if and only if there exists a Boolean function $h \in \BF{n}{n-d-1}$ with $\wt(h) = m$ and $\dim \AN_1(h) \leq 1$. 
+\end{proposition}
+\begin{proof}
+Let us assume that $S \in \ZS{n}{m}{d}$ is given in systematic form, i.e., it can be represented as in \EqRef{systematic_form}. Then, $S = \supp(h)$ for a Boolean function $h \in \BF{n}{n-d-1}$ for which $\forall i\in \{1,\dots,n\}: h(e_i) = 1$. Such a function cannot have a linear annihilator and therefore, any $a \in \AN_1(h) \setminus \{0\}$ must be of the form $a = \ell+1$ for a linear Boolean function $\ell$. It follows that $\dim AN_1(h) \leq 1$.
+
+Let now $h \in \BF{n}{n-d-1}$ with $\wt(h) = m$ and $\dim \AN_1(h) \leq 1$. Let $a \in \AN_1(h) \setminus \{0\}$. If $a = \ell + 1$ for a linear function $\ell$, then $h$ has no linear annihilator. If $a$ is linear, we fix a constant $c \in \F_2^n$ for which $a(c)=1$ and consider the function $h_c\colon x \mapsto h(x+c) \in \BF{n}{n-d-1}$ which is domain affine equivalent to $h$ and thus has the same weight. It is easy to verify that $a+1$ is an affine annihilator for $h_c$. Because the dimensions of the annihilator spaces are invariant under domain affine equivalence, $h_c$ has no linear annihilators. Therefore, without loss of generality, we can assume that $h$ has no linear annihilator. Let $S = \supp(h) \subseteq \F_2^n$ be the support of $h$ and consider a matrix $\matzs{S}$ the columns of which form exactly the set $S$. Since $h$ has no linear annihilator, there is no linear combination of rows of $\matzs{S}$ that is equal to zero. We conclude that $\matzs{S}$ has full rank $n$ and $S\in \ZS{n}{m}{d}$.
+\end{proof}
+
+\begin{proposition}
+\PropLabel{annihilator_construction2}
+Given a function $h \in \BF{n}{n-d-1}$ with $\wt(h) = m$ and $\AN_1(h) = \{0\}$, it is possible to construct a zero-sum set in $\ZS{(n+1)}{m}{d}$.
+\end{proposition}
+\begin{proof}
+Consider the function \[h': \F_2^{n+1} \to \F_2, (x_1, \ldots, x_{n+1}) \mapsto x_{n+1} h(x_1, \ldots, x_n)\;.\] Note that $h'$ has degree at most $n-d$. Further, $h'$ has no linear annihilator. Otherwise, by setting $x_{n+1} = 1$, we would obtain that $h$ has an annihilator of algebraic degree $1$, contradicting $\AN_1(h) = \{0\}$. By \PropRef{annihilator_construction}, we can construct $S \in \ZS{(n+1)}{m}{d}$.
+\end{proof}
+
+The converse statement is true for maximal zero-sum sets.
+
+\begin{proposition}
+\PropLabel{max_annihilator_construction}
+Let $n \geq 2$ and let $S \in \ZS{(n+1)}{m}{d}$ be maximal. Then, $\Ind_S$ is domain linear equivalent to a function $h \in \BF{n+1}{n-d}$ of the form 
+\eql{annihilator_reduce}{
+    h(x_1,\dots,x_{n+1}) = x_{n+1}\cdot g(x_1,\dots,x_{n}),
+}
+where $g \in \BF{n}{n-d-1}$ with $\wt(g) = \wt(h) = m$ and $\AN_1(g) = \{0\}$. Further, if $m < 2^{n-1}$, then $\AI(g) \geq 2$.
+\end{proposition}
+\begin{proof}
+Let $\matzs{S}$ be a matrix which columns correspond to the elements of $S$. Because $S$ is maximal, the vector subspace of $\F_2^m$ spanned by the rows of $\matzs{S}$ must contain the all-1 vector $\idvec{n} \coloneqq (1,1,\dots,1)$. Otherwise, one would obtain a zero-sum set in $\ZS{(n+2)}{m}{d}$ defined by the matrix
+$$
+\coltwo{\matzs{S}}{\idvec{n}}.
+$$
+Therefore, we can apply a linear permutation $A$ on the columns of $\matzs{S}$ such that $\Ind_{A(S)} = h$ where $h \in \BF{n+1}{n-d}$ is of the form as given in \EqRef{annihilator_reduce} with $g \in \BF{n}{n-d-1}$ and $\wt(g) = \wt(h)$. It is left to show that $\AN_1(g) = \{0\}$. 
+
+Clearly, $g$ cannot have a linear annihilator. We assume now that $g$ has an annihilator of degree $1$ of the form $(x_1,\dots,x_n) \mapsto 1+\bigoplus_{i=1}^{n}a_ix_i$. Then, $g(x)=0$ for all $x$ with $\bigoplus_{i=1}^{n}a_ix_i = 0$. Let $j$ be such that $a_j = 1$. For the linear permutation $Q:\field{n} \to \field{n}$, $Q(x_1, \ldots, x_{n}) = (x_1, \ldots, x_{j-1}, \bigoplus_{i=1}^{n}a_ix_i, x_{j+1}, \dots, x_{n})$, we have 
+\[ g(Q(x_1,\dots,x_{n})) = x_{j}\cdot g'(x_1,\dots,x_{j-1},x_{j+1},\dots,x_{n})\;\] for a function $g' \in \BF{n-1}{n-d-2}$. But this means that $h$ is linear-equivalent to a function of the form $(x_1,\dots,x_{n+1}) \mapsto x_{n+1}\cdot x_{n}\cdot g'(x_1, \ldots, x_{n-1})$, which has a linear annihilator $x_{n+1}+x_{n}$. We get a contradiction and conclude that $\AN_1(g) = \{0\}$.
+
+If $m < 2^{n-1}$, it is easy to see that $g+1$ cannot admit an annihilator of algebraic degree $1$. Suppose that $a \in \AN_1(g+1)\setminus \{0\}$. Then, $\wt(a) = 2^{n-1}$ and $ag = a$, which is impossible.
+\end{proof}
+
+As \PropRef{max_annihilator_construction} only holds for maximal zero-sum sets we cannot use it to establish an equivalence between minimal degree-$d$ zero-sums of rank $n+1$ and $n$-bit Boolean functions of degree $n-d-1$ with algebraic immunity at least 2 and minimum weight. We therefore propose the following question:
+
+\begin{question}
+\Label{q:minimal-maximal}
+Let $S \in \ZS{n}{F(n,d)}{d}$ be minimal. What are necessary and sufficient conditions for $S$ to be maximal?
+\end{question}
+
+
+\subsection{Minimal Zero-Sum Sets: Bounds and Values for $\minzs{n}{d}$}
+In order to derive values for $\minzs{n}{d}$, we basically have to study the Boolean functions that admit at most one annihilator of algebraic degree $1$ and find those of minimum weight. Indeed, from \PropRef{annihilator_construction}, we know that 
+$$
+\minzs{n}{d} = \min\{ \wt(g) \mid g \in \BF{n}{n-d-1} \setminus \{0\} ~\text{with}~ \dim \AN_1(g) \leq 1\}.
+$$
+
+For $d=1$ and $d=2$ we can easily determine the cardinalities of minimal degree-$d$ zero-sum sets, as stated in \PropRef{min_1} and \PropRef{min_2}. The proofs also provide a construction for a minimal zero-sum set. While the proof for $d=1$ is rather trivial, the proof for $d=2$ relies on the relation between degree-$2$ zero-sum sets and semi-orthogonal matrices.
+\begin{proposition}
+\PropLabel{min_1}
+For $n \geq 2$, $\minzs{n}{1} = n + 2 - (n \mod 2)$.
+\end{proposition}
+\begin{proof}
+Consider a zero-sum set $S\in\ZS{n}{m}{1}$ and its matrix in systematic form. Each row must have an even weight, therefore there must be at least one extra column besides the identity part, i.e. $m \ge n+1$. By setting the extra column to the all-one vector $\idvec{n}$ we make all rows to have even weight. Furthermore, $m$ must be even and we may also need to add the all-zero column. The proposition follows.
+\end{proof}
+
+\begin{proposition}
+\PropLabel{min_2}
+For $n = 4$ and for $n > 5$, it is $\minzs{n}{2} = 2n$. Further, $\minzs{3}{2} = 8$ and $\minzs{5}{2} = 12$. 
+\end{proposition}
+\begin{proof}
+Let $n \geq 3$ and $m$ be minimal such that there exists an $S \in \ZS{n}{m}{2}$. Let further $L \in \F_2^{n \times (m-n)}$ such that $S$ is in systematic form with $\matzs{S} = \rowtwo{\idmat{n}}{L}$. As $\matzs{S}$ cannot contain any repeated columns, it is $\matzs{S} = \matl{L}$ and thus, $L$ must be semi-orthogonal and $n \leq (m-n)$. It follows that $\minzs{n}{2} = m \geq 2n$.  
+
+Let now $n = 4$ or $n \geq 6$. To prove the existence of an $S \in \ZS{n}{2n}{2}$, we observe that if $L \in \F_2^{n\times n}$ is an orthogonal matrix for which each column has weight larger than $1$, $\matl{L}$ defines a degree-$2$ zero-sum set of size $2n$ and rank $n$ according to \PropRef{inner_product}. It is left to show that, for any dimension $n=4$ or $n \geq 6$, there exists an orthogonal matrix for which no column corresponds to a unit vector. We are going to distinguish four cases. Let us define the orthogonal matrices $M_4$ and $M_6$ as 
+$$
+M_4 = \matb{
+0 & 1 & 1 & 1 \\
+1 & 0 & 1 & 1 \\
+1 & 1 & 0 & 1 \\
+1 & 1 & 1 & 0
+}, \quad M_6 = \matb{
+0 & 1 & 1 & 1 & 1 & 1 \\
+1 & 0 & 1 & 1 & 1 & 1 \\
+1 & 1 & 0 & 1 & 1 & 1 \\
+1 & 1 & 1 & 0 & 1 & 1 \\
+1 & 1 & 1 & 1 & 0 & 1 \\
+1 & 1 & 1 & 1 & 1 & 0
+}.
+$$
+
+Case 1 ($n = 0 \mod 4$): The block-diagonal matrix $\diag(M_4,\dots,M_4)$ which contains $M_4$ as its diagonal blocks is orthogonal and each column weight is equal to $3$.
+
+Case 2 ($n = 2 \mod 4$): Because $n > 5$, it is $n = 4k+6$ for $k \geq 0$ and the matrix $\diag(M_6,M_4,M_4,\dots,M_4)$ is orthogonal and each column has weight at least $3$. 
+
+Case 3 ($n = 3 \mod 4$): Because $n > 5$, it is $n = 4k + 3$ for $k \geq 1$ and the two matrices $D_1 = \diag(1,1,1,M_4,M_4,\dots,M_4)$ and $D_2 = \diag(M_4,1,1,\dots,1)$ are orthogonal. Their product is orthogonal and of the form 
+\newcommand{\biga}{\mbox{\normalfont\Large A}}
+\newcommand{\bigd}{\mbox{\normalfont\Large D}}
+\eql{diag_matrix}{
+D_1D_2 = 
+\left[\begin{array}{@{}c|@{}c}
+  \begin{matrix}
+0   &   1   &   1   &   1 \\
+1   &   0   &   1   &   1\\
+1  & 1 & 0 & 1 
+\end{matrix}
+ ~&~  \begin{matrix}
+0   &   0   &   \dots   &   0 \\
+0   &   0   &   \dots   &   0\\
+0  & 0 & \dots & 0 
+\end{matrix} \\
+\hline
+   \biga  & 
+  \bigd
+\end{array}\right],
+}
+where $D$ is the $4k \times (4k-1)$ submatrix of $\diag(M_4,\dots,M_4)$ omitting the first column. It is obvious that each column has weight at least $3$.
+
+Case 4 ($n = 1 \mod 4$): Because $n > 5$, it is $n \geq 9$ and $n = 4k + 6 +3$ for $k \geq 0$. The two matrices $D_1 = \diag(1,1,1,M_6,M_4,\dots,M_4)$ and $D_2 = \diag(M_4,1,1,\dots,1)$ are orthogonal. Their product is orthogonal and of the form given in \EqRef{diag_matrix} with $D$ as the $4k + 6 \times (4k + 6 -1)$ submatrix of $\diag(M_6,M_4,M_4,\dots,M_4)$ omitting the first column. It is obvious that each column has weight at least $3$.
+
+For $n=3$ we use that any degree-$d$ zero-sum set must contain at least $2^{d+1}$ elements. Thus, $\minzs{n}{2} \geq 8$. We obtain $\minzs{3}{2} = 8$ because $\F_2^3$ is a degree-$2$ zero-sum set.
+
+For $n=5$, assume that there exists an orthogonal matrix $L \in \F_2^{5 \times 5}$ which does not have a unit vector as its row (or column). From point $(iii)$ of \PropRef{zero_sum} it follows that any $2\times 5$ submatrix of $L$ must contain an odd number of columns equal to each of $(0,1),(1,0),(0,0)$ and an even number of columns equal to $(1,1)$ (same applies for rows of any $5 \times 2$ submatrix of $L$). It follows that, up to a permutation of rows, $L$ has the following form:
+\begin{equation}
+L = \matb{
+1   &   0   &   0      &   1    & 1\\
+0   &   1   &   0      &   1    & 1\\
+0   &   0   &   . & . & . \\
+1   &   1   &   . & . & . \\
+1   &   1   &   . & . & .
+}.
+\end{equation}
+It is easy to see that it is not possible to complete this matrix such that all $2\times 5$ and $5\times 2$ submatrices satisfy the condition.
+Therefore, $\minzs{5}{2} > 10$. Moreover, it is easy to verify that
+$$
+\matzs{S} = \matb{
+1   &   0   &   0   &   0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 \\
+0   &   1   &   0   &   0 & 0 & 0 & 1 & 1 & 1 & 0 & 1 & 1\\
+0   &   0   &   1   &   0 & 0 & 1 & 0 & 1 & 1 & 0 & 1 & 1\\
+0   &   0   &   0   &   1 & 0 & 1 & 1 & 0 & 1 & 0 & 0 & 0\\
+0   &   0   &   0   &   0 & 1 & 0 & 0 & 1 & 0 & 1 & 0 & 1
+}
+$$
+defines a zero-sum set in $\ZS{5}{12}{2}$, thus $\minzs{5}{2} = 12$.
+\end{proof}
+
+\PropRef{extending_construction} below presents a simple way to construct a $d+1$ zero-sum set of rank $n+1$ from a degree-$d$ zero-sum set of rank $n$. This construction might be used to derive an upper bound on $\minzs{n}{d}$. 
+
+\begin{proposition}
+\PropLabel{extending_construction}
+If there exists an $S \in \ZS{n}{m}{d}$, one can construct a zero-sum set $S' \in \ZS{(n+1)}{2m}{d+1}$. In particular, for $n > d+1$, $\minzs{n}{d} \leq 2 \minzs{n-1}{d-1}$.
+\end{proposition}
+\begin{proof}
+If $S \in  \ZS{n}{m}{d}$, then the columns of the matrix
+\[ \left[\begin{array}{ccc}
+0~\ldots~0 &|& 1~\ldots~1 \\
+\matzs{S} &|& \matzs{S}
+\end{array} \right]\]
+define a degree-$(d+1)$ zero-sum set $S'$ with $2m$ elements of rank $n+1$. We remark that both sets $S$ and $S'$ have essentially the same indicator function, only the domain dimension is different.
+\end{proof}
+
+Note that the upper bound on $F(n,d)$ given by this construction is not always tight. Let $S \subseteq \F_2^9$ be such that $\Ind_S(x)=x_1(x_2x_3x_4x_5 + x_6x_7x_8x_9)$. It easy to verify that $S \in \ZS{9}{30}{3}$. It follows that $F(9,3) \le 30 \ne 2F(8,2) = 32$.
+The corresponding matrix $\matzs{S}$ is given by:
+\setcounter{MaxMatrixCols}{30}
+\begin{equation}
+    \small
+    \setlength\arraycolsep{2pt}
+    \matzs{S} = \begin{bmatrix}
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 \\
+    1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 \\
+    1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 
+    \end{bmatrix}.
+\end{equation}
+
+\begin{proposition}
+\PropLabel{diagonal_construction}
+For any $d \in \ZZplus$ and $n_1,n_2 >d$, $\minzs{n_1+n_2}{d} \leq \minzs{n_1}{d}+\minzs{n_2}{d}$.
+\end{proposition}
+\begin{proof}
+If $S_1 \in \ZS{n_1}{m_1}{d}, S_2 \in \ZS{n_2}{m_2}{d}$, then the columns of the matrix 
+$$
+\matzs{S} = \psquare{
+\begin{array}{c|c}
+    \matzs{S_1} &
+    \begin{array}{c}0~\ldots~0 \\ \vdots \\ 0~\ldots~0\end{array} \\
+\hline
+    \begin{array}{c}0~\ldots~0 \\ \vdots \\ 0~\ldots~0\end{array} &
+    \matzs{S_2}
+\end{array}
+}
+$$
+
+repeating an odd number of times define a degree-$d$ zero-sum set $S$ with at most $m_1+m_2$ elements of rank $n_1+n_2$. More precisely, if both $S_1$ and $S_2$ contain the zero vector, then the resulting zero-sum set has size $m_1 + m_2 - 2$ due to the zero-vector being cancelled by the repetition. Otherwise, $S$ has size $m_1 + m_2$.
+\end{proof}
+
+\begin{proposition}
+\PropLabel{lower_bound_n_plus_d}
+Let $d \geq 2$. If there exist an $S \in \ZS{n}{m}{d}$, one can construct a zero-sum set in $\ZS{(n+d)}{m}{d-1}$. In particular, for $n > d$, $\minzs{n}{d} \geq \minzs{n+d}{d-1}$.
+\end{proposition}
+\begin{proof}
+Let $\matzs{S} = \rowtwo{\idmat{n}}{L}$ be a matrix for $S$ in systematic form. By reordering the rows of $\matzs{S}$, one can bring it into the form 
+\eql{proof_form}{
+\psquare{
+\begin{array}{c|c|c|c} 1 \dots 1 & 1 & 0 \dots 0 & 0 \dots 0 \\
+A & 0 & B & \idmat{(n-1)}\end{array}
+},
+}
+where $A \in \F_2^{(n-1) \times m_1}$ and $B \in \F_2^{(n-1) \times m_2}$ for some $m_1$, $m_2$ with $m_1+m_2+n = m$. Moreover, $m_1$ cannot be zero because the first row must have an even weight.
+We see that $\left[\begin{array}{c|c} A &  0\end{array}\right]$ must define a degree-$(d-1)$ zero-sum set in $\F_2^{n-1}$, i.e., $\left[\begin{array}{c|c} A &  0\end{array}\right] = \matzs{T}$ for a $T \in \ZS{r}{(m_1+1)}{d-1}$. This is simply because the Hadamard (component-wise) product of any $d-1$ rows of $\left[\begin{array}{c|c} A &  0\end{array}\right]$ can be expressed as the Hadamard (component-wise) product of $d$ rows of $\matzs{S}$, i.e., the $d-1$ rows at the same positions as those of $\left[\begin{array}{c|c} A &  0\end{array}\right]$ and the first row $[1 1 \dots 1 0 0 \dots 0]$. We conclude that $m_1 = |T| \geq 2^d$ and thus, $r \geq d$. 
+
+Let $v_1,\dots,v_d$ be $d$ linearly independent rows of $A$ and consider the matrix
+\[ \left[ \begin{array}{c|c|c|c} 
+1 \dots 1 & 1 & 0 \dots 0 & 0 \dots 0 \\
+A & 0 & B & \idmat{(n-1)} \\
+v_1 & 0 & 0 \dots 0 & 0 \dots 0\\
+v_2 & 0 & 0 \dots 0 & 0 \dots 0\\
+\vdots & \vdots & \vdots &  \vdots \\
+v_d & 0 & 0 \dots 0 & 0 \dots 0\\
+\end{array} \right]\;,\]
+which must define a zero-sum set in $\ZS{(n+d)}{m}{d-1}$ by the same argument as above, i.e., the Hadamard product of any $d-1$ rows can be expressed as the Hadamard product of $d$ rows of $\matzs{S}$. It is also easy to see that no linear combination of rows can be equal to zero, i.e. the constructed set has full rank $n+d$.
+\end{proof}
+
+Using the above result and \PropRef{min_2}, we can prove a lower bound on $\minzs{n}{3}$ as follows.
+\begin{corollary}
+\Label{cor:Fn3}
+For $n \geq 4$ it is $\minzs{n}{3} \geq 2n+6$.
+\end{corollary}
+
+So far, we were able to characterize the minimal degree-$d$ zero-sum sets for $d=1$ and $d=2$ and proved some inequalities for the general case. Further, we can use the following classification theorem by Kasami, Tokura and Azumi in order to derive some more exact values of $\minzs{n}{d}$. 
+
+
+\begin{theorem}[\cite{kasami_tokura,kasami_tokura_azumi}]
+\ThmLabel{low-weight-bf}
+Let $r\geq 2$ and let $f \in \BF{n}{r}$ with $\wt(f) < 2^{n-r+1}$. Then $f$ is domain affine equivalent to either $(i)$ or $(ii)$, where
+\enumroman
+\begin{enumerate}
+\item $f = x_1 \ldots x_{r-2}(x_{r-1} x_{r} + x_{r+1} x_{r+2} + \ldots + x_{r+2\ell-3}x_{r+2\ell-2}), n \geq r+2\ell -2$
+\vspace{.5em}
+\item $f = x_1 \ldots x_{r-\ell}(x_{r-\ell+1}\ldots x_{r} + x_{r+1} \ldots x_{r+\ell}), r \geq \ell, n \geq r + \ell$\;.
+\end{enumerate}
+\end{theorem}
+
+
+A direct application leads to the following results.
+
+\begin{proposition}[Values of $\minzs{n}{d}$ for $n \leq 2d+4$]
+\PropLabel{diagonal_values}
+\enumroman
+$ $\newline % hack to start with newline
+\begin{enumerate}
+\item $\minzs{d+1}{d} = 2^{d+1}$.
+\item $\minzs{d+2}{d} = 2^{d+1}$ and the minimal zero-sum sets in $\F_2^{d+2}$ correspond to the Boolean functions of algebraic degree $1$.
+\item $\minzs{d+3}{d} = 3 \cdot 2^{d}$ and the minimal zero-sum sets in $\F_2^n$ correspond to the Boolean functions domain affine equivalent to $x \mapsto x_1x_2 + x_3x_4$.
+\item For $d + 4 \le n \le 2d+3$, $\minzs{n}{d} = 2^{2d-n+4}(2^{n-d-2}-1) = \wt(h_{n,d})$,
+where 
+\[
+r=n-d-1, h_{n,d}\colon (x_1,\dots,x_n) \mapsto x_1(x_2x_3\dots x_{r} + x_{r+1}x_{r+2}\dots x_{2r-1})\;.
+\]
+\item $\minzs{2d+4}{d} = 2^{d+2} = \wt(g_d)$, where: \[
+g_d\colon (x_1,\dots,x_{2d+4}) \mapsto x_1(x_2x_3\dots x_{d+3} + (x_2+1)x_{d+4}x_{d+5}\dots x_{2d+4})\;.
+\]
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+For $d \in \ZZplus, d<n$, let us define the set \[S_{n,d} \coloneqq \{g \in \BF{n}{d}\setminus \{0\} \text{ with } \dim \AN_1(g) \leq 1 \}\;.\]
+From \PropRef{annihilator_construction} we know that $\minzs{n}{d} = \min \{\wt(g) \mid g \in S_{n,n-d-1} \}$. Therefore, we trivially obtain $\minzs{d+1}{d} = 2^{d+1}$. $S_{d+2,1}$ is the set of Boolean functions of algebraic degree $1$ and thus $\minzs{d+2}{d} = 2^{d+1}$.
+
+To obtain the minimum weight of functions in $S_{d+3,2}$, we first note that every Boolean function of algebraic degree $2$ of the minimum weight $2^{d+1}$ must be domain affine equivalent to a monomial function, i.e., $x \mapsto x_1x_2$ (see Proposition 12 of~\cite{BMM:Carlet07}). As this monomial function admits the annihilators $x \mapsto x_1 +1$ and $x \mapsto x_2+1$, the minimum weight in $S_{d+3,d}$ must be at least $2^{d+2} - 2^{d}$ (see, e.g.,~\cite[p. 70]{BMM:Carlet07} for the possible weights of quadratic Boolean functions). This weight is obtained by the function $x \mapsto x_1x_2 + x_3x_4$, which clearly is in $S_{d+3,2}$. To see that all other functions in $S_{d+3,2}$ of minimal weight are domain affine equivalent to it, it is enough to see that all of the functions
+$$
+q_{n,\ell}\colon (x_1,\dots,x_n) \mapsto x_1x_2 + x_3x_4 + \dots + x_{2\ell-1}x_{2\ell}
+$$
+with $\ell \geq 3$ have a strictly larger weight. Indeed, by induction on $\ell$, it can be easily shown that $\wt(q_{n,\ell}) = 2^{n-1} - 2^{n-\ell-1}$.
+
+
+Let now $d+4 \le n \le 2d+3$. It is easy to see that $h_{n,d} \in S_{n,n-d-1}$. Further, its weight can be computed as \[
+\wt(h_{n,d}) =
+2^{d+1} + 2^{d+1} - 2^{2d-n+4} = 
+2^{2d-n+4}(2^{n-d-2}-1)\;.
+\]
+It is left to show that $h_{n,d}$ is an element of minimum weight in $S_{n,n-d-1}$. Let therefore be $h'$ in $S_{n,n-d-1}$ with $\wt(h') \leq \wt(h_{n,d})$. Since $\wt(h_{n,d}) < 2^{n-(n-d-1)+1}=2^{d+2}$, the assumptions of \ThmRef{low-weight-bf} are fulfilled and $h'$ would be domain affine equivalent to one of the forms given in cases $(i)$ and $(ii)$ of \ThmRef{low-weight-bf}. If $n \geq d + 5$, Case $(i)$ corresponds to a Boolean function of the form $x \mapsto x_1x_2 g$ which admits $x \mapsto x_1+1$ and $x \mapsto x_2+1$ as degree-$1$ annihilators. For $n = d + 4$, Case $(i)$ corresponds to a function of the form
+$$
+x \mapsto x_1(x_2x_3 + x_4x_5 + \dots + x_{2\ell}x_{2\ell+1}) = x_1g
+$$
+for $g \in S_{n,2}$ and, therefore, its weight must be at least $2^{n-2}-2^{n-4} = 2^{2d-n+4}(2^{n-d-2}-1)$. 
+
+Otherwise, $h'$ must be domain affine equivalent to one of the functions given in Case $(ii)$. Since it cannot admit two annihilators of algebraic degree $1$, it must be domain affine equivalent to either
+$$
+x \mapsto x_1(x_2x_3\dots x_{r} + x_{r+1}x_{r+2}\dots x_{2r-1}) = h_{n,d},
+$$
+or
+$$
+g_{n,d}\colon x \mapsto x_1x_2 \dots x_{r} + x_{r+1}x_{r+2} \dots x_{2r},
+$$
+where $r = n-d-1$.
+As
+$$
+\wt(g_{n,d}) = 2^{2d-n+3}(2^{n-d-1}-1) > \wt(h_{n,d})=2^{2d-n+3}(2^{n-d-1}-2),
+$$
+the point $(iv)$ follows.
+
+It is easy to see that $\wt(g_d)=2^{d+2}$, i.e. $F(2d+4,d)\le 2^{d+2}$. By \PropRef{extending_construction} and $(iv)$ of this Theorem, $F(2d+4,d) \ge F(2d+5,d+1)/2 = (2^{d+2}-1)$. Since $F(2d+4,d)$ has to be even, the Theorem follows.
+\end{proof}
+
+
+
+We are now going to show that, for any fixed $d$, the sequence $\minzs{n}{d}$ is increasing with $n$. For that, we need the following lemma.
+\begin{lemma}
+\LemLabel{growing}
+For $n > 2d+3$, we have $\minzs{n}{d} \leq \frac{2^n}{n+1}$.
+\end{lemma}
+\begin{proof}
+%If we substitute $d$ by $n-k$, the condition $n > 2d+3$ is equivalent to $n <2k-3$ where $k \geq 5$.
+By repeatedly applying \PropRef{extending_construction}, we obtain
+%\[\minzs{n}{d} \leq 2^{n-k-1}(k+2) = 2^n \frac{k+2}{2^{k+1}}\;.\]
+\[\minzs{n}{d} \leq 2^{d-1}(n-d+2) = 2^n \frac{n-d+2}{2^{n-d+1}}\;.\]
+
+It is left to show that $\frac{n-d+2}{2^{n-d+1}} \leq \frac{1}{n+1}$. We know that
+% \[(n+1)(n-d+2) < (2k-2)(k+2) = 2(k-1)(k+2) \leq 2^{k+1}\;,\]
+\[(n+1)(n-d+2) < (2n-2d-2)(n-d+2) = 2(n-d-1)(n-d+2) \leq 2^{n-d+1}\;,\]
+which is true for $n - d \geq 5$. The latter is guaranteed by $n \ge 2d + 4$ and $d \ge 1$. This proves the statement.
+\end{proof}
+
+\begin{proposition}
+For $n > d+1$, it is $\minzs{n}{d} \geq \minzs{n-1}{d}$.
+\end{proposition}
+\begin{proof}
+We prove this statement by induction on $d$. If $d = 1$ and $d=2$, the statement is obviously true by \PropRef{min_1} and \PropRef{min_2}. Let thereby $d \geq 3$ and assume that the statement is true for $d-1$. 
+
+Let $S \in \ZS{n}{m}{d}$ be a minimal zero-sum set, i.e., $m = \minzs{n}{d}$, such that $\matzs{S}$ can be given as in \EqRef{proof_form} for $A \in \F_2^{(n-1) \times m_1}$ and $B \in \F_2^{(n-1) \times m_2}$ with $m_1$, $m_2$ such that $m_1+m_2+n = m$. Let $m' \coloneqq m_2+n-1$. We see that $[B | \idmat{(n-1)}]$ must define a degree-$(d-1)$-zero-sum set in $\F_2^{n-1}$, i.e., $[B | \idmat{(n-1)}] = \matzs{T}$ for a $T \in \ZS{(n-1)}{m'}{d-1}$. This is because every $(d-1) \times (m')$ submatrix of $\matzs{T}$ must occur an even number of times (from the property of $S$ being a degree-$d$ zero-sum set) and, since $\matzs{T}$ contains $\idmat{(n-1)}$, it must have rank $n-1$. We now distinguish two cases.
+
+Case 1 ($m' \leq \frac{m}{2}$): In that case we directly obtain
+\[m = \minzs{n}{d} \geq 2 \minzs{n-1}{d-1} \geq 2 \minzs{n-2}{d-1} \geq \minzs{n-1}{d}\;,\]
+where the second estimation follows from the induction hypothesis and the last one follows from \PropRef{extending_construction}.
+
+Case 2 ($m' > \frac{m}{2}$): We first remark that if $n \leq 2d+3$, the statement directly follows from \PropRef{diagonal_values}. For example, for $n \geq d + 5$, 
+\[ \minzs{n}{d} = 2^{d+2} - 2^{2d-n+4} \geq 2^{d+2} - 2^{2d-n+5} = \minzs{n-1}{d}\;.\]
+
+Let us therefore assume that $n > 2d +3$. Note that in the matrix $\matzs{S}$, we can add the first row $[11\dots 1 00\dots 0]$ to any other row and would obtain an equivalent zero-sum set. This operation does not change the right part of $\matzs{S}$ containing $\idmat{(n-1)}$. Indeed, it allows us to obtain a zero-sum set $S_c \in \ZS{n}{m}{d}$ represented by 
+\eq{
+\matzs{S_c} = \psquare{
+    \begin{array}{c|c|c|c}
+    1 \dots 1 & 1 & 0 \dots 0 & 0 \dots 0 \\
+    A + c^{\top} & c^{\top} & B & \idmat{(n-1)}
+    \end{array}
+    }
+}
+for any $c \in \F_2^{n-1}$. Let us denote by $R$ the set of columns of $A$ together with the $(n-1)$-bit zero vector. Our statement to prove follows if we can guarantee the existence of a vector $\tilde{c}$  such that, for all $v \in (R+\tilde{c}^{\top})$, $\wt(v) \geq 2$. Then, we would obtain a zero-sum set in $\ZS{(n-1)}{m''}{d}$ defined by \[\left[ \begin{array}{c|c|c|c} 
+A + \tilde{c}^{\top} & \tilde{c}^{\top} & B & \idmat{(n-1)}\end{array} \right]\]
+as there won't be any cancellation between $[A +\tilde{c}^{\top} \mid \tilde{c}^{\top}]$ and $\idmat{(n-1)}$, thus keeping the rank maximum. Indeed, such a vector must always exist. Assume that, for all $c \in \F_2^{n-1}$, there exists a $v \in (R+\tilde{c}^{\top})$ with weight at most $1$. This is equivalent to say that the covering radius of the set $R \subseteq \field{n-1}$ is equal to $1$. By a simple counting argument it follows that $|R| \geq \frac{2^{n-1}}{n}$. On the other hand, it is 
+$$
+|R| = m - m' < \minzs{n}{d} - \frac{\minzs{n}{d}}{2} = \frac{1}{2} \minzs{n}{d}  \leq \frac{2^{n-1}}{n+1}\;,
+$$
+where the last inequality follows from the previous lemma.  We get a contradiction, therefore such vector $\tilde{c}$ always exists.
+\end{proof}
+
+

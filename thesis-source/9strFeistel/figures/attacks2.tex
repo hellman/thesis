@@ -1,0 +1,36 @@
+
+{
+    \renewcommand\arraystretch{1.1}
+    \setlength{\tabcolsep}{4pt}
+    % \vspace{-3em}
+    \begin{table}
+        \centering
+        \caption{
+            \TabLabel{attacks2}
+            Structural attacks against Feistel Networks whitened with unknown affine layers. The attacks recover parts of the unknown affine layers. $n$ is the branch size, $d$ is the degree of the Feistel functions.
+        }
+        \begin{tabularx}{\textwidth}{cXccc}
+            \toprule
+            
+            \textbf{Structure} & \textbf{Restrictions} & \textbf{Time} & \textbf{Data} & \textbf{Ref.}  \\
+            \midrule
+            
+            \multirow{1}{*}{$\afabij{4}{d}$}
+                & $f_i$ bij. & $2^{6n}$ & $2^{4n}$ & \cite{OurKuz1} \\
+            \hline
+            
+            \multirow{2}{*}{$\afabij{r}{d}$}
+                & $f_i$ bij., $\theta(d,r-1) < 2n$ & $n2^{2n}$ & $2^{2n}$ & \SecShortRef{afa} \\
+              
+                & or $\theta(d,r) < 2n$ & $n2^{2n}$ & $2^{2n}$ & \SecShortRef{afa} \\
+            \hline
+          
+            \multirow{2}{*}{$\mathsf{AF}^r\mathsf{A^{-1}}$}
+                & $f_i$ bij., $\theta(d,r) < 2n$ & $n2^{2n}$ & $2^{2n}$ & \cite{OurFeistel},Sec.~\ref{sec:attack-afa} \\
+              
+                & or $\theta(d,r+1) < 2n$ & $n2^{2n}$ & $2^{2n}$ & \cite{OurFeistel},Sec.~\ref{sec:attack-afa} \\
+               
+            \bottomrule
+        \end{tabularx}
+    \end{table}
+}

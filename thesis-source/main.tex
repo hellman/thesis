@@ -1,0 +1,135 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Masters/Doctoral Thesis 
+% LaTeX Template
+% Version 2.5 (27/8/17)
+%
+% This template was downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Version 2.x major modifications by:
+% Vel (vel@latextemplates.com)
+%
+% This template is based on a template by:
+% Steve Gunn (http://users.ecs.soton.ac.uk/srg/softwaretools/document/templates/)
+% Sunil Patel (http://www.sunilpatel.co.uk/thesis-template/)
+%
+% Template license:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%--------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%--------------------------------------------------------------------
+\input{-Config/flags.tex}
+
+\documentclass[
+12pt, % The default document font size, options: 10pt, 11pt, 12pt
+\if\OneSided1
+oneside,
+\fi % Two side (alternating margins) for binding by default, uncomment to switch to one side
+russian, english,
+singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+%liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+%toctotoc, % Uncomment to add the main table of contents to the table of contents
+%parskip, % Uncomment to add space between paragraphs
+%nohyperref, % Uncomment to not load the hyperref package
+headsepline, % Uncomment to get a line under the header
+%chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+%consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
+]{thesis} % The class file specifying the document structure
+
+\input{-Config/packages.tex}
+\input{-Config/macros.tex}
+\input{-Config/structure.tex}
+
+%--------------------------------------------------------------------
+%	MARGIN SETTINGS
+%--------------------------------------------------------------------
+
+\geometry{
+	paper=a4paper, % Change to letterpaper for US letter
+	inner=2.5cm, % Inner margin
+	outer=3.8cm, % Outer margin
+	bindingoffset=.5cm, % Binding offset
+	top=1.5cm, % Top margin
+	bottom=1.5cm, % Bottom margin
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%--------------------------------------------------------------------
+%	THESIS INFORMATION
+%--------------------------------------------------------------------
+
+% https://en.wikibooks.org/wiki/LaTeX/Hyperlinks
+% https://en.wikibooks.org/wiki/LaTeX/Colors
+\AtBeginDocument{
+    \hypersetup{linkcolor=Blue}
+    %\hypersetup{urlcolor=Maroon}
+    \hypersetup{citecolor=Green}
+    
+    \hypersetup{pdftitle={Design and Cryptanalysis of Symmetric-key Algorithms in Black and White-box Models}}
+    \hypersetup{pdfauthor={Aleksei Udovenko}}
+    \hypersetup{pdfkeywords={Symmetric-Key Cryptography, Cryptanalysis, Design, Block Ciphers, White-box}}
+}
+
+\begin{document}
+\dominitoc[n]
+% \doparttoc[c] % n means no header "Contents"
+
+% \noptcrule % remove liners 
+
+% =========================================================================
+% =========================================================================
+
+\frontmatter % roman numbering style (i, ii, iii, iv...)
+\pagestyle{plain}
+
+\if\FrontMatter1
+
+\includepdf{FinalFrontPage.pdf}
+%\import{-Text/}{titlepage.tex} % temporary front page
+
+% \import{-Text/}{declaration.tex}
+% \import{-Text/}{quote.tex}
+\import{-Text/}{abstract.tex}
+\import{-Text/}{acknowl.tex}
+\fi
+
+\setcounter{tocdepth}{1} % up to sections
+\tableofcontents % Prints the main table of contents
+
+%\listoffigures % Prints the list of figures
+%\listoftables % Prints the list of tables
+%\listofalgorithms % Prints the list of algos
+
+% \import{-Text/}{abbrev.tex}
+% \import{-Text/}{symbols.tex}
+% \import{-Text/}{dedicatory.tex}
+
+% =========================================================================
+% =========================================================================
+
+\mainmatter % numeric (1,2,3...) page numbering
+\pagestyle{thesis}
+
+% some hack with section counters...
+% multitoc does not count correctly
+\if\FrontMatter0
+\setcounter{mtc}{0} % without lists
+\fi
+%\setcounter{mtc}{1} % abstract 
+\if\FrontMatter1
+\setcounter{mtc}{2} % with all lists / whatever (abstract + acknowledgements)
+\fi
+
+\import{-Config/}{plot}
+
+% =========================================================================
+% =========================================================================
+
+
+
+\end{document}  

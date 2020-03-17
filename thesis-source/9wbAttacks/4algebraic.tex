@@ -1,0 +1,78 @@
+\SecDef{algebraic}{Algebraic DCA attacks}
+
+\SubSecDef{linear}{Linear Algebra Attack}
+
+For the classic Boolean masking the problem of finding shares consists in finding a subset of the window's vectors which sums to one of predictable vectors. Clearly, this is a basic linear algebra problem. Let $A$ be the matrix that has as columns vectors from the current window. For each predictable vector $\pv$ we solve the equation $A \times x = \pv$. A solution vector $x$ reveals shares locations. To avoid false-positive solutions the number $\numtext$ of encryptions should be increased proportionally to the window size. For the same matrix $A$ we need to check all predictable vectors. Instead of solving the entire system each time, we precompute the LU decomposition of the matrix and then use it for checking each predictable vector much faster. We estimate the data complexity $\numtext = \OO(\winsize)$ and the time complexity $\OO(\winsize^\matexp + \winsize^2\numpred)$, where $\matexp$ is the matrix multiplication exponent. This attack was independently proposed by the CryptoExperts team in~\cite{cryptoexperts} and among other techniques was successfully applied~\cite{CHESawards} during the WhibOx~2017 competition~\cite{whibox} in order to break the winning challenge ``Adoring Poitras''.
+
+We conclude that classic Boolean masking is insecure regardless of the number of shares. The attack complexity is polynomial in the circuit size. Even though it may not be highly practical to apply the attack to entire circuits containing millions of nodes, good window coverage makes the attack much more efficient. The attack becomes especially dangerous if a window containing all shares may be located by analyzing the circuit. Indeed, this is how team CryptoExperts attacked the main circuit of the winning challenge of the WhibOx competition. They obtained a minimized circuit containing around 300000 nodes; they draw the data dependency graph (DDG) of the top 5\% nodes and visually located several groups of 50 nodes and successfully mounted the described linear attack on each of the groups.
+
+
+% -------------------------------------------------------------------
+
+\SubSecDef{linearization}{Generalization through Linearization}
+
+The described linear attack suggests that a nonlinear masking scheme has to be used. We show that the attack can be generalized to nonlinear masking schemes as well. Of course, the complexity grows faster. Still, the attack can be used to estimate the security of such implementations.
+
+The generalization is based on the linearization technique. The idea is to compute products of vectors (with bitwise \tand{}) and include them as possible shares of the predictable vector. Each such product corresponds to a possible monomial in the algebraic normal form of the decoder function. The correct linear combination of monomials equals to the decoder function. The corresponding linear combination of products of vectors equals to the correct predictable vector.
+
+The set of products may be filtered. If a bound on the degree of the decoder function is known, products with higher degrees are not included. For example, for a quadratic decoder function only the vectors $v_i$ and all pairwise products $v_iv_j$ should be included.
+
+The data complexity is dependent on the number of possible monomials in the decoder function. For simplicity, we consider an upper bound $d$ on the algebraic degree. Then the number of possible monomials is equal to
+$$
+\sumbinom{\winsize}{d} \eqdef \sum_{i=0}^d \binom{\winsize}{i}.
+$$
+This generalized attack has the data complexity $\OO(\sumbinom{\winsize}{d})$ and the time complexity $\OO(\sumbinom{\winsize}{d}^\matexp + \sumbinom{\winsize}{d}^2\numpred)$. 
+
+The following definition is useful in formalizing the attack. It will be particularly useful in \ChapRef{wbc}, where countermeasures against this attack are analyzed.
+
+\begin{definition}[$d$-th order closure]
+\Label{def:d-closure}
+Let $V \subseteq \field{n}, V = \pset{v_1, v_2, \ldots}$. Define the \emph{$d$-th order closure of $V$} (denoted $V^{(d)}$) to be the vector space spanned by all component-wise products of at most $d$ vectors from $V$.
+$$
+V^{(d)} = \Span \pset{\fone} \cup \pset{
+    \pround{
+        v_{i_1}\land v_{i_2} \land \ldots \land v_{i_d}
+        \mid
+        1 \le i_1 \le i_2 \le \ldots \le i_d \le |V|
+    }
+}.
+$$
+
+Let $\VFUNCS$ be a set of Boolean functions with the same domain $\field{N}$.
+The $d$-th order closure of $\VFUNCS$ (denoted $\VFUNCSD{d}$) is defined completely analogously to $V^{(d)}$.
+\end{definition}
+\begin{example}
+$ $\newline
+$\VFUNCSD{1}$ is spanned by $\{\fone\}\cup\{g_i ~\mid~ g_i \in \VFUNCS\}$,\\
+$\VFUNCSD{2}$ is spanned by $\{\fone\}\cup\{g_ig_j ~\mid~ g_i,g_j \in \VFUNCS\}$ (includes $\VFUNCSD{1}$ as $i=j$ is allowed).                    
+\end{example}
+
+The (first-order) linear algebra attack can then be described as searching for a predictable vector $\tilde{v}$ in the vector space $V^{(1)}$. 
+The generalized linear algebra attack of order $d$ then searches in the vector space $V^{(d)}$.
+
+It is worth remarking that it is enough to consider only nonlinear (e.g. \tand{}, \tor{}) and input nodes inside the current window. All other nodes are affine combinations of these and are redundant. This fact is formalized in the following proposition.
+
+\begin{proposition}
+\PropLabel{nonlinear-gates}
+Let $C$ be a Boolean circuit. Let $\NFUNCS(C)$ be the set of all functions computed in the circuit's nonlinear nodes (i.e. any node except \txor{}, \tnot{}, \tnxor{}) together with functions returning input bits. Then for any integer $d \ge 1$ the sets $\FUNCSD{d}(C)$ and $\NFUNCSD{d}(C)$ are the equal.
+\end{proposition}
+\begin{proof}
+Note that for any set $\VFUNCS$ we have $\VFUNCSD{d} = (\VFUNCSD{1})^{(d)}$. Therefore, we only need to prove that $\FUNCSD{1}(C) = \NFUNCSD{1}(C)$. It is sufficient to show that any function from $\FUNCS$ belongs to $\NFUNCSD{1}(C)$. This can be easily proved by induction on circuit levels.
+\end{proof}
+\begin{remark}
+Note that linear relations may still hold between functions computed in the nonlinear gates. For example, the XOR gate may be implemented by several NAND gates. All such relations can be exploited to reduce the search space by simply reducing the set $V$ to a basis of the space that it spans. It is easy to show that the $d$-th order closure of such basis is equal to the $d$-th order closure of $V$ itself.
+\end{remark}
+
+\Label{interesting-scenario}I describe an interesting scenario where this generalized attack is highly relevant. Assume that a white-box designer first applies classic Boolean masking to the reference circuit. Afterwards, each intermediate bit is encoded by e.g. 8 bits using a random nonlinear encoding. The masked circuit then is transformed into a network of lookup tables which perform operations on the encoded bits without explicitly decoding them. The motivation for such scheme is that there will be no correlation between a single 8-bit encoding and any predictable vector because of the linear masking applied under the hood. For the generalized linear attack the degree bound is equal to 8 and normally, the time complexity would be impractical. However, in this case the lookup tables reveal the locations of encodings, i.e. the 8-bit groups. Therefore, we include only $2^8$ products from each group and no products across the groups. The attack works because the predictable value is a linear combination of \txor{}-shares which in turn are linear combinations of products (monomials) from each group. I remark that the system has a simpler expression in the point basis, i.e. when we consider functions of the form $x \mapsto (x = c)$ for all $c \in \field{8}$ instead of monomial maps.
+
+% -------------------------------------------------------------------
+
+\SubSecDef{linalg-restriction}{Value-restriction Analysis}
+
+The described algebraic attack can be modified to cover a broader range of masking schemes. Consider a low-degree combination of vectors from the current window and assume that the function it computes can be expressed as $s\land r$, where $s$ is the correct predictable value and $r$ is some uniform pseudorandom (unrelated) value. The basic algebraic attack will not succeed because $s \land r$ is not always equal to the predictable value $s$. However, it is possible to extend the attack to exploit the leakage of $s \land r$. The adversary chooses a set of inputs for which the predictable value $s$ is equal to 0 and adds a single random input for which the predictable value is equal to 1 (the adversary may need to guess a part of the key to compute the predictable value). Then with probability 1/2 he is expected to find a vector with all bits equal to 0 except the last bit equal to 1. In case the predictable value is wrong, the chance of finding such vector is exponentially small in the size of the plaintext set. The same approach works for more complex leaked functions. In particular, the leaked function may depend on multiple predictable values, e.g. on all output bits of an S-Box. The only requirement is that the leaked function must be constant for at least one assignment of the predictable values (except of course the case when the leaked function is constant on all inputs). However, the adversary must be able to find the correct assignment of predictable values. As a conclusion, this attack variant reveals a stronger constraint that a masking scheme must satisfy in order to be secure.
+
+% -------------------------------------------------------------------
+
+\SubSecDef{linalg-lpn}{Algebraic Attack in the Presence of Noise}
+
+In spirit of the value-restriction analysis, we continue to explore classes of exploitable leaking functions. Assume that a low-degree combination of vectors from the current window corresponds to a function $s\oplus e$, where $s$ is the correct predictable vector and $e$ is a function with a low Hamming weight. The function $e$ may be unpredictable and we consider it as noise. The problem of solving a noisy system of linear equations is well known as Learning Parity with Noise (LPN). It is equivalent to the problem of decoding random linear codes. The best known algorithms have exponential running time. We refer to a recent result by Both and May~\cite{LPN} where the authors propose an algorithm with approximated complexity $2^{1.3nr}$, where $n$ is the number of unknown variables and $r$ is the noise ratio. Several algorithms with low memory consumption were recently proposed by Esser~\etal{}~\cite{LPNdecoded}. The best algorithm for the problem depends on the exact instance parameters. The number of variables in our case corresponds to the number of monomials considered, i.e. the window size $\winsize$ in the linear attack and $\sumbinom{\winsize}{d}$ in the generalized attack. For example, if a linear combination of vectors from a 100-node window leaks $s$ with noise ratio $1/4$ then the LPN-based attack will take time $2^{32.5}$ using the algorithm from \cite{LPN}.

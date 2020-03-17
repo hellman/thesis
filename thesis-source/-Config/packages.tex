@@ -1,0 +1,113 @@
+\usepackage{floatrow}
+\newfloatcommand{capbtabbox}{table}[][\FBwidth]
+
+\usepackage{minitoc}
+\newcommand\myminitoc{\minitoc\vspace{0.5cm}}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian,english]{babel}
+\usepackage{marvosym}
+
+%\usepackage{mathpazo} % Use the Palatino font by default
+\usepackage{cite}
+
+\usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+\usepackage{multibib}
+\newcites{myconf}{Conference Proceedings}
+\newcites{myjour}{Journal Publications}
+\newcites{myeprint}{Unrefereed Publications}
+
+\usepackage{shorttoc}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{question}[theorem]{Question}
+
+\usepackage{extarrows}  % more arrows under text / over text, xlongarrow 
+
+\newtheoremstyle{remark}% name
+  {\topsep}% space above
+  {\topsep}% space below
+  {}% body font
+  {}% indent amount
+  {\itshape}% theorem head font
+  {.}% punctuation after theorem head
+  {.5em}% space after theorem head
+  {\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}% theorem head spec
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheoremstyle{example}% name
+  {\topsep}% space above
+  {\topsep}% space below
+  {}% body font
+  {}% indent amount
+  {\itshape}% theorem head font
+  {.}% punctuation after theorem head
+  {.5em}% space after theorem head
+  {\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}% theorem head spec
+\theoremstyle{example}
+\newtheorem{example}{Example}
+
+\usepackage{mathtools}
+\usepackage{bbm} % for \mathbbm{1}
+\usepackage{physics} % for \abs
+
+\usepackage[chapter]{algorithm}
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{pifont}
+\usepackage{multirow}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{comment}
+\usepackage{ifthen}
+
+\usepackage{rotating} % landscape
+
+\usepackage{xspace} % text macros without {}
+
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{patterns}
+\usetikzlibrary{shapes}
+\usetikzlibrary{shadows}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes.gates.logic.US}
+\tikzstyle{fun}=[draw,thick,fill=white]
+\tikzstyle{fork}=[shape=circle,inner sep=0pt,minimum size=1pt,fill=black]
+\tikzstyle{op}=[inner sep=2pt]
+
+\usepackage{import}
+\usepackage{todonotes}
+% \maxdeadcycles=200 % this number limits todonotes... hacky
+
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
+\algtext*{Indent}
+\algtext*{EndIndent}
+
+\captionsetup{width=.8\textwidth}
+
+\setcounter{MaxMatrixCols}{20} % increase matrix size
+
+\usepackage[final]{pdfpages}

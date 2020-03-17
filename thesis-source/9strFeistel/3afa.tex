@@ -1,0 +1,208 @@
+\section{Feistel Networks with Affine Encodings}
+\SecLabel{afa}
+
+In this section, I describe decomposition attacks on Feistel Networks masked with affine layers, which I shall call affine encodings. The motivation for studying this structure comes from the fact that such encodings preserve most of the cryptographic properties (linearity, differential uniformity, algebraic degree) but make it harder to distinguish or decompose the structure. As an evidence, observe that attacks on the ASASA construction~\cite{ASASA1,ASASA2} are more involved than the attack on the SASAS construction~\cite{SASAS}.
+Thew new attacks also expand the toolkit for the white-box cryptanalysis and S-Box reverse-engineering. I start with a formal definition of the analyzed structure.
+
+\newcommand\FF{\mathcal{F}^r_d}
+\begin{definition}[Feistel Network with Affine Encodings]
+\Label{def:afa}
+    $\afanbij{r}{d}$ denotes the set of all permutations that can be expressed as an $r$-round Feistel Network with Feistel functions $f_1,\ldots,f_r\colon \field{n} \to \field{n}$ of algebraic degree at most $d$, and composed with bijective affine mappings from both sides. Furthermore, let $\ainvfanbij{r}{d}$ denote the $\afanbij{r}{d}$ structure where the output affine encoding is the inverse of the input affine encoding; let $\afnbij{r}{d}$ denote the $\afanbij{r}{d}$ structure where the input affine encoding is the identity mapping:
+    \begin{align*}
+        \afanbij{r}{d} &\eqdef \pset{\eta \circ R_{f_n}\circ\ldots\circ R_{f_1} \circ \mu \mid f_i \in \FF,
+        \mu,\eta \in \affbij{n}
+        },\\
+        \ainvfanbij{r}{d} &\eqdef \pset{\mu^{-1} \circ R_{f_n}\circ\ldots\circ R_{f_1} \circ \mu \mid f_i \in \FF,
+        \mu \in \affbij{n}
+        },\\
+        \afnbij{r}{d} &\eqdef \pset{\mu \circ R_{f_n}\circ\ldots\circ R_{f_1} \mid f_i \in \FF,
+        \mu \in \affbij{n}
+        },
+    \end{align*}
+    where $R_{f_i}$ is a Feistel round as defined in Definition~\Ref{def:feistel}, and $\FF$ denotes the set of all vectorial Boolean functions of degree at most $d$ mapping $\field{n}$ to itself.
+\end{definition}
+
+All the attacks in this section are based on the type-I and type-II integral distinguishers from \SecRef{hdim-feistel}. The constant additions on any of the sides do not change the integral property, in particular the HDIM. Therefore, it is sufficient to consider the case of linear encodings.
+
+The cryptanalyst may compose a given structure $S \in \afanbij{r}{d}$ with additional random affine or linear encodings $\mu', \eta'$ and still obtain a structure $\eta' \circ S' \circ \mu' \in \afanbij{r}{d}$. In this way, it is possible to \emph{re-randomize} the initial encoding for any of the three structures. Our attack works for affine encodings satisfying a particular (rather dense) property. The attack therefore applies to arbitrary encodings via the re-randomization. The following definition captures the class of linear permutations that our attack will target.
+
+\newcommand\idup[1]{
+\matbtwo{\idmat{n}}{#1}{0}{\idmat{n}}
+}
+\newcommand\idlo[1]{
+\matbtwo{\idmat{n}}{0}{#1}{\idmat{n}}
+}
+\newcommand\diag[2]{
+\matbtwo{#1}{0}{0}{#2}
+}
+\newcommand\compos{\circ}
+
+\begin{definition}
+Let $\mu \in \linbij{2n}$.
+$\mu$ is said to have a 2-UL decomposition, if there exist matrices $a,b,c,d \in \linmap{n}{n}$ such that
+$$
+\mu ~=~
+\matb{
+  \mu_{1, 1} & \mu_{1, 2} \\
+  \mu_{2, 1} & \mu_{2, 2} \\
+}
+~=~
+\idup{c} \compos \diag{b}{d} \compos \idlo{a}.
+$$
+\end{definition}
+
+\begin{lemma}
+It is sufficient that $\mu_{2,2}$ is invertible for $\mu$ to have a 2-UL decomposition.
+\end{lemma}
+\begin{proof}
+Note that
+$$
+%2-UL
+\idup{c} \compos \diag{b}{d} \compos \idlo{a} =
+\matbtwo{c\times d\times a \oplus b}{c\times d}{d \times a}{d}.
+$$
+Set
+\begin{align*}
+&d = \mu_{2,2},\\
+&a = d^{-1}\times \mu_{2,1},\\
+&c = \mu_{1,2} \times d^{-1},\\
+&b = \mu_{0,0} \oplus c\times d \times a.
+\end{align*}
+\end{proof}
+
+The attacks presented in this section recover a partial information about the linear encodings. The underlying structure is not restricted to Feistel Network, it is only required that it has the type-I or type-II distinguisher. However, the partial information recovered is most useful in the Feistel Network case, as it allows to apply the decomposition attack on the unmasked Feistel Network.
+
+% ===========================================================
+% A'F4A
+% ===========================================================
+
+\subsection{Type-I Affine Encodings Recovery}
+
+The following theorem describes an attack against a structure with the type-I distinguisher masked with affine encodings. Type-I distinguisher is strong and provides enough equations to recover the required partial information from both sides of the structure.
+
+\begin{theorem}[Type-I Affine Encodings Recovery]
+\Label{thm:af4a}
+Let $S\colon \field{2n} \to \field{2n}$ be a permutation that has the type-I distinguisher and let $\HDIM{S} = \matbtwo{h_{1,1}}{0}{0}{0}$. Let $\mu,\eta \in \linbij{2n}$ such that $\mu$ and $\eta^{-1}$ both have a 2-UL decomposition. Let $T \eqdef \eta \circ S \circ \mu$.
+
+Let $(a,b,c,d)$ and $(a',b',c',d')$ be the 2-UL decompositions of $\mu$ and $\eta^{-1}$ respectively.
+Then, given $T$, $a$ and $a'$ can be recovered in time $\OO(n2^{2n})$ if $h_{1,1}$ is invertible.
+\end{theorem}
+\begin{proof}
+Observe that $\eta$ can be expressed as
+$$
+\eta = \idlo{a'} \compos \diag{b'^{-1}}{d'^{-1}} \compos \idup{c'}.
+$$
+Let $S'\colon \field{2n}\to \field{2n}$ be given by:
+$$
+S' = \diag{b'^{-1}}{d'^{-1}} \compos \idup{c'} \compos S \compos \idup{c} \compos \diag{b}{d}.
+$$
+Then $T$ can be expressed as:
+$$
+T = \idlo{a'} \compos S' \compos \idlo{a}.
+$$
+The relation between $S, S'$ and $T$ is illustrated in \FigRef{afa-explanation} where $S$ assumed to be a Feistel Network). 
+
+\FigTex{afa-explanation.tex}
+
+Consider the HDIM of $S'$ and $S$. They are related by Proposition~\Ref{prop:hdim-linear-effect}:
+%Let $T=\eta \circ S \circ \mu$. Then
+$$
+\HDIM{S'} = \diag{b'^{-1}}{d'^{-1}} \compos \idup{c'} \compos \HDIM{S} \compos \idlo{c^\top} \compos \diag{\invtop{b}}{\invtop{d}}.
+$$
+It is easy to verify that
+$$
+\HDIM{S'} = \matbtwo{b'^{-1} \times h_{1,1} \times \invtop{b}}{0}{0}{0}.
+$$
+Let $h' = b'^{-1} \times h_{1,1} \times \invtop{b}$. By a similar argument,
+$$
+\HDIM{T} = \idlo{a'} \compos \HDIM{S'} \compos \idup{a^{\top}} = \matbtwo{h'}{h' \times a^{\top}}{a' \times h'}{a' \times h' \times a^{\top}}.
+$$
+Since $h_{1,1}$ is assumed to be invertible and $b,b'$ are invertible too, $h'$ is invertible. Therefore, $a$ and $a'$ can be easily recovered from $\HDIM{T}$ in time $\OO(n^3)$. The attack complexity is then dominated by the cost of computing $\HDIM{T}$, which can be done in $\OO(n2^n)$ operations.
+\end{proof}
+\begin{remark}
+If the rank of $h_{1,1}$ is not full but is high enough, it may still be possible to recover $a$ and $a'$ completely by including the quadratic equations from $(\HDIM{T})_{2,2}$.
+\end{remark}
+
+The theorem shows that the type-I distinguisher provides $2n^2$ linear equations and $n^2$ quadratic equations. This is enough to recover $2n^2$ bits of information about the affine encodings. In the case of the type-II distinguisher, only $n^2$ quadratic equations are available for $2n^2$ unknowns. Still, the method can be applied to simplified structures. One possible scenario is the $\ainvfanbij{r}{d}$ structure where the output linear layer is the inverse of the input linear layer. In this case though, the cryptanalyst has to solve a system of quadratic equations. Another scenario is the one-sided affine masking, i.e. the $\afnbij{r}{d}$ structure. In this case linear equations are obtained and the required partial information is recovered.
+
+% ===========================================================
+% A-1F5A
+% ===========================================================
+
+\subsection{Type-II Affine Encodings Recovery}
+
+\begin{theorem}[Type-II Affine Encodings Recovery, $\ainvfanbij{r}{d}$]
+\Label{thm:af5a}
+Let $S\colon \field{2n} \to \field{2n}$ be a permutation that has the type-II distinguisher and let $\HDIM{S} = \matbtwo{h_{1,1}}{h_{1,2}}{h_{2,1}}{0}$. Let $\mu \in \linbij{2n}$ such that $\mu$ has a 2-UL decomposition. Let $T \eqdef \mu^{-1} \circ S \circ \mu$.
+
+Let $(a,b,c,d)$ be the 2-UL decomposition of $\mu$.
+Then, given $T$, a system of $n^2$ quadratic equations on $a$ can be obtained.
+\end{theorem}
+\begin{proof}
+Let $S'\colon \field{2n}\to \field{2n}$ be given by:
+$$
+S' = \diag{b^{-1}}{d^{-1}} \compos \idup{c} \compos S \compos \idup{c} \compos \diag{b}{d}.
+$$
+Similarly to the proof of Theorem~\Ref{thm:af4a},
+$$
+\HDIM{S'} = \diag{b^{-1}}{d^{-1}} \compos \idup{c} \compos \HDIM{S} \compos \idlo{c^{\top}} \compos \diag{\invtop{b}}{\invtop{d}},
+$$
+$$
+\HDIM{S'} = \matbtwo{b^{-1}\times \pround{h_{1,1} \oplus c\times h_{2,1} \oplus h_{1,2}\times c^{\top}}\times \invtop{b}}{b^{-1}\times h_{1,2} \times \invtop{d}}{d^{-1}\times h_{2,1} \times \invtop{b}}{0}.
+$$
+Let
+$$
+\HDIM{T} = \matbtwo{t_{1,1}}{t_{1,2}}{t_{2,1}}{t_{2,2}}.
+$$
+Then
+\begin{align*}
+\HDIM{S'} &= \idlo{a} \compos \HDIM{T} \compos \idup{a^{\top}} = \\
+          &= \matbtwo{t_{1,1}}{t_{1,2}\oplus t_{1,1}\times a^{\top}}{t_{2,1}\oplus a \times t_{1,1}}{t_{2,2} \oplus a\times t_{1,2}\oplus t_{2,1}\times a^{\top} \oplus a \times t_{1,1} \times a^{\top}}.
+\end{align*}
+The quadratic equation system follows:
+$$
+(\HDIM{S'})_{2,2} = t_{2,2} \oplus a\times t_{1,2}\oplus t_{2,1}\times a^{\top} \oplus a \times t_{1,1} \times a^{\top} = 0.
+$$
+\end{proof}
+
+% ===========================================================
+% A-1F5
+% ===========================================================
+
+\begin{theorem}[Type-II Affine Encodings Recovery, $\afnbij{r}{d}$]
+\Label{thm:f5a}
+Let $S\colon \field{2n} \to \field{2n}$ be a permutation that has the type-II distinguisher and let $\HDIM{S} = \matbtwo{h_{1,1}}{h_{1,2}}{h_{2,1}}{0}$. Let $\mu \in \linbij{2n}$ such that $\mu$ has a 2-UL decomposition. Let $T \eqdef \mu^{-1} \circ S$.
+
+Let $(a,b,c,d)$ be the 2-UL decomposition of $\mu$.
+Then, given $T$, $a$ can be recovered in time $\OO(n2^n)$ if $h_{1,2}$ is invertible.
+\end{theorem}
+\begin{proof}
+Let $S'\colon \field{2n}\to \field{2n}$ be given by:
+$$
+S' = \diag{b^{-1}}{d^{-1}} \compos \idup{c} \compos S
+$$
+Then
+$$
+\HDIM{S'} = \diag{b^{-1}}{d^{-1}} \compos \idup{c} \compos \HDIM{S},
+$$
+$$
+\HDIM{S'} = \matbtwo{b^{-1}\times \pround{h_{1,1} \oplus c\times h_{2,1}}}{b^{-1}\times h_{1,2}}{d^{-1}\times h_{2,1} }{0}.
+$$
+Let 
+$$
+\HDIM{T} = \matbtwo{t_{1,1}}{t_{1,2}}{t_{2,1}}{t_{2,2}}.
+$$
+Then
+$$
+\HDIM{S'} = \idlo{a} \compos \HDIM{T} = \matbtwo{t_{1,1}}{t_{1,2}}{t_{2,1}\oplus a \times t_{1,1}}{t_{2,2} \oplus a \times t_{1,2}}.
+$$
+It follows that 
+$$
+(\HDIM{S'})_{2,2} = t_{2,2} \oplus a \times t_{1,2} = 0.
+$$
+Note that $t_{1,2} = b^{-1}\times h_{1,2}$ is invertible since $h_{1,2}$ is assumed to be invertible, therefore the linear system has full rank.
+\end{proof}
+
+\Todo{Mention implementation of AFA attacks}
+
+In the next sections, I will describe how to continue the decomposition process of the unmasked Feistel Networks.

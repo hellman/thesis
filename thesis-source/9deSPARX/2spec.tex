@@ -1,0 +1,68 @@
+\SecDef{spec}{Specification of the \sparx{} Family}
+
+The \sparx{} family includes three block ciphers: \sparxinstance{64}{128},\sparxinstance{128}{128} and \sparxinstance{128}{256}. The first parameter specifies the block size, and the second parameter specifies the key size. All three members of the family are Substitution-Permutation Networks. The substitution, however, is keyed. It is a 32-bit ARX-based block cipher, which is a slightly modified Speck. The substitution is called an \emph{ARX-box}. It is the same for all members of the family, for all rounds and for all positions. The linear layer in \sparx{} is a Feistel round: a linear bijective mapping is applied to the left half of the state, the result is \txor{}ed to the right half of the state, and the halves of the state are swapped. A high-level illustration is given in \AlgRef{sparx} and \FigRef{sparx}. An SPN round is called \emph{a step}, and a round of the ARX-box cipher is called \emph{a round}. A \sparx{} block cipher consists of steps, which in turn consist of ARX-box rounds and a linear layer. A \emph{word} is a vector from $\field{16}$. A \emph{branch} is a pair of words. Parameters of the three \sparx{} instances are summarized in \TabRef{instances}. In this section, $(x)_L$ and $(x)_R$ denote the left and the right halves of a vector $x \in \field{2n}$ for some $n$.
+
+\begin{algorithm}
+\AlgDef{sparx}{\sparx{} encryption}
+\begin{algorithmic}[1]
+\Require plaintext $(x_1, \ldots, x_w) \in (\field{32})^w$, key $(k_1, \ldots, k_v) \in (\field{32})^v$
+\Ensure ciphertext $(y_1, \ldots, y_w) \in (\field{32})^w$
+\Statex{}
+\State{Let $y_i \gets x_i$ for all $i \in \seg{1}{w}$}
+\ForAll{$s \in \seg{1}{n_s}$}
+    \ForAll{$i \in \seg{1}{w}$}
+        \ForAll{$r \in \seg{1}{r_a}$}
+            \State{$y_i \gets y_i \oplus k_r$}
+            \State{$y_i \gets A(y_i)$}
+        \EndFor
+        \State{$(k_1, \ldots, k_{v-1}) \gets K_v\proundd{(k_1, \ldots, k_v)}$} \Comment{Update key state}
+    \EndFor
+    \State{$(y_1, \ldots, y_w) \gets \linLayer{w}\proundd{(y_1,\ldots, y_w)}$} \Comment{Linear mixing layer}
+\EndFor
+\State{Let $y_i \gets y_i \oplus k_i$ for all $i \in \seg{1}{w}$}
+\Comment{Final key addition}
+\State{\Return $(y_1, \ldots, y_w)$}
+\end{algorithmic}
+\end{algorithm}
+
+\FigTex{sparx.tex}
+\FigTex{speckey.tex}
+
+\begin{table}[ht]
+\begin{center}
+    \begin{tabular}{lccc}
+        \toprule
+        & ~\sparxinstance{64}{128}~ & ~\sparxinstance{128}{128}~ & ~\sparxinstance{128}{256} \\
+        \midrule
+        \# State words $w$ & 4 & 8 & 8 \\
+        \# Key words $v$ & 8 & 8 & 16 \\
+        \# Rounds/Step $r_a$ & 3 & 4 & 4 \\
+        \# Steps $n_s$ & 8 & 8 & 10 \\
+        \bottomrule
+    \end{tabular}
+    \TabDef{instances}{The three \sparx{} instances.}
+\end{center}
+\end{table}
+
+\SubSecDef{sparx64}{Specification of \sparxinstance{64}{128}}
+\FigTex{sparx64.tex}
+\FigTex{sparx64ks.tex}
+
+\sparxinstance{64}{128} has 64-bit block and 128-bit key. The state consists of two branches $x_1^s, x_2^s \in \field{32}$. A step applies the 3-round ARX-box $A^3$ to each branch in parallel, and the following mixing layer is a linear Feistel round with the function $\Lthirty \in \linbij{32}$, which is borrowed from the Noekeon block cipher~\cite{Noekeon}. The step structure and the function $\Lthirty$ are illustrated in \FigRef{sparx64}.
+
+The key schedule of \sparxinstance{64}{128} is shown in \FigRef{sparx64ks} and \AlgRef{sparx64ks}. It is a generalized Feistel Network with 4 branches. A round of the key schedule consists of one ARX-box round, two modular additions and one constant addition of the (key schedule) round number.
+
+
+\SubSecDef{sparx128}{Specification of \sparxinstance{128}{128} and \sparxinstance{128}{256}}
+
+\sparx{} with 128-bit block has two variants which differ only in the key size and the key schedule. Both \sparxinstance{128}{128} and \sparxinstance{128}{256} have state of four 32-bit branches. In a step, the 4-round ARX-box $A^4$ is applied to every branch. Then the linear layer follows, which is also a linear Feistel round. The Feistel function $\Lsixty \in \linbij{64}$ takes as input the two leftmost branches and the output is \txor{}ed to the two rightmost branches. It is a generalized version of $\Lthirty$ composed with a swap of two words. The common step structure and the linear map $\Lsixty$ are shown in \FigRef{sparx128}.
+
+\FigTex{sparx128.tex}
+
+The key schedule of \sparxinstance{128}{128} is the same as that of \sparxinstance{64}{128}, except that an extra ARX-box round is added to the third branch, and afterwards the third branch words are added to the fourth branch. The algorithm and graphical representation of the key schedule are given in \FigRef{sparx128ks128}.
+
+\FigTex{sparx128ks128.tex}
+
+The key schedule of \sparxinstance{128}{256} is similar to the key schedule of \sparxinstance{128}{128}. The operations are the same, and four more branches are inserted: two after $k_2$ and two after the last branch. In the end, the branches are rotated to the left by 3 positions, instead of 1. The key schedule is illustrated in \FigRef{sparx128ks256} and \AlgRef{sparx128ks256}.
+
+\FigTex{sparx128ks256.tex}

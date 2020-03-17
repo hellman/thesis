@@ -1,0 +1,75 @@
+\SubSecDef{prediction}{Prediction Security}
+Taking into account the above discussions, we propose the following game-based security definition:
+
+\newcommand\advanPS{\Advan^{\mathsf{PS}}_{C, \Enc, d}}
+\newcommand\expPS{\mathsf{PS}^{C, \Enc, d}}
+\newcommand\rC{R_C}
+\newcommand\rE{R_E}
+\newcommand\Enc{E}
+
+
+\begin{definition}[Prediction Security (d-PS)]
+\DefLabel{prediction-security}
+Let
+$C: \field{N'} \times \field{\rC} \to \field{M}$ be a Boolean circuit,
+$\Enc: \field{N} \times \field{\rE} \to \field{N'}$ an arbitrary function,
+$d \ge 1$ an integer
+and
+$\adv$ an adversary.
+Consider the following security game:
+
+\vspace{0.25cm}
+\fbox{\parbox{0.925\linewidth}{
+\begin{algorithmic}
+    \small
+    \State {\bf Experiment} $\expPS(\adv,b)$:
+    \Indent
+        \State $(\tilde{f}, x^{[0]}, x^{[1]}, \tilde{y}) \gets \adv(C,\Enc,d),$ where \\
+            \quad\quad\quad\quad 
+                 $\tilde{f} \in \FUNCSD{d}(C)\notconst,
+                  x^{[l]} = (x_1^{[l]}, \ldots, x_Q^{[l]}),
+                  x_i^{[l]} \in \field{N}, \tilde{y} \in \field{Q}$
+    
+        \State $(r_1, \ldots, r_Q) \xleftarrow{\$} (\field{\rE})^Q$
+        \State $(\tilde{r}_{1}, \ldots, \tilde{r}_{Q}) \xleftarrow{\$} (\field{\rC})^Q$
+    
+        \State For any $f \in \FUNCSD{d}(C)$ define \\
+            \quad\quad\quad\quad 
+            $y(f) = \Big(
+                f\big(\Enc(x_1^{[b]}, r_1), \tilde{r}_1\big),
+                \ldots,
+                f\big(\Enc(x_Q^{[b]}, r_Q), \tilde{r}_Q\big)
+            \Big)$
+        \State $F \gets \{f \in \FUNCSD{d}(C) \mid y(f) = \tilde{y}\}$
+        \State \Return $F = \{ \tilde{f} \}$
+    \EndIndent
+\end{algorithmic}
+}}
+\vspace{0.25cm}
+
+In the above experiment, $\xleftarrow{\$}$ means sampling uniformly at random. Define the advantage of an adversary $\adv$ as
+$$
+    \advanPS[\adv] =
+    \Big|
+        \Prob[\expPS(\adv,0)=1]
+        -
+        \Prob[\expPS(\adv,1)=1]
+    \Big|.
+$$
+
+The pair $(C,\Enc)$ is said to be $d$-th order prediction-secure ($d$-PS) if for any adversary $\adv$ the advantage is negligible.
+\end{definition}
+
+\begin{example}
+Consider a white-box AES implementation with a first-order Boolean masking protection. Assume that there are two nodes in the circuit computing two masks of an output bit of an S-Box in the first round. Denote the functions computed by masks as $f_1, f_2$. The adversary finds these nodes and chooses $\tilde{f}=f_1\oplus f_2 \in \FUNCSD{1}(C)$. She also chooses sufficiently large $Q$ and random vectors $x^{[0]}$ and $x^{[1]}$ of $Q$ (plaintext, key) pairs. For example, the same key may be used for all pairs in $x^{[0]}$ and another key for all pairs in $x^{[1]}$. The adversary computes $\tilde{y} = (s(x^{[0]}_1), ...,s(x^{[0]}_Q))$ (where function $s$ computes an output bit of the attacked S-Box in the first round from the plaintext and the key). In this case the adversary succeeds in the game with advantage close to 1 and the implementation is not prediction-secure (indeed, the adversary easily distinguishes the two keys). Note that we required the adversary to find the nodes in order to choose the right function $\tilde{f}$. Since the adversary is unbounded, this is just a technical requirement. In the real attack the adversary does not need to guess the exact function, only to generate a predicted vector of its values.
+\end{example}
+
+The function $\Enc$ in the definition should be referred to as \emph{the encoding function}. Though the definition allows the encoding function to be arbitrary, we are mainly interested in the encodings with useful semantics, i.e. masking. Moreover, we expect the encoding to be lightweight and universal: main computations should be performed in the circuit $C$.
+
+The circuit $C$ can be completely unobfuscated but still prediction-secure, because the adversary is forced to consider the whole vector space $\FUNCSD{d}(C)$. In a real white-box implementation this restriction is expected to be enforced by the structure-hiding protection.
+
+We now discuss possible attacks that are not covered by this definition. The definition ensures that any single function from $\FUNCSD{d}(C)$ is unpredictable. However, it may be possible that multiple functions jointly exhibit a behaviour that leads to an attack. For example, the dimension of $\FUNCSD{d}(C)$ may differ depending on the input being encoded. Though, such attack is related to the value-restriction method from Section~\ref{wba.sec:linalg-restriction}. The definition also does not cover a general LPN-based attack.
+
+\begin{remark}
+The definition actually covers security against a simple LPN algorithm, which simply tries to guess the error vector and solve the error-less linear system. In general, security against any LPN algorithm can be achieved by increasing the number of unknowns and increasing the error probability. As will be shown further, the latter is harder and is the main difficulty. In fact, achieving a \emph{constant error probability} for circuits of \emph{arbitrary size} should be enough to guarantee security, given that the number of unknowns (i.e., the window size) can be increased arbitrarily by the structure hiding component.
+\end{remark}

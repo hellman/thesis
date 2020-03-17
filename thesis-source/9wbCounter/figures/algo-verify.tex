@@ -1,0 +1,28 @@
+\newcommand\tbX{{c}}
+
+\begin{algorithm}
+    \AlgDef{verify}{Verification of Algebraic Security}
+    
+    \begin{algorithmic}[1]
+        \Require a Boolean circuit $C(x,r):\field{N}\times\field{R}\to\field{M}$;
+        \Ensure \texttt{Secure} if the circuit $C$ is $\maxcor$-1-AS for some (unknown) $\maxcor < 1$,
+            \Statex ~~~~~~~~\texttt{Insecure} otherwise.
+    
+        % \Statex
+        
+        \State evaluate $C$ on all possible inputs;
+        \State associate the vector of computed values to each node of $C$;
+        \State let $\VFUNCS$ be the set of all associated vectors;
+        
+        \State let $\bas$ be a basis of $\VFUNCSD{1}$;
+        
+        \ForAll {$c \in \field{N}$}
+            \State let $\VFUNCS_c$ be the set of all vectors from $\bas$ restricted to the case of $x = c$;
+            \State let $\bas_c$ be a basis of $\VFUNCS_c^{(1)}$;
+            \If {$|\bas|-|\bas_c| \ne N$}
+                \State \Return \texttt{Insecure};
+            \EndIf
+        \EndFor
+        \State \Return \texttt{Secure}.
+    \end{algorithmic}
+\end{algorithm}

@@ -1,0 +1,75 @@
+\SubSecDef{security}{Security Analysis}
+
+In the experiment both the encoding function $E$ and the circuit $C$ use randomness. However, the $d$-th order closure is computed only using functions from $\FUNCS(C)$. Still, the inputs of $C$ include the outputs of $E$ and that is how the randomness used in $E$ affects the computations in $C$. In other words, $E$ generates some distribution in the inputs of $C$. Therefore, in order to study functions from $\FUNCSD{d}(C)$ we need to compose them with $E$.
+
+It is crucial to study how functions from $\FUNCSD{d}(C)$ composed with $E$ behave on a \emph{fixed input} $x$. Consider a function $f \in \FUNCSD{d}(C)$. If the function $f(E(x,\cdot),\cdot)$ is constant for some $x$ and the function $f(E(x',\cdot),\cdot)$ is non-constant for some $x'\ne x$ (or is constant but $f(E(x,\cdot),\cdot) \ne f(E(x',\cdot),\cdot)$, then these inputs are distinguishable and the pair $(C,\Enc)$ is insecure\footnote{Unless $f(E(x',\cdot),\cdot)$ has extremely high bias and is indistinguishable from the constant function on practice.}.
+More generally, if for some $f \in \FUNCSD{d}(C)\notconst$ and for some $x \in \field{N}$ the function $f(E(x,\cdot),\cdot)$ is non-constant but has a high bias (i.e. it has very low or very high weight), then the adversary still may have high chances to predict its output. We conclude that for all functions $f \in \FUNCSD{d}(C)\notconst$ and for all $x\in \field{N}$ the function $f(E(x,\cdot),\cdot)$ should have a low bias.
+
+We now show that this requirement is enough to achieve $d$-th order prediction security if there are enough random bits used in the main circuit. The following proposition gives an upper bound on $d$-PS advantage from the maximum bias and the number of random bits.
+
+\newcommand\FF{\mathcal{R}}
+\newcommand\maxcor{\varepsilon}
+
+\begin{definition}
+Let $C, E, d$ be defined as above.
+For any function $f \in \FUNCSD{d}(C)\notconst$ and for any $x \in \field{N}$ define $f_x: \field{\rE}\times\field{\rC} \to \field{}$ given by
+$$
+f_x(r_e, r_c) \eqdef f(E(x, r_e), r_c)
+$$
+and denote the set of all such functions $\FF$:
+$$
+\FF \eqdef \pset{ f(E(x,\cdot),\cdot) ~\mid~ f \in \FUNCSD{d}(C)\notconst, x \in \field{N}}.
+$$
+Furthermore, let $\maxcor$ be the maximum absolute correlation among all functions from $\FF$:
+$$
+\maxcor \eqdef \max_{f_x \in \FF} \pabs{f_x}.
+$$
+The pair $(C,E)$ is then said to be a $d$-th order algebraically $\maxcor$-secure ($\maxcor$-$d$-AS) scheme.
+\end{definition}
+
+
+
+\begin{proposition}
+\PropLabel{ps-bound}
+Let $(C,E)$ be a $d$-th order algebraically $\maxcor$-secure scheme. Let $e \eqdef \log_2\pround{(1 + \maxcor)/2}$. Then, for any adversary $\adv$ choosing vectors of size~$Q$
+\eql{ps-bound}{
+    \advanPS[\adv] \le min(2^{Q-\rC}, 2^{eQ}).
+}
+\end{proposition}
+\begin{proof}
+First, we prove that $\advanPS[\adv] \le 2^{Q-\rC}$. If $\tilde{f}$ chosen by the adversary is an affine function of random bits $r$ (independent of $x$), then it is clear that the advantage in this case is zero. Otherwise, we compute the probability of the event when the predicted value $\tilde{y}$ matches some linear function of random bits $r$. There are $\rC$ independent uniformly distributed random vectors $r_1,\ldots, r_{\rC}$ from $\field{Q}$. Let $p$ be the probability of the event that they span the whole space $\field{Q}$. In this case the experiment returns 0, because any $\tilde{y}$ matches a function different from the one chosen by the adversary. The following holds (see e.g.~\cite{matrank}):
+\eq{
+    & p \eqdef \Pr_{r_1,\ldots, r_{\rC} \xleftarrow{\$} \field{Q}}[\Span(r_1, \ldots, r_{\rC}) = \field{Q}] = \prod_{i=0}^{Q-1} \big(1 - 2^{i-\rC} \big), \\
+    & \log_2{(1-p)} \le Q-\rC.
+}
+We conclude that $p \ge 1 - 2^{Q-\rC}$ and the advantage is upper bounded by $2^{Q-\rC}$.
+
+Now we prove that $\advanPS[\adv] \le 2^{eQ}$. We simply bound the probability that the adversary submits $\tilde{f},\tilde{y}$ such that $y(\tilde{f}) = \tilde{y}$ in the experiment. Since elements of $y(\tilde{f})$ are independent, the probability to have $y(\tilde{f}) = \tilde{y}$ is maximized when each bit of $\tilde{y}$ equals to the most probable value of the respective bit of $y(\tilde{f})$ (the adversary would also need to use the least probable value at least once to avoid matching with the constant functions). For each bit the probability is bounded by $(1+\maxcor)/2=2^e$, therefore for $Q$ bits the upper bound is $2^{eQ}$.
+\end{proof}
+
+Note that the bounds are quite loose. The randomness-based term takes into account only single random bits from $r_c$. The randomness in the inputs of $C$ (generated from $r_e$ in the encoding process) as well as all intermediate values computed in the circuit add much more noise (note that we can not directly include $r_e$ since it is used in the encoding process and not in the main circuit). The correlation-based term bounds only the probability of predicting the output for a single vector of inputs. It does not include the cost of distinguishing the two vectors. We stick to these loose bounds as our current goal is to provide a simple and sound provably secure protection. 
+Assume that we know the maximum absolute correlation $\maxcor$ in $\FF$ and we want to achieve a better security bound. We can always add ``dummy'' random bits to the circuit. Note that this leads to stronger requirements for the structure-hiding protection. It follows that given the maximum bias, we can compute how many ``dummy'' random bits are needed to achieve any required security level:
+
+\begin{corollary}
+\Label{cor:seclevel}
+Let $k$ be a positive integer. Then for any  adversary $\adv$
+$$\advanPS[\adv] \le 2^{-k} \text{~if~}$$
+$$\maxcor < 1 ~\text{and}~ \rC \ge k\cdot(1-\frac{1}{e}).$$
+\end{corollary}
+
+\begin{proof}
+    Consider each term of the bound from \PropRef{ps-bound}:
+    $$
+    Q - \rC \le -k
+    \text{~or~}
+    eQ \le -k.
+    $$
+    The result follows from the second term if $Q \ge -\frac{k}{e}$ (note that $e$ is negative when $\maxcor < 1$).
+    To cover all other $Q$ we need
+    $$
+    \rC \ge Q + k \ge k\cdot(1 - \frac{1}{e}).
+    $$
+\end{proof}
+\begin{remark}
+The advantage bound is information-theoretic as we do not constraint the adversary's powers. This is an effect of the attack formalization given in \DefRef{prediction-security}: the attack requires that the adversary predicts the chosen function precisely. An unbounded adversary could simply iterate over all functions $f \in \FUNCSD{d}(C)$ and e.g. compute the bias. We argue that this kind of attack is not the linear algebra attack that we consider. Furthermore, the attack model restricts the adversary to use the full circuit $C$. Without this restriction it would be possible to choose a part of the circuit (a \emph{window}) to reduce the noise. In our model we expect that a structure-hiding protection is used to prevent this. 
+\end{remark}

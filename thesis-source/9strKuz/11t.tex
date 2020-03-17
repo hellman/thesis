@@ -1,0 +1,88 @@
+\subsection{Decomposition of T}
+\SecLabel{t}
+
+The decomposition of $T$ follows similar path as that of $U$, but with a couple of differences. all permutations $T_i$ are linearly-equivalent, excluding $T_{\hex{0}}$. The latter function stands out and does not follow any patterns. Furthermore, all $T_i,i \ne 0$ are related only by linear layer in the input. Let $N_{\hex{1}},\ldots,N_{\hex{f}}\colon \field{4} \to \field{4}$ be given by
+$$
+N_k(x) \eqdef T_k^{-1}(x) \circ T_{\hex{1}}(x).
+$$
+For any $k \ne 0$, $T_k = T_{\hex{1}} \circ N_k$ and each of $N_i$ is affine. The look-up table of $N$ is given in \TabRef{n}.
+
+In order to obtain linear mapping from affine, we detach the constant xor \emph{before} the linear map. It could also be detached \emph{after}, but detaching \emph{before} allows to merge it with the outer linear layer $L$. Let $\delta\colon \field{4} \to \field{4}$ be given by
+$$
+\delta(k) \eqdef \begin{cases}
+    0, &~\text{if}~k = 0,\\
+    N_k^{-1}(0), &~\text{otherwise}.
+\end{cases}
+$$
+It turns out that $\delta$ is a linear map:
+$$
+\delta(k_1, k_2, k_3, k_4) = (0, k_1 \oplus k_3, 0, k_1 \oplus k_2 \oplus k_3).
+$$
+
+Let $N'_{\hex{1}},\ldots,N'_{\hex{f}}\colon \field{4} \to \field{4}$ be given by
+$$
+N'_k(x) = N_k(x \oplus \delta(k)).
+$$
+Then all $N'_k$ are linear functions, i.e. $N'_k(0) = 0$ for all $k \in \field{4},k\ne 0$. The codebook of $N'$ is given in \TabRef{np}.
+
+\FigTex{n-np.tex}
+
+Consider $N'_{\hex{2}}$ (other choices are possible, but this one leads to simplest linear layers in the decomposition). It is linear-similar to the same field multiplication chosen in the decomposition of $U$: there exists $\eta \in \linbij{4}$ such that
+$$
+N'_{\hex{2}} = \eta \circ (\cdot~\odot X) \circ \eta^{-1}.
+$$
+Such $\eta$ is given by:
+$$
+\eta(x_1, x_2, x_3, x_4) \eqdef (x_1, x_2 \oplus x_4, x_3 \oplus x_2, x_4).
+$$
+Further, all $N'_k$ turn out to be multiplications by a $k$-dependent constant in the finite field. Let $\varepsilon\colon \field{4} \to \field{4}$ be given by
+$$
+\varepsilon(k) \eqdef \begin{cases}
+0, & ~\text{if}~ k = 0,\\
+\eta^{-1} \circ N'_{k} \circ \eta (1), & ~\text{otherwise}.
+\end{cases}
+$$
+Then $\varepsilon$ turns out to be a bijection, and the following holds for $k \ne 0$:
+$$
+\eta^{-1} \circ N'_{k} \circ \eta (x) = \varepsilon(k) \odot x,
+$$
+$\varepsilon$ seems to be a complicated permutation without any pattern. Note that when the inverse of $T$ is computed, the field multiplication becomes the field division and thus, the output of $\varepsilon$ is inverted. Denote the composition of the inversion in the finite field with $\varepsilon$ by $1/\varepsilon$ (defining $1/0 = 0$). Surprisingly, it is a linear function. Furthermore, when composed with $\swaplsb$ which appears here from the decomposition of $U$, it becomes a simple multiplication by a constant in the finite field:
+$$
+1/\varepsilon \circ \swaplsb(k) = k \odot (X^3 + X^2)
+$$
+for all $k \in \field{4}$.
+It follows that
+$$
+\varepsilon(k) = 1/(\swaplsb(x) \odot (X^3 + X^2)) = X \odot (1 / \swaplsb(k)),
+$$
+where $X \odot (X^3 + X^2) = 1$ in the chosen finite field. The multiplication by constant can be transferred through the main multiplication in $N'$ and merged with $T_{\hex{1}}$.
+
+We obtain that, when $k \ne 0$, $T_k$ can be computed as:
+$$
+T_k(x) = T_{\hex{1}} \circ \eta (\cdot~\odot X) \pround{
+(1/\swaplsb(k)) \odot \eta^{-1} (x \oplus \delta(k))
+}.
+$$
+The addition of $\delta(k)$, $\eta^{-1}$ and $\swaplsb$ can be merged with the outer linear layer $L$. $\eta$ can be merged with $T_{\hex{1}}$, and $\swaplsb$ will cancel out when $T$ is merged with $U$.
+
+Let
+\begin{align*}
+\zeta_0 &\eqdef T_{\hex{0}} \circ \eta,\\
+\zeta_+ &\eqdef T_{\hex{1}} \circ \eta \circ (\odot X).
+\end{align*}
+
+Then $$
+T_k(x) = \begin{cases}
+\zeta_+ \pround{
+(1/\swaplsb(k)) \odot \eta^{-1} (x \oplus \delta(k))
+},&~\text{if}~k\ne 0,\\
+\zeta_0\pround {
+\eta^{-1} (x \oplus \delta(k))
+},&~\text{if}~k = 0.
+\end{cases}
+$$
+
+The final decomposition of $T^{-1}$ and the codebooks of $\delta, \eta, \swaplsb, \zeta_0, \zeta_+$ and the field inverse $1/x$ are given are shown in \FigRef{final-t}. It uses a multiplexer, which chooses its left input branch if the control branch (i.e., $k$) is equal to zero, and its right input branch otherwise.
+The only differences between $T$ and $T^{-1}$ are using the inverses of $\zeta_0, \zeta+$, removing the field inversion, and changing the position of the multiplexer. Note that $\eta$ is an involution, and the addition of $\delta(k)$ is involution too. 
+
+\FigTex{final-t.tex}

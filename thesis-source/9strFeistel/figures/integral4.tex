@@ -1,0 +1,45 @@
+\begin{figure}[ht!]
+  \begin{center}
+    \begin{tikzpicture}[xscale=-.7,yscale=.27]
+      \path[fun]  +(0,5.75) rectangle +(1,7.25);
+      \path[fun]
+      +(0.5,6.5) node {$f_0$}
+      +(2  ,6.5) node[op,inner sep=0] (x0) {$\oplus$}
+      +(-1 ,6.5) node[fork] (f0) {};
+      
+      \path[fun] +(0,2.75) rectangle +(1,4.25);
+      \path[fun] +(0.5,3.5) node {$f_1$}
+      +(2  ,3.5) node[op,inner sep=0] (x1) {$\oplus$}
+      +(-1 ,3.5) node[fork] (f1) {};
+      
+      \path[fun] +(0,-.25) rectangle +(1,1.25);
+      \path[fun] +(0.5,0.5) node {$f_2$}
+      +(2  ,0.5) node[op,inner sep=0] (x2) {$\oplus$}
+      +(-1 ,0.5) node[fork] (f2) {};
+      
+      \path[fun] +(0,-3.25) rectangle +(1,-1.75);
+      \path[fun] +(0.5,-2.5) node {$f_3$}
+      +(2  ,-2.5) node[op,inner sep=0] (x3) {$\oplus$}
+      +(-1 ,-2.5) node[fork] (f3) {};
+      
+    
+      \draw (-1, 8.0) -- (f0);
+      \draw[line width=0.4mm, color=red] (+2, 8.0) -- (x0);
+      \draw[->] (f0) -- +(1,0) +(2,0) -- (x0);
+      \draw (f0) -- +(0, -1) -- +(3, -2) -- (x1);
+      \draw[line width=0.4mm, color=red] (x0) -- +(0, -1) -- +(-3, -2) -- (f1);
+      \draw[line width=0.4mm, color=red,->] (f1) -- +(1,0) +(2,0) -- (x1);
+      \draw[line width=0.4mm, color=red] (f1) -- +(0, -1) -- +(3, -2) -- (x2);
+      \draw[line width=0.4mm, color=red] (x1) -- +(0, -1) -- +(-3, -2) -- (f2);
+      \draw[line width=0.4mm, color=red,->] (f2) -- +(1,0) +(2,0) -- (x2);
+      \draw[line width=0.4mm, color=red] (f2) -- +(0, -1) -- +(3, -2) -- (x3);
+      \draw[line width=0.5mm, densely dashed, color=blue] (x2) -- +(0, -1) -- +(-3, -2) -- (f3);
+      \draw[->] (f3) -- +(1,0) +(2,0) -- (x3);
+      \draw (x3) -- (+2, -4);
+      \draw[line width=0.5mm, densely dashed, color=blue] (f3) -- (-1, -4);
+      
+    \end{tikzpicture}
+
+    \caption{\label{fig:integral-4-rounds}The 4-round integral characteristic: words taking all values are represented in bold red and balanced words are represented in dashed blue.}
+  \end{center}
+\end{figure}

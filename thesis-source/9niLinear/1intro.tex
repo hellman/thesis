@@ -1,0 +1,64 @@
+\SecDef{intro}{Introduction}
+After the introduction of \emph{linear cryptanalysis} in~\cite{EC:Matsui93} as a powerful method to attack symmetric cryptographic primitives, people started studying how to generalize this method in order to exploit \emph{nonlinear approximations} for cryptanalysis, see, e.g.,~\cite{EC:HarKraMas95} and~\cite{EC:KnuRob96}. While it might be easier to find a nonlinear approximation over parts of the primitive, e.g., over an S-box of small size, a crucial problem in nonlinear cryptanalysis is to find nonlinear approximations that hold true for the \emph{whole round function} of the primitive. An example  that exploits nonlinear approximations that are preserved over the whole round function is \emph{bilinear cryptanalysis} over Feistel ciphers~\cite{C:Courtois04}.
+
+More recently, an interesting solution for the above problem was described by Todo, Leander and Sasaki in~\cite{NonlinInv} for round functions that can be described in terms of an LS-design~\cite{FSE:GLSV14}.  Let one round of a substitution-permutation cipher operating on $n$ S-boxes of $t$-bit length be given as depicted in \FigRef{spn} and let the linear layer $L^{(t)} \colon \F_2^{nt} \rightarrow \F_2^{nt}$ only XOR the outputs of the S-boxes, i.e., each $(y_1,\dots,y_{n})$ for $y_j \in \F_2^t$ is mapped to $(z_1,\dots,z_{n})$ where $z_j = \sum_{i=1}^{n}\alpha_{i,j} y_i$ for particular $\alpha_{i,j} \in \F_2$. In that case, $L^{(t)}$ can be  defined by $t$ parallel applications of the matrix $L$ given by
+\[L = \left[\begin{array}{cccc} \alpha_{1,1} & \alpha_{1,2} & \dots & \alpha_{1,n} \\
+\alpha_{2,1} & \alpha_{2,2} & \dots& \alpha_{2,n} \\
+\vdots & \vdots & \ddots& \vdots \\
+\alpha_{n,1} & \alpha_{n,2} & \dots & \alpha_{n,n} \\
+\end{array}\right]\;.\]
+Todo \etal{} observed that if $L$ is orthogonal, then for \emph{any} $t$-bit Boolean function $f$ of algebraic degree less than or equal to $2$ and for any $y_1,\ldots,y_n \in \F_2^t$ it is 
+\begin{equation}
+\EqLabel{target}
+    f(y_1) + f(y_2) + \dots + f(y_{n}) = f(z_1) + f(z_2) + \dots + f(z_{n})\;.
+\end{equation}
+This fact was used to successfully cryptanalyze the block ciphers Midori, Scream and iScream in a weak key setting. Indeed, if $f$ is any invariant function for the S-box $S$, i.e., if for all $x \in \F_2^t$, $f(x) = f(S(x))$, and if $\deg(f) \leq 2$, one obtains an invariant function for the whole round according to \EqRef{target}.
+
+An interesting question is whether the property of $L$ being orthogonal is also necessary for \EqRef{target} to hold for all $f$ with degree upper-bounded by $2$. More generally, we would like to understand the necessary and sufficient properties of the linear layer that preserve such invariants in the case when $\deg(f) \leq d$ for $d > 2$. Although the existence of a non-trivial\footnote{By \emph{non-trivial}, we mean that the matrix of $L$ is not a permutation matrix.} linear layer for which \EqRef{target} holds for all $f$ with $\deg f \leq d$ is totally unclear, such a construction would be of significant interest. On the one hand, it would deepen the knowledge on how to design strong symmetric cryptographic primitives and to avoid possible attacks and could on the other hand be useful in order to design symmetric \emph{trapdoor ciphers} to be used as public-key schemes, see, e.g.,~\cite{FSE:RijPre97,DBLP:conf/icics/PatarinG97a,DBLP:journals/iacr/BannierBF16}.
+The idea would be to hide a nonlinear approximation as the trapdoor information. If the linear layer is designed such that it preserves \emph{all invariants} of a special form, e.g., all functions of degree at most $d$, the specification of the linear layer would not leak more information on the particular invariant and thus on the trapdoor. There could also be applications besides cryptography, so the above problem might be of independent interest.
+
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.9]{\PathFig{spn_round.pdf}}
+    \FigDef{spn}{The round function of a substitution-permutation cipher based on an LS-design.}
+\end{figure}
+
+\subsection{Our Contribution} In this work we answer the above question and consider the case of $L \in \F_2^{n \times m}$, i.e., the number of outputs might be different than the number of inputs. We precisely characterize the matrices that preserve \emph{all} invariants of the form similar as given in \EqRef{target}, i.e.,
+\begin{equation}
+\EqLabel{target_general}
+    f(y_1) + \dots + f(y_{n}) = f(z_1) + \dots + f(z_{m}) + f(0)\cdot (m+n \mod 2)\;,
+\end{equation}
+where the degree of $f$ is upper bounded by $d$. We call such matrices \emph{degree-$d$ sum-invariant}. We show that such matrices correspond to $n$-bit Boolean functions of degree at most $n-d-1$ which admit no linear annihilators. We call the \emph{supports} of such Boolean functions \emph{degree-$d$ zero-sum sets of rank $n$}. This characterization is obtained in \PropRef{zero_sum}, \PropRef{inner_product} and \PropRef{annihilator_construction}. Our results imply that $m \geq n$ and, for the case of $d=2$, the property of $L$ being (semi-)orthogonal is not only sufficient, but also necessary. Moreover, we obtain an interesting characterization of orthogonal matrices over $\F_2$, i.e., $L \in \F_2^{n \times n}$ is orthogonal if and only if in every $2 \times 2n$ submatrix of $\left[\begin{array}{c|c}I_n & L\end{array}\right]$, each column occurs an even number of times.
+
+Besides showing the link between degree-$d$ zero-sum sets and degree-$d$ sum-invariant matrices, we study degree-$d$ zero-sum sets of full rank in more detail. We are in particular interested in the smallest of such sets. Let $\minzs{n}{d}$ denote the minimum number of elements in a degree-$d$ zero-sum set of rank $n$. The following theorem summarizes our main results.
+
+\begin{theorem}
+\ThmLabel{main}
+Let $n,d \in \ZZplus$ with $n > d \geq 1$. Then the following properties of $\minzs{n}{d}$ hold.
+ \renewcommand{\labelenumi}{(\roman{enumi})}
+\begin{enumerate}
+    \item $\minzs{n}{d} = \min\{ \wt(g) \mid g \in \BF{n}{n-d-1} \setminus \{0\} \text{ with } g \text{ having at most 1}$ affine annihilator$\}$.
+    \vspace{.3em}
+    \item $\minzs{n}{1} = n+2-(n \mod 2)$ and, for $n = 4$ or $n > 5$, $\minzs{n}{2} = 2n$.
+    
+    As exceptions, $\minzs{3}{2} = 8$ and $\minzs{5}{2} = 12$.
+    \vspace{.3em}
+    \item $\minzs{d+1}{d} = \minzs{d+2}{d} = 2^{d+1}$. Moreover, $\minzs{d+3}{d} = 3 \cdot 2^d$ and $\minzs{2d+4}{d} = 2^{d+2}$. For $d+4 \leq n \leq 2d+3$,  \[\minzs{n}{d} = 2^{2d-n+4}(2^{n-d-2}-1)\;.\]
+    \item for any fixed $d$, the sequence $\minzs{n}{d}$ is increasing, i.e., $\minzs{n+1}{d} \geq \minzs{n}{d}$.
+    \vspace{.3em}
+    \item for $n_1, n_2 > d$, the inequality \[\minzs{n_1+n_2}{d} \leq \minzs{n_1}{d} + \minzs{n_2}{d}\] holds. Moreover, for $d \geq 2$, it is \[\minzs{n+d}{d-1} \leq \minzs{n}{d} \leq 2 \minzs{n-1}{d-1}\;.\]
+\end{enumerate}
+The last inequality implies that, for $n \geq 4$,  $\minzs{n}{3} \geq 2n +6$.
+\end{theorem}
+
+We prove the above values by providing a construction of the corresponding zero-sum sets (resp. Boolean functions). In case where we only prove an upper bound, we provide a construction that meets this bound. \TabRef{bounds} shows the values and bounds for $\minzs{n}{d}$ for $n \leq 30$ and $d \leq 10$.
+
+The last inequality in \ThmRef{main} implies that any degree-$d$ sum-invariant matrix $L \in \F_2^{n \times n}$ for $d \geq 3$ must be a permutation matrix, i.e. an invertible matrix with exactly $n$ ones. In other words, the observation of Todo \etal cannot be extended for higher-degree invariants without $L$ being expanding.
+
+\subsection{Organization} In \SecRef{prelim}, I fix notation specific to this chapter. I also recall the observations made in~\cite{NonlinInv} with regard to orthogonal matrices and the preservation of degree-$2$ invariants. For motivating the remainder of the chapter, I directly present an example construction of an expanding linear mapping that preserves higher-degree invariants. 
+
+In \SecRef{zerosum}, I show equivalent characterizations of degree-$d$ zero-sum sets and explain the links between degree-$d$ sum-invariant matrices and degree-$d$ zero-sum sets. 
+
+Minimal degree-$d$ zero-sum sets are studied in \SecRef{minimal}, where \ThmRef{main} is proven. I further summarize the implications to degree-$d$ sum-invariant matrices in \SecRef{implications}. Finally, the chapter is concluded in \SecRef{conclusions}.
+

@@ -1,0 +1,32 @@
+{
+  \renewcommand\arraystretch{1.2}
+  \setlength{\tabcolsep}{4pt}
+
+  \begin{table}
+      \centering
+      \begin{tabular}{cccc}
+        \toprule
+        $(d,2n)$ & Structure & $r_{\max}$ & Instance \\
+        \midrule
+        %\multirow{2}{*}{$(2, 8)$} & $\bij{r}{d}$ & 6 & --- \\
+        %& $\nbij{r}{d}$ & 5 & --- \\
+        %\hline
+        \multirow{2}{*}{$(2, 32)$} & $\bij{r}{2}$ & 10 & --- \\
+        & $\nbij{r}{2}$ & 9 & SIMON-32~\cite{Simon} \\
+        \hline
+        % \multirow{2}{*}{$(3, 64)$} & $\bij{r}{d}$ & 9 & LBlock~\cite{WZ+11}, TWINE~\cite{SMMK11} \\
+        % & $\nbij{r}{d}$ & 8 & --- \\
+        %\hline
+        \multirow{2}{*}{$(5, 64)$} & $\bij{r}{5}$ & 7 & --- \\
+        & $\nbij{r}{5}$ & 6 & DES~\cite{DES} \\
+        \hline
+        \multirow{2}{*}{$(31, 64)$} & $\bij{r}{31}$ & 5 & MISTY1/KASUMI~\cite{MISTY1} \\
+        & $\nbij{r}{31}$ & 4 & --- \\
+        \hline
+        \multirow{2}{*}{$(n-1, 2n)$} & $\bij{r}{n-1}$ & 5 & --- \\
+        & $\nbij{r}{n-1}$ & 4 & --- \\
+        \bottomrule
+      \end{tabular}
+      \TabDef{distinguishers}{Maximum number $r_{\max}$ of rounds in Feistel Networks with a type-II distinguisher. It is assumed that $\dinv \le d$.}
+  \end{table}
+}

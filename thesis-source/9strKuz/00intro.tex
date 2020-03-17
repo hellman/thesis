@@ -1,0 +1,23 @@
+\SecDef{intro}{Introduction}
+
+S-Boxes play important role in the design of symmetric cryptographic primitives. It is one of the two components of an SPN structure and often S-Boxes are used inside the Feistel functions in Feistel Networks. The main role of S-Boxes is to provide non-linearity and confusion. An S-Box at least should have low linearity, low differential uniformity and high algebraic degree. It is also desirable that the S-Box has good implementation properties: an efficient hardware/bit-slice implementation, small size in order to reduce the memory footprint. 
+
+The cryptographic community expects designers to explain all choices done during the design procedure. How the S-Boxes were generated? Do they have an algebraic structure, e.g. an inversion in the finite field? Or do they have a Feistel Network structure? Were they generated at random? If yes, what was the seed used? Which cryptographic properties were optimized and how?
+
+Unfortunately, often the designers describe the S-Box as a look-up table and do not provide any rationale behind its choice. A prominent example is the S-Box of the Skipjack block cipher designed by the American National Security Agency (NSA). Léo Perrin and Alex Biryukov~\cite{LeoRE} attempted to \emph{reverse-engineer} it, i.e. to find the hidden design criteria, an underlying structure or optimization procedure. They succeeded and described a simple optimization method which generates S-Boxes with very close cryptographic properties. The designers of the Russian cryptographic standards did not disclose any rationale behind the S-Box as well, except that it has reasonable cryptographic properties.
+
+The 8-bit S-Box used in the Kuznyechik block cipher and in the Streebog hash function is denoted $\pi$ in this chapter. The look-up table of $\pi\colon \field{8} \to \field{8}$ is given in \TabRef{sbox}. It has linearity equal to 56 and differential uniformity equal to 8. Using methods developed in~\cite{LeoRE}, it can be shown that the probability to randomly sample an S-Box with as good differential properties is approximately $2^{-82.69}$. It follows that $\pi$ has strong resistance against differential cryptanalysis, compared to random S-Boxes. The algebraic degree of all coordinates of $\pi$ is maximal and equal to 7.
+
+\FigTex{sbox.tex}
+
+In this chapter I describe two decompositions of $\pi$ and the way in which they were obtained. A simplified view of the discovered structures of $\pi$ is given in  \FigRef{simplified}. The first decomposition is based on finite field multiplications. It also contains four 4-bit S-Boxes and two whitening (external) linear layers. Interestingly, 16 inputs clearly stand out from the patterns and force the usage of a multiplexer (omitted in the simplified view). The second decomposition is based on a finite field logarithm. It contains only one extra 4-bit S-Box, one whitening linear layer and a simple arithmetic layer.
+
+More recently, my former colleague Léo Perrin studied the logarithm-based decomposition further~\cite{LeoKuz}. He shows that the S-Box maps a partition of $\field{8}$ into multiplicative cosets of $\fielde{4}^*$ into a partition of $\field{8}$ into additive cosets of $\field{4}$. Furthermore, he derives a structure called $\mathsf{TKlog}$ that $\pi$ follows.
+
+\FigTex{simplified.tex}
+
+\subsection{Outline}
+\SecRef{multi} described the first decomposition, and \SecRef{expo} explains the second decomposition. The results are summarized and discussed in \SecRef{conclusions}.
+
+\subsection{Differences with~\cite{OurKuz1,OurKuz2}}
+This chapter is a reworked version of the two papers~\cite{OurKuz1,OurKuz2} that we wrote with my colleagues Alex Biryukov and Léo Perrin. In this chapter I kept only results directly related to decompositions of $\pi$. The decompositions are kept the same, except that for the first decomposition I performed the analysis for $\pi$ from the beginning, without decomposing $\pi^{-1}$ first. In this way $T$ and $U$ are inverted and swapped, compared to~\cite{OurKuz1}. The final decomposition is the same.

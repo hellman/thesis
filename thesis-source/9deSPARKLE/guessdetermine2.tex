@@ -1,0 +1,48 @@
+\subsection{Attack on 4.5-step \aead{} without Rate Whitening}
+
+Consider an instance of \aead{} with the rate equal to the capacity (i.e. one of 
+\aeadversion{128}{128},
+\aeadversion{192}{192},
+\aeadversion{256}{256}),
+which uses the \aCipher{} permutation reduced to 4 steps and has no rate whitening.
+
+Let $y$ be the input to the linear Feistel layer $\M$ in the third step (see~Figure~\ref{fig:mitm4.5nowhit}). We aim to mount a birthday-differential attack with zero-difference in $y$. The parts of the structure with zero difference are marked with purple crosses in the figure. It follows that differences of the observed rate parts can be propagated and connected by independent branches. More formally, let
+\begin{align*}
+    &\Min' = \MINV (\BBB{1} (\AAA{0} (\Min))),\\
+    &\Mout' = \MINV(\R(\Mout)).
+\end{align*}
+% be values computed for the first encryption, and $\xMin', \xMout'$ be respective values computed for the second encryption. Then
+% $$
+% \BBB{2}(\Min') \oplus \BBB{2}(\xMin') = \RINV(\AAAINV{3}(\Mout')) \oplus \RINV(\AAAINV{3}(\Mout')).
+% $$
+Denote the difference in $\Min'$ by $\Delta\Min'$, and the difference in $\Mout'$ by $\Delta\Mout'$.
+It follows that the difference $\Delta\Min'$ propagates through $\BBB{2}$ into the same difference as the difference $\Delta\Mout'$ propagates through $\RINV \circ \AAAINV{3}$. Note that they are connected by $\halfbranches$ independent 64-bit branches:
+\begin{equation}
+\label{eq:mitm-4.5steps-nowhitening}
+(\Delta\Min')_i
+\xlongrightarrow{\B{2}{i}} \alpha_i
+\xlongleftarrow{\AINV{3}{i-1}}
+(\Delta\Mout')_{i-1},
+\end{equation}
+where $\alpha$ is the unknown intermediate difference.
+
+{\FigTex{mitm_4p5steps_nowhitening.tex}}
+
+In order to make the birthday-differential attack, we further strengthen the zero-difference constraint in order to perform an efficient initial filtering. We require that $(\Delta\Min')_i = \alpha_i = (\Delta\Mout')_{i-1} = 0$ for all $i < t$ for an integer $t$, $0 < t < \halfbranches$. This constraints allows us to filter the pairs efficiently by the zero-difference parts of $\Min'$ and $\Mout'$.
+
+The second filtering step is based on checking the possibility of the differential transitions from Equation~\ref{eq:mitm-4.5steps-nowhitening}. This is Problem~2 mentioned in Section~\ref{sec:mitm-arx-assum}.
+
+Similarly to the previous attack, we the final complexity of the attack is estimated by $2^{64(\halfbranches+t)/2+1/2}$ data and $2^{64(\halfbranches-t)}(\soltime + \solratio^{\halfbranches-t} \finalrec)$ time.
+Under the assumption of low values of $\solratio,\soltime$ and $\finalrec$, the following attacks are derived:
+\begin{enumerate}
+    \item \aeadversion{128}{128}: with $t=1$, the attack requires $2^{96.5}$ data, and more than $2^{64}$ time.
+    By the precomputation cost of $2^{96+\epsilon}$ time and memory, the data requirement can be reduced to $2^{96-\epsilon}$ for any $\epsilon < 32$.
+
+    \item \aeadversion{192}{192}: with $t=1$, the attack requires $2^{128.5}$ data, and more than $2^{128}$ time.
+    By the precomputation cost of $2^{128+\epsilon}$ time and memory, the data requirement can be reduced to $2^{128-\epsilon}$ for any $\epsilon < 64$.
+    
+    \item \aeadversion{256}{256}: with $t=1$, the attack requires $2^{160.5}$ data, and more than $2^{192}$ time. By the precomputation cost of $2^{160+\epsilon}$ time and memory, the data requirement can be reduced to $2^{160-\epsilon}$ for any $\epsilon < 96$.
+\end{enumerate}
+
+
+

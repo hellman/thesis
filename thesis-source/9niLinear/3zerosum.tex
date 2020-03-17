@@ -1,0 +1,204 @@
+\SecDef{zerosum}{Degree-\texorpdfstring{$d$}{d} Zero-Sum Sets and Sum-Invariant Matrices}
+
+A natural question to ask is which other linear mappings have a similar property as given in \EqRef{invariant_preserving_linear}. To answer this question, we study \emph{degree-$d$ zero-sum sets} as a generalization of the above problem. 
+
+\begin{definition}[Degree-$d$ Zero-Sum Set]
+Let $S \subseteq \F_2^n$ and let $d \in \mathbb{N}$. We call $S$ \emph{degree-$d$ zero-sum} if, for all $f \in \BF{n}{d}$,
+\eql{zerosum}{
+\bigoplus_{s \in S} f(s) = 0.
+}
+We define $\rank(S)$ to be the maximum number of linearly independent elements in $S$ and denote by $\ZS{n}{m}{d}$ the set of degree-$d$ zero-sum sets with $m$ elements and rank $n$.
+\end{definition}
+
+We first show the following equivalent characterizations of degree-$d$ zero-sum sets. 
+\begin{proposition}
+\PropLabel{zero_sum}
+Let $S = \{s_1,\dots,s_{k}\} \subseteq \F_2^n$ and let $d \in \ZZplus$. Let $\matzs{S} \in \F_2^{n \times k}$ be any matrix (up to a permutation of the columns) the columns of which correspond to the elements of $S$, i.e., $$
+\matzs{S} = \rowthree{s_1^\top}{\dots}{s_{k}^\top}.
+$$
+Then the following statements are equivalent: 
+\enumroman
+\begin{enumerate}
+    \item $S$ is a degree-$d$ zero-sum set.
+    \item $k$ is even and, for any choice of $d$ (not necessarily distinct) rows $r_1,\dots,r_d$ of $\matzs{S}$, it is $\inprod{ r_1,\dots,r_d} = 0$.
+    \item in every $d \times k$ submatrix of $\matzs{S}$, each column occurs an even number of times.
+    \item $\deg(\Ind_S) \leq n-d-1$.
+    \item for all $t \geq 1$ and all $f \in \BF{t}{d}$, $\forall X \in \F_2^{t \times n}\colon \bigoplus_{s \in S} f(sX^\top) = 0$.
+\end{enumerate}
+In particular, the degree-$d$ zero-sum sets in $\F_2^n$ are exactly the supports of the $n$-bit Boolean functions of degree at most $n-d-1$. Therefore, any non-empty degree-$d$ zero-sum set must contain at least $2^{d+1}$ elements.
+\end{proposition}
+\begin{proof}
+To prove $(i) \Rightarrow (ii)$, let 
+$$
+\matzs{S} = \colthree{r_1}{\vdots}{r_n}
+$$
+with $r_i \in \F_2^{k}$. Let $l_1,\dots,l_d$ be $d$ (not necessarily distinct) row indices and consider the monomial function $f \in \BF{n}{d}, \ x \mapsto \prod_{i=1}^{d}x_{l_i}$, which has degree $d$. From \EqRef{zerosum}, it must be
+$$
+0
+= \bigoplus_{s \in S} f(s)
+= \bigoplus_{s \in S} \prod_{i=1}^{d} s_{l_i}
+= \inprod{ r_{l_1},\dots,r_{l_d}}.
+$$
+Clearly, $k$ must be even because $\bigoplus_{s \in S} 1 = 0$.
+
+$(ii) \Rightarrow (iii)$: We first see that any $1 \times k$ submatrix of $\matzs{S}$ contains each element in $\F_2$ an even number of times. Indeed, let $r$ be any row in $\matzs{S}$. From $(ii)$ we know that $\wt(r) \mod 2 = \langle r \rangle = 0$ and thus $r$ contains an even number of $1$'s. Because $k$ is even, it must also contain an even number of $0$'s. We now use induction on the number of rows. Let $d' < d$ such that $(ii) \Rightarrow (iii)$ holds for $d'$. Let us choose an arbitrary $(d'+1) \times k$ submatrix $H = [m_{i,j}]_{1\leq i \leq d'+1, 1 \leq j \leq k}$ of $\matzs{S}$. We define $H^{(0)} \coloneqq [m^{(0)}_{i,j}]$ to be the submatrix of $H$ that is obtained by selecting exactly the columns $m_{\star,j}$ of $H$ for which $m_{d'+1,j} = 0$. Similarly, let $H^{(1)} \coloneqq [m^{(1)}_{i,j}]$ be the submatrix of $H$ that is obtained by selecting exactly the columns $m_{\star,j}$ of $H$ for which $m_{d'+1,j} = 1$. We have already seen from the initial step that both $H^{(0)}$ and $H^{(1)}$ must contain an even number of columns (otherwise the row $m_{d'+1,\star}$ would have an odd weight). From $(ii)$, we know that 
+\begin{align*}
+    0 &= \inprod{ m_{1,\star},\dots,m_{d',\star},m_{d'+1,\star} } =
+    \inprod{ m^{(0)}_{1,\star},\dots,m^{(0)}_{d'+1,\star} } + \inprod{ m^{(1)}_{1,\star},\dots,m^{(1)}_{d'+1,\star} } \\
+    &= \inprod{ m^{(1)}_{1,\star},\dots,m^{(1)}_{d',\star} } = \inprod{ m^{(0)}_{1,\star},\dots,m^{(0)}_{d',\star} }.
+\end{align*}
+Because of the induction hypothesis, $H^{(0)}$ and $H^{(1)}$ contain each column an even number of times and therefore, every column of $H$ occurs an even number of times.
+
+$(iii) \Rightarrow (iv)$: Let $u \in \F_2^n$ with $\wt(u) \geq n-d$. Because of $(iii)$,
+$$
+|\pset{s \in S \mid s \preceq u}|
+$$
+is even (because $d$ zeroes in positions $i$ where $u_i = 0$ occur an even number of times among elements of $S$). It follows that 
+$$
+|\pset{s \in S \mid s \preceq u}| \mod 2 = \bigoplus_{s \preceq u}\Ind_S(s) = 0
+$$
+and thus, the monomial $x^u$ doesn't occur in the ANF of $\Ind_S$. Since this holds for all $u$ with $\wt(u) \geq n-d$, the algebraic degree of $\Ind_S$ is at most $n-d-1$.
+
+
+$(iv) \Rightarrow (v)$: Let $f \in \BF{t}{d}$ be an arbitrary function of degree at most $d$. Observe that
+\eql{indicator_sum}{
+    \forall X \in \field{t \times n} \quad \bigoplus_{s \in \field{n}} \Ind_{S} \cdot f(sX^{\top}) = 0,
+}
+because $\deg{\Ind_{S} \cdot (f \circ X)} \le \deg{\Ind_{S}} + \deg{f}\le n - 1$. Here, $f \circ X$ denotes the $n$-bit Boolean function $s \mapsto f(sX^\top)$.
+\EqRef{indicator_sum} can equivalently be written as
+\eq{
+    \forall X \in \field{t \times n} \quad \bigoplus_{s \in S}  f(sX^\top) = 0,
+}
+which proves $(v)$. The implication $(v) \Rightarrow (i)$ follows by letting $t=n$ and $X = \idmat{n}$.
+
+To see that any non-empty degree-$d$ zero-sum set contains at least $2^{d+1}$ elements, we use the fact that any non-zero Boolean function of degree at most $n-d-1$ has a weight at least $2^{n-(n-d-1)} = 2^{d+1}$. 
+\end{proof}
+
+It is worth remarking that the property of being degree-$d$ zero-sum  is invariant under the application of an injective linear mapping. Indeed, if $\varphi\colon \Span(S) \rightarrow \F_2^{n'}$ is an injective linear function on the subspace $\Span(S)$ of dimension $\rank(S)$, then $|\varphi(S)|=|S|$ and if $S$ is degree-$d$ zero-sum, so is $\varphi(S)$. Further, $\rank(\varphi(S)) = \rank(S)$. Therefore, without loss of generality, we can represent a zero-sum set $S \in \ZS{n}{m}{d}$ as a subset of $\F_2^n$ and given by the columns of an $n \times m$ matrix $\matzs{S}$ of the form 
+\eql{systematic_form}{
+\matzs{S} = \rowtwo{\idmat{n}}{L}
+}
+for an $L \in \F_2^{n \times (m-n)}$. We say that a zero-sum set (resp. a matrix $\matzs{S}$) given in the representation of \EqRef{systematic_form} is in \emph{systematic form}. We are in particular interested in the properties of such matrices $L$ that define zero-sum sets in $\ZS{n}{m}{d}$ in the above way. For instance, such an $L$ can only exist if $m$ is even. We generalize this by introducing the notion of a \emph{degree-$d$ sum-invariant matrix} as follows.
+
+
+
+\begin{definition}[Degree-$d$ Sum-Invariant Matrix]
+A matrix $L \in \F_2^{n \times m}$ is called \emph{degree-$d$ sum-invariant} if, for all $t \geq 1$ and all $f \in \BF{t}{d}$,
+\eql{linear_layer}{
+\forall X \in \F_2^{t \times n} \colon 
+\bigoplus_{i=1}^n f\big( (X^\top)_i \big) =
+\bigoplus_{j=1}^m f\big( ((XL)^\top)_j \big) + \varepsilon_{m+n}f(0),
+}
+where $\varepsilon_{m+n} = (m+n) \mod 2$.
+\end{definition}
+
+
+\begin{proposition}
+\PropLabel{inner_product}
+Let $L \in \F_2^{n \times m}$ be a linear mapping and let $d \in \mathbb{N}$.
+Then the following statements are equivalent:
+\enumroman
+\begin{enumerate}
+    \item $L$ is degree-$d$ sum-invariant.
+
+    \item The columns of the matrix $\matl{L}$ occurring with odd multiplicity define a degree-$d$ zero-sum set, where
+    \begin{equation}
+    \begin{cases}
+    \arraycolsep=4pt\def\arraystretch{1}
+    \matl{L} \coloneqq \rowtwo{\idmat{n}}{L} \in \F_2^{n\times(m+n)},
+    & \text{~if~} m+n \text{~is even}\;; \\
+    \arraycolsep=4pt\def\arraystretch{1}
+    \matl{L} \coloneqq \rowthree{\idmat{n}}{L}{0} \in \F_2^{n\times(m+n+1)},
+    & \text{~if~} m+n \text{~is odd}\;.
+    \end{cases}
+    \end{equation}
+    
+    \item For all $x_1,\dots x_d \in \F_2^{n}$ it is $\inprod{ x_1,\dots,x_d} = \inprod{x_1 L,\dots,x_d L}$.
+\end{enumerate}
+Moreover, if $L$ fulfills $(i)$ and if $d \geq 2$, then $n \le m$, $LL^{\top} = I_{n}$ and $L$ must have full rank $n$. 
+\end{proposition}
+\begin{proof}
+
+We first prove $(i) \Rightarrow (ii)$.
+If $m+n$ is even, then \EqRef{linear_layer} is equivalent to 
+\eql{linear_layer_rewrite}{
+\forall X \in \F_2^{t \times n} \colon
+\bigoplus_{i=1}^n f\big(e_iX^\top\big) +
+\bigoplus_{j=1}^m f\big( (L^\top)_j X^\top \big) = 0,
+}
+where $e_i$ denotes the $i$-th unit vector. If there is a $j$ for which $(L^\top)_j$ is equal to a unit vector $e_k$, then $f((L^\top)_j X^\top) = f(e_k X^\top)$ and the two terms cancel in \EqRef{linear_layer_rewrite}. Similarly, if there exist two different $j_1,j_2$ such that $(L^\top)_{j_1} = (L^\top)_{j_2}$, then $f( (L^\top)_{j_1} X^\top)$ and  $f( (L^\top)_{j_2}X^\top)$ cancel out. This is another way of saying that the columns of the matrix $\matl{L} = \rowtwo{\idmat{n}}{L}$ occurring with odd multiplicity define a degree-$d$ zero-sum set.
+
+If $m+n$ is odd, then $\varepsilon_{m+n} = 1$ and \EqRef{linear_layer} can be written as
+\eq{
+\forall X \in \F_2^{t \times n} \colon
+\bigoplus_{i=1}^n f\big(e_i X^\top \big) +
+\bigoplus_{j=1}^m f\big( (L^\top)_{j} X^{\top}\big) + f(0X^\top) = 0.
+}
+This is equivalent to say that the columns of the $n\times(m+n+1)$ matrix $\matl{L} = \rowthree{\idmat{n}}{L}{0}$ occurring with odd multiplicity define a degree-$d$ zero-sum set.
+
+
+$(ii) \Rightarrow (iii)$. If the columns of $\matl{L}$ occurring with odd multiplicity define a degree-$d$ zero sum set, then, because of \PropRef{zero_sum}, any $d$ (not necessarily distinct) rows $\rowtwo{e_{l_1}}{L_{l_1}},\ldots,\rowtwo{e_{l_d}}{L_{l_d}}$ of $\matl{L}$ fulfill 
+\begin{align*}
+    \inprod{ \rowtwo{e_{l_1}}{L_{l_1}}, \ldots, \rowtwo{e_{l_d}}{L_{l_d}} } = 0\;, 
+\end{align*}
+which is equivalent to
+$$
+\inprod{e_{l_1},\dots,e_{l_d}} = \inprod{ e_{l_1}L,\dots,e_{l_d}L }.
+$$
+Because of the linearity of the inner product, i.e.,
+$$
+\inprod{x_1+x_1',x_2,\dots,x_d} = \inprod{x_1,x_2,\dots,x_d} + 
+                                  \inprod{x_1',x_2,\dots,x_d},
+$$
+the statement follows.
+
+$(iii) \Rightarrow (i)$. If there are $f_1,f_2 \in \BF{t}{d}$ such that \EqRef{linear_layer} holds for both $f_1$ and $f_2$, then it clearly holds for $f_1+1$ and for $f_1+f_2$ as well. Therefore, without loss of generality, let $f \in \BF{t}{d}$ be a monomial function, i.e., $f(z) = \prod_{k=1}^{d}z_{l_k}$ for $1 \leq l_1 \leq \dots \leq l_{d} \leq t$. Let $X \in \F_2^{t \times n}$. Then,
+\begin{align*}
+    \bigoplus_{i=1}^n f((X^\top)_i) =
+    \bigoplus_{i=1}^n\prod_{k=1}^d (X^\top)_{i,l_k} =
+    \langle X_{l_1},\dots,X_{l_d} \rangle 
+\end{align*}
+and
+\begin{align*}
+    \bigoplus_{j=1}^m f( ((XL)^\top)_j) + \varepsilon_{m+n}f(0) = 
+    \bigoplus_{j=1}^m\prod_{k=1}^d ((XL)^\top)_{j,l_k} = \langle X_{l_1}L,\dots,X_{l_d}L \rangle \;.
+\end{align*}
+It follows that if $L$ preserves all generalized inner products of $d$ elements, then $L$ is degree-$d$ sum-invariant.
+
+If $L$ fulfills the equivalent statements $(i)$ - $(iii)$,  then, for all $x,y \in \F_2^{n}$, it is 
+\[ xy^\top = \inprod{ x,y} = \inprod{xL,yL} = xL(yL)^\top =  xLL^{\top}y\;.\]
+It follows that $LL^\top$ must be the identity and thus, $L$ must have full rank $n$.
+\end{proof}
+
+This result shows a relation between degree-$d$ sum-invariant matrices and semi-orthogonal matrices. A matrix $L \in \F_2^{n \times m}$ with $n \leq m$ is called \emph{semi-orthogonal} if $LL^\top = \idmat{n}$. Indeed, we have shown that a matrix is degree-$2$ sum-invariant if and only if it is semi-orthogonal.\footnote{We only consider matrices with $n \leq m$. If $L \in \F_2^{n\times m}$ with $n > m$, $L$ would be defined to be semi-orthogonal if $L^\top L = I_m$. Then, $L$ is semi-orthogonal if and only if $L^\top$ is degree-$2$ sum-invariant.} Because of the above relation, the degree-$(d+1)$ sum-invariant matrices might also be called \emph{$d$-th order semi-orthogonal}.
+
+The invertible semi-orthogonal matrices are exactly the \emph{orthogonal} matrices and the orthogonal matrices in dimension $n$ form a multiplicative group, called the \emph{orthogonal group}. With the above equivalences, we obtain an interesting characterization of the orthogonal groups over $\F_2$.  
+
+\begin{corollary}
+A matrix $L \in \F_2^{n \times n}$ is orthogonal if and only if in each $2 \times 2n$ submatrix of $\rowtwo{\idmat{n}}{L}$, each column occurs an even number of times. 
+\end{corollary}
+
+\subsection{Relation to Orthogonal Arrays}
+\PropRef{zero_sum} points out a relation between degree-$d$ zero-sum sets and orthogonal arrays.
+
+\begin{definition}[Orthogonal Array~\cite{hedayat1999orthogonal}]
+An $m \times n$ matrix $M$ with entries from a finite set of cardinality $k$ is said to be an \emph{orthogonal
+array with $k$ levels, strength $d$ and index $\lambda$}, denoted $OA(m,n,k,d)$, if every $m \times d$ submatrix of $M$ contains each $d$-tuple exactly $\lambda$ times as a row. Without loss of generality, we will assume that $M$ is a matrix with elements in $\mathbb{Z}_k$. 
+\end{definition}
+% \lambda = m / s^d
+
+For our purposes we are only interested in the  case of $k = 2$. We directly obtain the following.
+
+\begin{corollary}
+Let $S \subseteq \F_2^n$. If $\matzs{S}^{\top}$ is an $OA(|S|,n,2,d)$ such that $2^{d+1}$ divides $|S|$ (i.e., if the index $\lambda$ is even), then $S$ is a degree-$d$ zero-sum set.
+\end{corollary}
+
+
+As an example, for $d = 3$, there is a well-known construction of orthogonal arrays from Hadamard matrices (see~\cite[pp.\@ 145--148]{hedayat1999orthogonal}). A \emph{Hadamard matrix} of order $n$ is a matrix $H \in \mathbb{Z}^{n \times n}$ which can only take values in $\{-1,1\}$ and which fulfills $H^{\top}H = n \idmat{n}$. For a  matrix $M$ with elements in $\{-1,1\}$, we denote by $\widetilde{M}$ the $\F_2$ matrix obtained from $M$ by replacing $-1$ with $0$, i.e., we define $\widetilde{M}$ to be the result of $\frac{1}{2}(M+1)$, interpreted in $\F_2$.
+
+If $H$ is a Hadamard matrix of order $8k$ for $k \in \ZZplus$, it is well known that 
+$$
+\widetilde{\coltwo{H}{-H}}
+$$
+is an $OA(16k,8k,2,3)$ of even index (see~\cite[Theorem 4.16]{hedayat_hadamard}). Therefore, it defines a degree-$3$ zero-sum set $S \subseteq \F_2^{8k}$ with $16k$ elements. However, its rank can be at most $4k$ (see~\cite[Proposition 2]{hadamard_codes}) and we are interested in the zero-sum sets of full rank.
+

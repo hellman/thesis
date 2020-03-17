@@ -1,0 +1,9 @@
+\section{Introduction}
+\label{sec:intro}
+
+CAESAR is a finished competition of authenticated ciphers aiming to select a portfolio of ciphers suitable for different usage scenarios. NORX~\cite{NORX} is one of the fifteen candidates that have reached the third round. NORX is based on the Monkey~Duplex~\cite{Bertoni2012,Bertoni12} construction which is a sponge mode tailored for authenticated encryption schemes.
+
+In this chapter, I report on some non-random properties of the NORX permutation. More specifically, I show that it exhibits some rotational symmetries on different structure levels. They yield simple distinguishing properties for the permutation, which propagate with very high probability or even probability one.
+
+\subsection{Outline}
+The rest of the chapter is organized as follows. I begin by briefly outlining the NORX algorithm in \SecRef{spec}. In \SecRef{symmetries}, I describe rotational symmetric properties in its core permutation, both at the state and at the word level and show attacks on slightly modified versions of NORX exploiting these properties. In \SecRef{cycles-invariants}, I propose an algorithm to search for nonlinear invariants of low-degree from the cycle decomposition of a permutation and apply the algorithm to the permutation $G$ used in NORX8.

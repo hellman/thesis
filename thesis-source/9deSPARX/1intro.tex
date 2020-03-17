@@ -1,0 +1,14 @@
+\SecDef{intro}{Introduction}
+
+Lightweight cryptography is a modern direction in the design of symmetric-key primitives. It aims to provide cryptographic security with constrained resources. Lightweight ciphers usually have a low security margin against unknown attacks and rely on the cryptanalysis done in the design phase.
+
+My colleagues developed a framework for benchmarking lightweight ciphers, called FELICS~\cite{Felics,Felics1,Felics2}. A large amount of implementations for 3 target platforms - AVR, MSP, ARM - was collected and benchmarked. The leading block ciphers were Chaskey~\cite{Chaskey}, Simon and Speck~\cite{Simon}, RECTANGLE~\cite{RECTANGLE}, LEA\cite{LEA}, HIGHT~\cite{HIGHT}, AES~\cite{AES}. Chaskey is an Even-Mansour block cipher and has a data-security trade-off; it does not have a security proof against linear/differential attacks. Simon and Speck were designed by the NSA and do not have a proof too. 
+
+As the top designs are ARX-based, i.e. they are composed from Addition, Rotation and XOR operations, we decided to design an ARX-based block cipher. However, the current \emph{wide-trail strategy} for proving security against linear/differential cryptanalysis does not apply well to ARX-based block ciphers. For this reason, we developed a novel \emph{long-trail strategy}. As a result, the block cipher \sparx{} is the first ARX-based block cipher with provable security against single-trail linear and differential cryptanalysis.
+
+In this chapter, I describe briefly the long-trail strategy.
+Afterward, I describe my contributions to the design. I developed an algorithm for efficient long-trail evaluation of a large class of SPN structures. We used this algorithm and the division property~\cite{division} to evaluate a large class of potential linear layers. Interestingly, a Feistel-like linear layer turned out to provide an optimal balance between the linear/differential and integral attacks resistance, lightweightness of the primitive and simplicity. A few alternative linear layers seem to be a good choice as well.
+
+\subsection{Outline}
+I describe briefly the long-trail strategy and my algorithms in \SecRef{longtrail}. In \SecRef{linear}, I describe the procedure that we used to choose an optimal linear layer for the cipher.
+I omit the specification of \sparx{}, because it is not required for the contents of this chapter; it can be found in~\cite{OurSPARX}.

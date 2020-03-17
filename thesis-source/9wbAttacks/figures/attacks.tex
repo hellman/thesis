@@ -1,0 +1,110 @@
+{
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{10pt}
+\newcommand{\numnodes}{n}
+
+%\todoin{protections to the table?}
+%- in table 1, maybe add s-share fault injection on s shares - to show that attack is exponential in the number of shares ( otherwise one might think that these are the best attacks, which can be always applied) similarly add one sentence about it into sect 3.3
+\newcommand\com[1]{{\scriptsize #1}}
+
+\def\DAT{0}
+\begin{table}
+    \begin{center}
+    \if\DAT1{l}
+        \begin{tabular}{@{} l l l l @{}}
+    \else
+        \begin{tabular}{@{} l l l @{}}
+    \fi
+    % \begin{tabular}{@{} l l l l m{2.8cm} @{}}
+        \toprule
+        Attack & Ref. & \if\DAT1{Data &}\fi Time \\
+        \midrule
+            %\multicolumn{4}{l}{Combinatorial} \\
+            
+            Correlation &
+            \cite{AttackBos},\SecShortRef{attack-correlation} &
+            \if\DAT1{$\OO(2^{\cororder})$ &}\fi
+            $\OO(\numnodes^{\cororder} \numpred 2^{2\cororder})$ %&
+            %\com{$t$ shares correlate with the secret value}
+            \\
+            
+            Time-Memory Trade-off &
+            \SecShortRef{attack-tmt} &
+            \if\DAT1{$\OO(1)$ &}\fi
+            $\OO(\numnodes^{\lceil \numshares/2 \rceil} + \numnodes^{\lfloor \numshares/2 \rfloor} \numpred)$ %&
+            %\com{$\oplus$-masking}
+            \\
+            
+            %\multicolumn{4}{l}{Algebraic} \\
+            
+            Linear Algebra &
+            \cite{cryptoexperts},\SecShortRef{linear} &
+            \if\DAT1{$\OO(\numnodes)$ &}\fi
+            $\OO(\numnodes^\matexp + \numnodes^2\numpred)$ %&
+            %\com{$\oplus$-masking}
+            \\
+            
+            %Lin. Alg. Improved &
+            % Linear Algebra (Improved) &
+            % Sec.~\ref{par:attack-linalg} &
+            % $\OO(\numnodes + \numpred)$ &
+            % $\OO((\numnodes + \numpred) ^\matexp)$ \\
+        
+            Generalized Lin. Alg. &
+            \cite{cryptoexperts},\SecShortRef{linearization} &
+            \if\DAT1{$\OO(\sumbinom{\numnodes}{d}))$ &}\fi
+            $\OO(\sumbinom{\numnodes}{d}^\matexp + \sumbinom{\numnodes}{d}^2\numpred)$ %&
+            %\com{degree $d$ masking}
+            \\
+            
+            LPN-based Gen. Lin. Alg. &
+            \SecShortRef{linalg-lpn} &
+            \if\DAT1{$D_{LPN}(r,\sumbinom{\winsize}{d})$ &}\fi
+            $T_{LPN}(r,\sumbinom{\winsize}{d})$ %&
+            %\com{noise ratio $\le r$}
+            \\
+            
+            % Gen. Lin. Alg. (Improved)&
+            % Sec.~\ref{par:attack-linearization} &
+            % $\OO(\theta(\numnodes, d) + \numpred)$ &
+            % $\OO((\theta(\numnodes, d) + \numpred)^\matexp)$. \\
+
+            %\multicolumn{4}{l}{Fault Attack} \\
+
+            1-Share Fault Injection &
+            \SecShortRef{fault1} &
+            \if\DAT1{$\OO(\numnodes)$ &}\fi
+            $\OO(\numnodes^2)$ %&
+            %\com{no fault protection; fault is amplified}
+            \\
+            
+            2-Share Fault Injection &
+            \SecShortRef{fault2} &
+            \if\DAT1{$\OO(\numnodes^2)$ &}\fi
+            $\OO(\numnodes^3)$ %&
+            %\com{no fault protection}
+            \\
+            
+            
+        \bottomrule
+    
+    \if\DAT1
+        \end{tabular}
+    \else
+        \end{tabular}
+    \fi
+    \end{center}
+    
+    \TabDef{attacks}{Attacks on masked white-box implementations.}
+    
+    {\bf Notations:}
+    $\numnodes$ denotes size of the obfuscated circuit or its part selected for the attack;
+    $\numshares$ is the number of shares in the masking scheme;
+    $\numpred$ is the number of key candidates required to compute a particular intermediate value in the circuit;
+    $\cororder$ denotes the correlation order ($t \le s$);
+    $\matexp$ is the matrix multiplication exponent (e.g. $\matexp = 2.8074$ for Strassen algorithm);
+    $d$ is the algebraic degree of the masking decoder (see~\SecRef{linearization});
+    $\sumbinom{\numnodes}{d} = \sum_{i=0}^d \binom{\numnodes}{i}$ is the number of monomials of $\numnodes$ bit variables of degree at most $d$;
+    $r$ is the noise ratio in the system of equations, $T_{LPN}(r,m),D_{LPN}(r,m)$ are time and data complexities of solving an LPN instance with noise ratio $r$ and $m$ variables.
+\end{table}
+}

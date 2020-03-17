@@ -1,0 +1,65 @@
+\SubSecDef{spec-sparkle}{The \aCipher{} Permutations}
+
+Our schemes for authenticated encryption and hashing employ the permutation family \aCipher{} which we specify in the following. In particular, the \aCipher{} family consists of the permutations $\aCipherSmall_{\steps}$, $\aCipherMedium_{\steps}$ and $\aCipherLarge_{\steps}$ with block sizes of 256, 384, and 512 bit, respectively. The parameter $\steps$ refers to the number of \emph{steps} and a permutation can be defined for any $\steps \in \ZZplus$. The permutations are built using the following main components:
+\begin{itemize}
+    \item An \emph{ARX-box} $\arxbox$, a 64-bit block cipher with a 32-bit key \[\arxbox \colon (\ftwo^{32} \times \ftwo^{32}) \times \ftwo^{32} \rightarrow (\ftwo^{32} \times \ftwo^{32}), ((x,y),c) \mapsto (u,v).\]
+    We define $\arxbox_{c}$ to be the permutation $(x,y) \mapsto \arxbox(x,y,c)$ from $\ftwo^{32} \times \ftwo^{32}$ to $ \ftwo^{32} \times \ftwo^{32}$.
+    
+    \item A linear \emph{diffusion layer} $\mathcal \difflayer_{\branches} \colon (\ftwo^{64})^{\branches} \rightarrow (\ftwo^{64})^{\branches}$, where $\branches$ denotes the number of 64-bit branches, i.e., the block size divided by $64$. It is necessary that $\branches$ is even.
+\end{itemize}
+
+The high-level structure of the permutation is given in \AlgRef{permutation}. It is a classical Substitution-Permutation Network (SPN) construction except that functions playing the role of the S-boxes are different in each branch. More specifically, each member of the permutation family iterates a parallel application of the ARX-box $\arxbox$ under different, branch-dependent, constants $c_i \in \field{32}$. This small 64-bit block cipher is specified in \SecRef{spec-arxbox}. It is followed by an application of $\difflayer_{\branches}$, a linear permutation operating on all branches; it is specified in \SecRef{spec-linear}. We call such a parallel application of the ARX-boxes followed by the linear layer a \emph{step}. The high-level structure of a step is represented in \FigRef{step}. Before each step, a sparse step-dependent constant is \txor{}ed to the cipher's state (more precisely, to $y_0$ and $y_1$). 
+
+In what follows, we rely on the following definition given below to simplify our descriptions.
+
+\begin{definition}[Left/Right branches]
+We call \emph{left branches} those that correspond to the state inputs $(x_0,y_0), (x_1,y_1), \dots, (x_{\branches/2-1},y_{\branches/2-1})$, and we call \emph{right branches} those corresponding to $(x_{\branches/2},y_{\branches/2}), \dots, (x_{\branches-2},y_{\branches-2}), (x_{\branches-1},y_{\branches-1})$.
+\end{definition}
+
+
+\begin{algorithm}
+  \AlgDef{permutation}{
+    The Permutation $\aCipher_{128\branches}$ \newline
+    \emph{In/Out:}~ $\big((x_0, y_0), \ldots, (x_{\branches-1},y_{\branches-1})\big), x_i \in \ftwo^{32}, y_i \in \ftwo^{32}$
+  }
+  \begin{algorithmic}
+    \State $(c_0,c_1) \gets (\texttt{0xB7E15162,0xBF715880})$
+    \State $(c_2,c_3) \gets (\texttt{0x38B4DA56,0x324E7738})$
+    \State $(c_4,c_5) \gets (\texttt{0xBB1185EB,0x4F7C7B57})$
+    \State $(c_6,c_7) \gets (\texttt{0xCFBFA1C8,0xC2B3293D})$
+    \ForAll{$s \in \seg{0}{n_s-1}$}
+      \State{$y_0 \gets y_0 \oplus c_{(s \bmod{8})}$}
+      \State{$y_1 \gets y_1 \oplus (s \bmod{2^{32}})$}  
+      \ForAll{$i \in \seg{0}{\branches-1}$}
+        \State{$(x_i,y_i) \gets \arxbox_{c_i}(x_i, y_i)$}
+      \EndFor
+      \State{$\big((x_0, y_0), \ldots, (x_{\branches-1},y_{\branches-1})\big) \gets \mathcal{L}_{\branches} \big((x_0, y_0), \ldots, (x_{\branches-1},y_{\branches-1})\big)$}
+    \EndFor
+    \State{\Return $\big((x_0, y_0), \ldots, (x_{\branches-1},y_{\branches-1})\big)$}
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\columnwidth]{\PathFig{step.pdf}}
+  \FigDef{step}{The overall structure of a step of \aCipher{}. $z_i$ denotes the 64-bit input $(x_i,y_i)$ to the corresponding ARX-box.}
+\end{figure}
+
+\paragraph{Specific Instances.} The \aCipher{} permutations are defined for 4,6 and 8 branches and for any number of steps. In our suite we use two versions of the permutations which \emph{differ only by the number of steps} used. More precisely, we use a \emph{slim} and a \emph{big} instance of \aCipher{}. The slim and big versions of all \aCipher{} instances are given in \TabRef{sparkle-versions}.
+
+\begin{table}
+    \centering
+    {
+    \TabDef{sparkle-versions}{The different versions of each \aCipher{} instance.}
+    \begin{tabular}{cccc}
+      \toprule
+      Name & $n$ & $\#$ steps slim & $\#$ steps big  \\
+      \midrule
+      \aCipherSmall{}  & 256 & 7 & 10 \\
+      \aCipherMedium{} & 384 & 7 & 11 \\
+      \aCipherLarge{}  & 512 & 8 & 12 \\
+      \bottomrule
+    \end{tabular}
+    }
+\end{table}

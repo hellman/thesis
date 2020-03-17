@@ -1,0 +1,203 @@
+\SecDef{longtrail}{The Long-Trail Strategy}
+
+Linear and differential cryptanalysis are powerful methods of attacking block ciphers. It became a standard for new designs to be accompanied with arguments for security against linear and differential cryptanalysis.
+
+The goal of linear and differential cryptanalysis is to find a \emph{distinguisher} of a cryptographic function. 
+
+\begin{definition}[Linear and Differential Distinguishers]
+Let $E\colon \field{n} \to \field{n}$.
+
+A pair $\alpha_{in},\alpha_{out}\in \field{n}$ is called a \emph{linear distinguisher} of $E$ with linear correlation
+\eq{
+& \LC{E}(\alpha_{in}, \alpha_{out}) \eqdef 2^{-n} \LAT{E}(\alpha_{in}, \alpha_{out}), \\
+\text{if}~ &\pabs{\LC{E}((\alpha_{in}, \alpha_{out})} \gg 2^{-n/2}.
+}
+
+A pair $\alpha_{in},\alpha_{out}\in \field{n}$ is called a \emph{differential distinguisher} of $E$ with differential probability
+\eq{
+&\DP{E}(\alpha_{in}, \alpha_{out}) \eqdef \DDT{E}(\alpha_{in},\alpha_{out}), \\
+\text{if}~ &\DP{E}(\alpha_{in}, \alpha_{out}) \gg 2^{-n}.
+}
+
+For a keyed permutation $E_k(x)\colon \field{n} \times \field{\kappa} \to \field{n}$, a pair $\alpha_{in},\alpha_{out}\in \field{n}$ is a linear/differential distinguisher if for a large enough fraction of keys $k \in \field{\kappa}$, $(\alpha_{in}, \alpha_{out}$ is a linear/differential distinguisher of $E_k$.
+\end{definition}
+
+Cryptographic functions are in most cases built in an iterated way.  Intermediate values are analyzed and included in the distinguisher. The iterations of the round function are \emph{assumed to be independent} and linear/differential distinguishers of each round are linked in a chain, called \emph{a trail}.
+
+\newcommand\vf{\mathbf{f}}
+\newcommand\valpha{\boldsymbol{\alpha}}
+
+\begin{definition}[Linear and Differential trail]
+$ $\newline
+%Let $\vf = (f_1,\ldots,f_r)$, $f_i\colon \field{n} \times \field{\kappa} \to \field{n}$ and for $k \in \field{\kappa}$ let $f_i^k\colon \field{n} \to \field{n}$ be such that $f_i^k(x) = f_i(x, k)$.
+Let $\vf = (f_1,\ldots,f_r)$, $f_i\colon \field{n} \to \field{n}$.
+%Let \emph{trace} of $x \in \field{n}$ with respect to $\vf$ and $\vk = (k_1, \ldots, k_r), k_i \in \field{\kappa}$ be defined as
+% \eq{
+% &\Tr_{\vf}^{\vk} \colon \field{n} \to (\field{n})^{r+1},\\
+% &\Tr_{\vf}^{\vk}(x) \eqdef \proundd{
+% x, f_1^{k_1}(x), f_2^{k_2}\circ f_1^{k_1}(x), \ldots, f_r\circ f_{r-1} \circ \ldots\circ f_2 \circ f_1(x)
+% }.
+% }
+A \emph{trail} over $\vf$ is a sequence $\valpha$ of $r+1$ vectors:
+$$
+\valpha = (\alpha_0, \ldots, \alpha_r), \alpha_i \in \field{n}.
+$$
+
+The \emph{expected differential probability} of the trail $\valpha$ is defined as 
+\eq{
+\EDP{\vf}(\valpha) \eqdef 
+    \prod_{i = 1}^r \DP{f_i}(\alpha_{i-1}, \alpha_i).
+}
+
+The \emph{expected linear correlation} of the trail $\valpha$ is defined as 
+\eq{
+\ELC{\vf}(\valpha) \eqdef 
+    \prod_{i = 1}^r \LC{f_i}(\alpha_{i-1}, \alpha_i).
+}
+\end{definition}
+
+\Todo{motivation: trails add up to differential/linear distinguisher (with independent rounds, e.g. with markov assumption}
+
+In order to ensure that a cryptographic primitive is secure against trail-based differential/linear cryptanalysis, it is necessary to prove an upper-bound of the maximum $\EDP{}$ and $\ELC{}$ among all trails.
+
+\begin{definition}
+Let $\vf = (f_1,\ldots,f_r)$, $f_i\colon \field{n} \to \field{n}$. 
+
+The \emph{maximum expected differential trail probability} of $\vf$ is denoted $\MEDP{\vf}$ and is equal to:
+$$
+\MEDP{\vf} \eqdef \max_{\valpha \in (\field{n})^{r+1}, \valpha \ne 0} \EDP{\vf}(\valpha).
+$$
+
+The \emph{maximum expected linear trail correlation} of $\vf$ is denoted $\MELC{\vf}$ and is equal to:
+$$
+\MELC{\vf} \eqdef \max_{\valpha \in (\field{n})^{r+1}, \valpha \ne 0} \ELC{\vf}(\valpha).
+$$
+\end{definition}
+
+
+\SubSecDef{widetrail}{The Wide-Trail Argument}
+
+The wide-trail strategy is the main method of proving an upper bound on the $\MEDP{}$ and $\MELC{}$ of a cryptographic primitive. It was introduced by Daemen and Rijmen~\cite{WideTrail} and was used to argue about the security of AES against linear and differential attacks.
+
+I describe the argument for the differential trail cryptanalysis, the linear case is completely analogous.
+
+Consider an SPN structure and a trail $\valpha$ with a nonzero $\MEDP{}$. Any difference propagates through the linear layer of the structure with probability 1. Furthermore, a zero difference propagates through an S-Box to a zero difference with probability 1. It follows that the $\MEDP{}$ of the trail depends only on the differential probabilities of S-Boxes with nonzero input/output differences in the trail. Such S-Boxes are called \emph{active} S-Boxes. 
+
+The idea of the wide-trail strategy is to prove a lower bound on the number of active S-Boxes in a trail. Then, the differential uniformity of the S-Box is used to obtain an upper bound on the expected differential probability of a trail, i.e. the $\MEDP{}$. This is done by simply raising the minimum differential probability of the S-Box to the power of the minimum number of active S-Boxes.
+The first step is usually done by proving strong diffusion properties of the linear layer. For example, the MixColumns operation in the AES has branch number 5 and this already proves that every 2 rounds of AES have at least 5 active S-Boxes. The second step suggests that an S-Box with a low differential uniformity (and low linearity) should be used.
+
+Assume that we want to design an ARX-based block cipher with provable security against linear and differential trail-based cryptanalysis. We can use an existing ARX-based block cipher with a small block as a (keyed) S-Box. We then have to use the $\MEDP{}$ of the small block cipher instead of the differential uniformity. Indeed, for small block sizes, the $\MEDP{}$ can be obtained for example using the Matsui search algorithm~\cite{MatsuiAlgo}. This evaluation was performed by Biryukov~\etal{} in~\cite{BVL16} for the block ciphers \speck{32} up to \speck{64}. See~\TabRef{speckey-bounds} for the results on 32-bit block size.
+
+\begin{remark}
+In order to justify the assumption of independent rounds in trails, the authors of~\cite{BVL16} consider \speckey{}, a slightly modified variant of \speck{32}. The only difference is that, in \speckey{}, the round keys are added to the whole state. In this way, the independence assumption is lifted from the block cipher structure to the key schedule. In \sparx{}, we used \speckey{} in order to have better justified provable security.
+\end{remark}
+
+\begin{table}[ht]
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{center}
+        \begin{tabular}{c|rrrrrrrrrrr}
+            \toprule
+            $r$    &  $1$ &  $2$ &  $3$ &  $4$ &  $5$ &  $6$ &  $7$ &  $8$ &  $9$ & $10$ & \\
+            \midrule
+            $\MEDP{}$ & $-0$ & $-1$ & $-3$ & $-5$ & $-9$ & $-13$ & $-18$ & $-24$ & $-30$ & $-34$ & \\
+            $\MELC{}$ & $-0$ & $-0$ & $-1$ & $-3$ & $-5$ &  $-7$ &  $-9$ & $-12$ & $-14$ & $-17$ & \\ 
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    \TabDef{speckey-bounds}{$\protect\MEDP{}$ and $\protect\MELC{}$ of \speck{32} / \speckey{} ($\log_2$ scale); $r$ is the number of rounds.}
+\end{table}
+
+Consider using 1 round of \speck{32} as the keyed S-Box. Note that it has a differential with probability $1=2^{-0}$. Therefore, the bound on $\MEDP{}$ obtained from the wide-trail argument will be trivial, i.e. $\MEDP{} \le 1$.
+
+Now consider using 3 rounds of \speck{32} as the keyed S-Box $A$. Assume that we design a block cipher $E$ with 128-bit block, i.e. with 4 parallel \speck{32}-based S-Boxes. Assume that the linear layer is a $4\times 4$ MDS matrix over $\fielde{32}$, i.e. it has branching number 5. Then at least 5 S-Boxes are active every two rounds and each S-Box has $\MEDP{A} = 2^{-3}$. It follows that for the $r$ round block cipher $E_r$, the wide-trail argument provides bound $\MEDP{E_r} \le (2^{-3})^{5r/2}$. In order to get $\MEDP{E_r} \le 2^{-128}$, we need $r \ge 128/7.5 \approx 17.07$. Therefore, at least 18 rounds of SPN are needed, i.e. 54 rounds of \speck{32} repeated four times in parallel. Such a block cipher would be very inefficient.
+
+Using the novel \emph{long-trail} strategy, we show that it is possible to build much more efficient block ciphers with ARX-based S-Boxes and provable security against linear and differential trail-based cryptanalysis.
+
+
+\SubSecDef{longtrailsub}{The Long-Trail Argument}
+
+Observe that in the ARX-based block ciphers the $\MEDP{}$ grows slower at the first few rounds and grows faster afterwards. For example, the $\MEDP{}$ of the 10 round \speck{32} is $2^{-34}$, which is much less than the $\MEDP{}$ of the 5 round \speck{32} squared: $(2^{-9})^2 = 2^{-18}$. The wide-trail strategy does not exploit this fact and uses the worse bound. Indeed, in general, the better bound can not be used, because the 10 rounds of \speck{32} are not always isolated inside the trail structure. Therefore, each concrete trail structure must be analyzed separately. We call \emph{a long trail} such an isolated chain of (keyed) S-Boxes.
+
+\newcommand\LT[1]{\mathsf{LT}({#1})}
+\begin{definition}[Long Trail]
+Consider an SPN-based block cipher and a fixed trail $\valpha$. A \emph{long trail (LT)} is a chain of active S-Boxes in the trail interleaved with key additions, such that no difference comes into the chain from outside (i.e., the linear layers do not mix in differences into the chain).
+
+Consider a partition of active S-Boxes in the trail into long trails. The multiset of lengths of long trails in any such partition is called a \emph{long trail decomposition} of the trail $T$, denoted $\LT{\valpha}$.
+\end{definition}
+
+\begin{proposition}[Long-Trail Bound]
+\PropLabel{longtrailbound}
+Let $\vf$ be round function of an SPN-based block cipher with an S-Box $S$ and let $\valpha$ be a trail over $\vf$. Then
+\eq{
+&\EDP{\vf}(\valpha) \le \prod_{r^{(m)} \in \LT{\valpha}} \pround{\MEDP{S^r}}^m,\\
+&\ELC{\vf}(\valpha) \le \prod_{r^{(m)} \in \LT{\valpha}} \pround{\MELC{S^r}}^m,
+}
+where $r^{(m)}$ means that element $r$ repeats $m$ times in the multiset $\LT{\valpha}$, and $\MEDP{S^r}$ (resp. $\MELC{S^r}$) denote the $\MEDP{}$ of $r$ rounds of $S$ (resp. $\MELC{}$).
+\end{proposition}
+
+\begin{proof}
+Recall that in the definition of $\EDP{}$ and $\ELC{}$ all rounds are considered independent. Therefore, all S-Boxes are independent as well. Hence, $\EDP{\vf}(\valpha)$ is a product of some $\DDT{}$ entry of each S-Box (depending on the trail $\valpha$). The proposition simply replaces a subset of these factors by the upper bound on their product, which does not depend on the exact trail $\valpha$, only on the fact that it is a non-zero trail. The same reasoning applies to the case of linear trails.
+\end{proof}
+
+This proposition gives an idea of improving a bound on $\MEDP{}$ and $\MELC{}$ of a block cipher. Instead of enumerating all valid \emph{exact} trails, we only need to enumerate all valid \emph{truncated} trails telling whether each S-Box is active or not. For each such trail, we need to obtain a preferably optimal long-trail decomposition, which leads to an upper bound on $\EDP{}$ or $\ELC{}$ of all exact trails fitting the current truncated trail. By taking the maximum bound among all truncated trails, we obtain an upper bound on $\MEDP{}$ and $\MELC{}$ of the block cipher.
+
+For the sake of completeness, I express the wide-trail bound in the same way to highlight that it is a special case of the long-trail bound. Indeed, the long-trail partition of any trail into chains of length 1 is equivalent to counting the number of active S-Boxes. This, in turn, requires less information about each trail and allows to obtain a simple mathematical argument. On the contrary, the long-trail bound requires algorithmic evaluation.
+
+\begin{proposition}[Wide-Trail Bound]
+Let $\vf$ be round function of an SPN-based block cipher with an S-Box $S$ and let $\valpha$ be a trail over $\vf$. Then
+\eq{
+&\EDP{\vf}(\valpha) \le \prod_{r^{(m)} \in \LT{\valpha}} \pround{\MEDP{S}}^{rm},\\
+&\ELC{\vf}(\valpha) \le \prod_{r^{(m)} \in \LT{\valpha}} \pround{\MELC{S}}^{rm}.
+}
+\end{proposition}
+
+
+
+\SubSecDef{alg-decomposition}{An Algorithm for Long-Trail Decomposition}
+
+The most straightforward way to apply the long-trail argument to bound the $\MEDP{}$ and $\MELC{}$ of a cipher is as follows:
+\begin{enumerate}
+    \item enumerate all possible truncated trails composed of active/inactive S-boxes;
+    \item find an optimal decomposition of each trail into long trails (LT);
+    \item bound the probability of each trail using the product of the $\MEDP{}$ (resp. $\MELC{}$) of all active long trails i.e. by applying the Long Trail Argument (see~\PropRef{longtrailbound});
+    \item the maximum bound over all trails is the final upper bound.
+\end{enumerate}
+
+
+Note that this approach is feasible only for a small number of rounds, because the number of truncated trails grows exponentially.
+
+In this section, I sketch an algorithm for the only non-trivial step, step $(2)$, i.e. an algorithm for finding an optimal decomposition of a given truncated trail into long trails. 
+
+First, note that the trail can be represented as a graph, where nodes are active S-Boxes and an edge corresponds to a possible connection of two S-Boxes in a long trail. Moreover, this graph is a forest. Indeed, an S-Box can't receive two edges from the previous round, because it contradicts a definition of long trail - there must be a single difference coming in. For each tree in the forest, we choose the root to be the S-Box from the earliest round, which is determined uniquely by the same reason. Then, for any node its children may only be in the next round.
+
+The goal then is to cover all nodes with disjoint ``vertical'' paths, such that the product of the paths' probabilities is minimal. By the path probability we understand the respective long trail's probability. The simplest (and the worst) solution is to choose paths consisting of single nodes. Note that this solution already gives some upper bound and by finding a better decomposition we improve this bound.
+
+I propose an algorithm based on recursive dynamic programming approach. For each node, we recursively solve the sub-problem for the subtree rooted at that node. However, we need to compute some additional information apart from the best decomposition of the subtree. Consider the optimal decomposition of the whole forest into such paths and consider the long trail which goes through the current subtree's root. Clearly, if we fix this long trail, the rest of the subtree becomes completely independent and has to be decomposed optimally. Therefore, from the subtree we need to know only the probability of this decomposition and the length of the long trail's part in the subtree. We don't know the optimal length beforehand, therefore we store the best probabilities for all possible lengths. Another view on this is that we group all possible subtree decompositions by length of the long trail which goes through the subtree root and for each such length we greedily choose the minimum probability. Then, when we obtain such tables for all children of some node, we can easily compute the table for the node itself - we check all possible ways to choose a child of the node and the length of the long trail which goes through the child and we try to join the current node to that long trail. Then the corresponding probability is the product of the best probabilities of the other children with the probability corresponding to the children's long trail and the probability stored in the children's table respectively for that length.
+
+\paragraph{Complexity.}
+The complexity is dominated by computing the table for each node. One of the $w$ children has to be selected for the continuation of the trail, and the size of its child's table is limited by the number of rounds $r$.
+Therefore, each node's contribution to the complexity is at most $\OO(wr)$. The total complexity of the algorithm then is $O(w^2r^2)$, where $w$ is the number of S-Boxes in parallel, and $r$ is the number of rounds. Note that $wr$ corresponds to the total number of S-Boxes in the cipher.
+
+Despite the reasonable efficiency of the algorithm, the amount of all truncated trails for which the algorithm has to be run adds a large factor to the complexity of the evaluation of a block cipher. In the next section, I will describe an algorithm which completes the whole evaluation in a much more efficient way, under a special condition on the linear layer.
+
+
+\SubSecDef{alg-special}{Efficient Algorithm for Special Linear Layers}
+
+The most complicated step in the above procedure is finding an optimal decomposition of a given truncated trail into long trails. The difficulty arises from the so-called \emph{branching}: situation in which a long trail may be extended in more than one way. The definition of long trail relies on the fact that there is no linear transformation on a path between two S-Boxes in a long trail. Therefore, branching happens only when some output word of the linear layer receives two or more active input words without modifications. 
+
+In order to cut off the branching effect (and thus to make finding the optimal decomposition of a long trail trivial), we can put some additional linear functions that will modify the contribution of some of the input words. Equivalently, when choosing a linear layer we simply do not consider layers which cause branching of long trails. As we will show later, this restriction has many advantages. 
+
+To simplify our study of the linear layer, we introduce a matrix representation for it. In an SPN-based block cipher operating on $w$ words, the linear layer may be expressed as a $w\times w$ block matrix. We will denote the zero and the identity sub-matrices by $0$ and $1$ respectively and an unspecified (arbitrary) sub-matrix by $L$. This information is sufficient for analyzing the high-level structure of a cipher. Using this notation, the linear layers to which we restrict our analysis have matrices in which each column has at most one element $1$.
+
+For the special subset of linear layers outlined above, I present an algorithm for obtaining $\MEDP{}$ and $\MELC{}$ bounds, based on a dynamic programming approach. Since there is no branching, any truncated trail consists of disjoint sequences of active S-Boxes. We can treat each such sequence as a long trail to obtain an optimal decomposition. More importantly, because of this simplification, we can avoid enumerating all trails by grouping them in a particular way.
+
+We proceed round by round and maintain a set of best truncated trails up to an equivalence relation, which is defined as follows. For all S-Boxes at the current last round $s$, we assign a number, which is equal to the length of the long trail that covers this S-Box, or zero if the S-Box is not active. We say that two truncated trails for $s$ steps are equivalent if the tuples consisting of those numbers (lengths of long trails) are the same for both truncated trails. This equivalence captures the possibility to replace some prefix of a trail by an equivalent one without breaking the validity of the trail or its LT decomposition. The total probability, however, can change. The key observation is that from two equivalent trails we can keep only the one with the highest current probability. Indeed, if the optimal truncated trail for all $r$ rounds is an extension of the trail for $s$ rounds with lower probability, we can take the first $s$ rounds from the trail with higher probability without breaking validity and obtain a better trail, which contradicts the assumed optimality.
+
+The pseudo-code for the algorithm is given in~\AlgRef{special}.
+Note that in the case of the $\MELC{}$ bound, the matrix of the linear layer has to be inverted and transposed. However, instead of inversion, we can build up the trails in the reverse direction: from the ciphertext side to the plaintext side. In this way, it is sufficient to only transpose the linear layer.
+
+\FigTex{alg-special.tex}
+
+\paragraph{Complexity.}
+The complexity of the algorithm can be upper-bounded as follows. The size of the set $S_i$ is upper-bounded by the number of all $w$-tuples of integers in $\seg{0}{i}$, i.e. $(i+1)^w$. Generating extensions of an element $s \in S_i$ requires $w2^w$ operations. Repeating this for $r$ rounds results in complexity $\OO(r \cdot w 2^w \cdot (r+1)^w)$. In practice, only a small subset of all possible $w$-tuples is possible. Note that this algorithm implicitly already performs the enumeration of all truncated trails and therefore, this is the complexity of the full evaluation of the $\MEDP{}$ and $\MELC{}$ of the block cipher.

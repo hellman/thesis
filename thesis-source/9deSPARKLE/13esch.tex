@@ -1,0 +1,19 @@
+\SubSecDef{spec-hash}{The \hash{} Hash Function}
+
+We propose two instances for hashing, i.e., \hash{256} and \hash{384}, which allow to process messages $M \in \ftwo^{*}$ of arbitrary length\footnote{More rigorously, all bitlengths under a given (very large) threshold are supported.} and output a digest $D$ of bitlengths $256$, and $384$, respectively. They employ the well-known sponge construction, which is instantiated with \aCipher{} permutations and parameterized by the rate $r$ and the capacity $c$.  The slim version is used during both absorption and squeezing. The big version is used in between the two phases. 
+
+In both \hash{256} and \hash{384}, the rate $r$ is fixed to 128. This means that the message $M$ has to be padded such that its length in bit becomes a multiple of 128. For this, we use the simple padding rule that appends $10^*$. The algorithms are depicted in \FigRef{esch256} and \FigRef{esch384}, respectively. Note that the 128 bits of message blocks are injected \emph{indirectly}. They are first padded with zeros and transformed via $\mathcal{M}_3$ in \hash{256}, respectively, $\mathcal{M}_4$ in \hash{384}, and the resulting image is \txor{}ed to the \emph{leftmost} branches of the state. We stress that this tweak can still be expressed in the regular sponge mode. Instead of injecting the messages through $\mathcal{M}_{\halfbranches}$, one can use an equivalent representation in which the message is injected as usual and the permutation is defined by prepending $\mathcal{M}_{\halfbranches}$ and appending $\mathcal{M}^{-1}_{\halfbranches}$ to $\aCipher_{\branches}$.
+
+A message with a length that is a multiple of $r$ is not padded. To prevent trivial collisions, we borrow the technique introduced in~\cite{add:Hirose16} and add $\mathsf{Const_M}$ in the capacity, where $\mathsf{Const_M}$ is different depending on whether the message was padded or not.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\columnwidth]{\PathFig{esch256.pdf}}
+  \FigDef{esch256}{The Hash Function \hash{256} with rate $r=128$ and capacity $c=256$.}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\columnwidth]{\PathFig{esch384.pdf}}
+  \FigDef{esch384}{The Hash Function \hash{384} with rate $r=128$ and capacity $c=384$.}
+\end{figure}

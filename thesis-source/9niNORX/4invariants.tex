@@ -1,0 +1,157 @@
+\SecDef{cycles-invariants}{Proving Absence of Low Degree Invariants}
+
+Recently, a nonlinear invariant attack was introduced by Todo \etal{} in \cite{NonlinInv}. They show that, for any SPN-based cipher, if there exists a quadratic invariant for the S-Box and  the linear layer is orthogonal, then it is possible to construct a nonlinear invariant for the full round of the cipher. Together with Christof Beierle and Alex Biryukov, we studied and generalized such linear layers in~\cite{OurNLI}. I describe the results in \ChapRef{linear}. In this chapter, I keep the focus on invariants of nonlinear functions. 
+
+In \cite{NonlinInv} it was noted that all nonlinear invariants of an S-Box can be obtained from its cycle decomposition. Indeed, an invariant must take a constant value on each cycle. If an S-Box $S$ has $t$ cycles, then there are precisely $2^t$ invariants corresponding to $2^t$ possible assignments of the invariant values to all $t$ cycles. A special kind of invariants was considered in~\cite{NonlinInv}, where the output value of the invariant is allowed to be a negation of the input value., i.e. a function $g$ such that $g(S(x)) = g(x) \oplus 1$. This case is only possible if all cycles of $S$ have even length.
+
+Quadratic invariants are interesting because they are preserved by an orthogonal linear layer. However, one can argue that any low-degree invariant is an interesting property, even if no orthogonal layer is used in the analyzed cipher. First, the algebraic degree can be seen as a measure of simplicity. Second, invariants may be used to generate equation systems of a cipher, and low-degree equations are generally easier to solve. Third, low-degree invariants are also an evidence that the analyzed component is non-ideal.
+
+\subsection{Low Degree Invariants from Cycle Decomposition}
+
+\subsubsection{A naive approach}
+Let $S$ be a permutation of $\field{n}$ with $t$ cycles. The most straightforward approach of finding all invariants $g\colon \field{n} \to \field{}$ of $S$ of degree at most $d$ is to generate all $2^t$ invariants and check their algebraic degree. Generating the ANF of an $n$-bit Boolean function requires $n2^n$ operations. As a result, the complexity of this approach is $n2^{t+n}$. It is possible to compute a single ANF coefficient of a monomial degree $d+1$ in $2^{d+1}$ evaluations of the function. If the coefficient is equal to one, then the considered invariant has degree at least $d+1$ and can be excluded. Otherwise, other monomials must be checked. In the best case (when the first chosen coefficient is equal to 1), the complexity is $2^{t+d+1}$.
+
+\subsubsection{An improved approach}
+The method can be improved by replacing the enumeration of all $2^t$ invariants by solving a linear algebra problem. Consider an affine subspace $A$ of dimension $d+1$. Any possible invariant $g$ of degree at most $d$ must sum to zero over this subspace:
+$$
+\bigoplus_{x \in A} g(x) = 0.
+$$
+As $g$ must be constant on each cycle of $S$, $g$ can be defined by $t$ unknowns - values of the invariant on each of the cycles. Let $c_1, \ldots, c_t \subseteq \field{n}$ be cycles of $S$. Denote by $g_1, \ldots, g_t \in \field{}$ the unknowns, where $g_i$ corresponds to the value of $g$ on all elements from $c_i$. It follows that the sum of $g$ over $A$ can be expressed as a linear combination of $g_i$:
+\eq{
+&\bigoplus_{x \in A} g(x) = \bigoplus_{1 \le i \le t} \lambda_i g_i = 0,~\text{where} \\
+&\lambda_i = \pabs{A \cap c_i} \mod 2.
+}
+
+The improved approach is to generate enough linear equations on the unknowns $g_i$ and solve the system.
+
+\paragraph{Complexity.}
+Generating one equation requires $2^{d+1}$ operations, assuming that the map $x \mapsto (i: x \in c_i)$ is efficient. This assumption can be implemented by a precomputation, which requires $\OO(2^n)$ memory. This is a downside of this approach. 
+$\OO(t)$ equations are needed, and can be generated in time $\OO(t2^{d+1})$. Solving the linear equation system requires $\OO(t^3)$. Thus, the final time complexity is $\OO(t2^{d+1} + t^3)$. In particular, all degrees (lower bounds) of invariants can be computed in time $\OO(t2^n + t^3n)$ using memory $\OO(2^n)$. On practice, the algorithm is reasonably efficient for S-Boxes of sizes up to 32 bits and with a non-extremely large number of cycles. A parallelization is possible but requires a significant amount of memory.
+
+\begin{remark}
+Generating equations requires special care. If we choose a random affine subspace of dimension $d$, it is likely that only large cycles will be covered by the generated equation and we obtain no constraints on small cycles. Therefore, when generating an affine subspace, we ensure that multiple elements from the subspace lie in distinct cycles. This can be done by choosing basis vectors accordingly. For example, we can choose a cycle uniformly at random and then choose an element of the cycle uniformly at random.
+\end{remark}
+
+\begin{remark}
+The algorithm has a one-sided error possibility. If the generated linear system has no solutions (besides the constant ones $g=0$ and $g=1$), then surely there are no invariants of degree at most $d$. In this way, the algorithm provides a tool for \emph{provable} security against low-degree invariants.
+
+However, a solution to the system is not guaranteed to have degree at most $d$, only that it sums to 0 on generated affine spaces of dimension $d+1$. I argue that we do not restrict the affine subspaces to be cosets of cubes, and an unrestricted affine subspace corresponds to a monomial coefficient in a random basis. In this way, even an invariant with a sparse ANF can be disproved to have a low degree with high probability, since in a random basis it may have a non-sparse ANF.
+\end{remark}
+
+The pseudo-code of the proposed algorithm is given in \AlgRef{cycle-invariants}.
+
+\begin{algorithm}
+    \AlgDef{cycle-invariants}{Low-Degree Invariants from Cycle Decomposition.}
+    \begin{algorithmic}[1]
+    \Require partition $c_1,\ldots,c_t \subseteq \field{n}$ of $\field{n}$ corresp. to the cycles of $S\colon \field{n} \to \field{n}$;
+        \Statex~~~~~ an integer $d, 1 \le d \le n-1$.
+    \Ensure an invariant $g\colon \field{n} \to \field{}$ of $S$ with possibility that $\deg{g} \le d$;
+        \Statex~~~~~~~ or \textsf{No invariants with $\deg{g} \le d$}.
+    
+    % \Statex
+    \State $E \gets$ an empty equation system
+    \For{$i \in \{0,\ldots,t+\epsilon\}$}
+        \State $u \gets$ a random element from $c_{1+(i\mod t)}$
+        \State $V \gets$ a random linear subspace of $\field{n}$ of dimension $d+1$
+        \Statex \hspace{0.55cm}such that several $v \in V$ belong to distinct cycles.
+        \State $A \gets u \oplus V$
+        \For{$j \in \{1,\ldots,t\}$}
+            \State $\lambda_j \gets 0$
+        \EndFor
+        \For{$x \in A$}
+            \State $\lambda_k \gets \lambda_k \oplus 1$, where $k$ is such that $x \in c_k$
+        \EndFor
+        \State $E \gets E \cup (\bigoplus_{1 \le k \le t} \lambda_k g_k = 0)$
+    \EndFor
+    \If{$E$ has non-trivial solutions}
+        \State $(g_1,\ldots,g_t) \gets$ a non-trivial solution of $E$
+        \State $g \gets \pround{x \mapsto (g_i~\text{such that}~x \in c_i)}$
+        \State \Return $g$
+    \Else
+        \State \Return \textsf{No invariants with $\deg{g} \le d$}
+    \EndIf
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Cycle Decomposition of G from NORX8}
+
+States consisting of four equal columns lie on the cycles of $F_{col}$ and $F_{diag}$ functions that correspond directly to cycles of the $G$ function. Indeed, such states always consist of four copies of a single column and applying $F_{col}$ or $F_{diag}$ to such state is equivalent to applying $G$ to the corresponding column. For instance, it is possible to enumerate all cycles of the $G$ function for NORX8, where $G$ permutes $(\field{8})^4$. All these cycles of $G$ can be transformed into cycles of $F_{col}$ or $F_{diag}$ by simply making 4 copies of the column. These cycles then are also cycles of $F$, except that all even cycles will split into two cycles each, because we need to consider cycles of $G^2$. I provide the cycle decomposition of $G\colon (\field{8})^4 \to (\field{8})^4$ from NORX8 in \TabRef{cycles} by providing starting points and lengths of the cycles.
+
+\begin{table}[ht]
+\TabDef{cycles}{Cycles of $G$ from NORX8. Starting points are of the form $(a,b,c,d) \in (\field{8})^4$ (see \FigRef{G}).}
+\begin{center}
+\setlength{\tabcolsep}{.2cm}
+\begin{tabular}{c|lcc|l}
+
+Starting point & Cycle length & ~ & Starting point & Cycle length \\
+
+\midrule
+
+$(\hex{00},\hex{00},\hex{00},\hex{01})$ & 3294443807 & ~ & $(\hex{00},\hex{00},\hex{2b},\hex{65})$ & 399843 \\
+$(\hex{00},\hex{00},\hex{00},\hex{08})$ & 621984749 & ~ & $(\hex{00},\hex{02},\hex{1c},\hex{06})$ & 52972 \\
+$(\hex{00},\hex{00},\hex{00},\hex{56})$ & 212798071 & ~ & $(\hex{00},\hex{00},\hex{5c},\hex{28})$ & 23344 \\
+$(\hex{00},\hex{00},\hex{00},\hex{07})$ & 56236016 & ~ & $(\hex{00},\hex{00},\hex{00},\hex{d5})$ & 8301 \\
+$(\hex{00},\hex{00},\hex{00},\hex{06})$ & 55712043 & ~ & $(\hex{00},\hex{00},\hex{b8},\hex{d2})$ & 6339 \\
+$(\hex{00},\hex{00},\hex{00},\hex{02})$ & 21461014 & ~ & $(\hex{00},\hex{05},\hex{94},\hex{d3})$ & 2124 \\
+$(\hex{00},\hex{00},\hex{02},\hex{29})$ & 9062510 & ~ & $(\hex{01},\hex{66},\hex{26},\hex{d2})$ & 848 \\
+$(\hex{00},\hex{00},\hex{04},\hex{52})$ & 7374122 & ~ & $(\hex{00},\hex{4e},\hex{63},\hex{c1})$ & 595 \\
+$(\hex{00},\hex{00},\hex{00},\hex{46})$ & 7328319 & ~ & $(\hex{00},\hex{9d},\hex{2b},\hex{c3})$ & 137 \\
+$(\hex{00},\hex{00},\hex{08},\hex{4e})$ & 5608893 & ~ & $(\hex{03},\hex{4f},\hex{69},\hex{6c})$ & 78 \\
+$(\hex{00},\hex{00},\hex{01},\hex{f7})$ & 2463170 & ~ & $(\hex{00},\hex{00},\hex{00},\hex{00})$ & 1 \\
+
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\subsection{Low-Degree Invariants in G from NORX8}
+
+I applied the proposed approach to the function $G$ from NORX8 permuting $\field{32}$. In the previous section I described the cycle decomposition of $G$. There are 22 cycles and thus there are $2^{22}$ invariants of $G$. Note that there are cycles with odd length, therefore there exist no ``switching'' invariants of $G$.
+
+The algorithm used around 36 gigabytes of memory and ran for 25 hours on a single 3.5GHz core. It generated 100 linear equations over 22 unknowns for each subspace dimension in $\seg{1}{32}$. Solving the systems took negligible time.
+
+The results are as follows. For all dimensions $d \le 31$, there are no non-trivial invariants of degree $d-1$. For the dimension $d = 32$, there a space of dimension 21 of invariants of degree $d-1=31$. It follows that the other coset of this space has invariants of degree 32. That is, a half of the invariants have degree $32$ and the other half are of degree 31. Note that these are the maximum possible degrees of invariants, since any pair of invariants of degree 32 must sum to an invariant of lower degree.
+
+Furthermore, I searched for low-degree invariants of iterated $G$, i.e. $G^l$ for $1 \le l \le 16$ and for particular values of $l$ that lead to an increased number of cycles. Each cycle of $G$ of length $c$ splits into $gcd(l,c)$ cycles of $G^l$ of lengths $c/gcd(l,c)$. Thus, the number of cycles grows and the number of invariants too. For example, $G^8$ has 54 cycles and thus, $2^{54}$ invariants. The results show that for $1 \le l \le 16$ and for $l \in \pset{24,30,32,36,51,59}$, all non-trivial invariants of $G^l$ have degree at least 30. More detailed results are given in \TabRef{iter-invariants}. Evaluation of $G^l$ for a single $l$ took the time proportional to the number of cycles in $G^l$.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{c|cccc}
+    \toprule
+    
+    function & $d\le{29}$ & $d\le{30}$ & $d\le{31}$ & $d\le{32}=\#cycles$\\
+    
+    \midrule
+    
+$G^{1}$ & 1 & 1 & 21 & 22 \\
+$G^{2}$ & 1 & 2 & 31 & 32 \\
+$G^{3}$ & 1 & 5 & 37 & 38 \\
+$G^{4}$ & 1 & 9 & 41 & 42 \\
+$G^{5}$ & 1 & 2 & 33 & 34 \\
+$G^{6}$ & 1 & 19 & 51 & 52 \\
+$G^{7}$ & 1 & 2 & 33 & 34 \\
+$G^{8}$ & 1 & 21 & 53 & 54 \\
+$G^{9}$ & 1 & 23 & 55 & 56 \\
+$G^{10}$ & 1 & 19 & 51 & 52 \\
+$G^{11}$ & 1 & 1 & 21 & 22 \\
+$G^{12}$ & 1 & 33 & 65 & 66 \\
+$G^{13}$ & 1 & 2 & 33 & 34 \\
+$G^{14}$ & 1 & 17 & 49 & 50 \\
+$G^{15}$ & 1 & 17 & 49 & 50 \\
+$G^{16}$ & 1 & 45 & 77 & 78 \\
+$G^{24}$ & 1 & 45 & 77 & 78 \\
+$G^{30}$ & 1 & 39 & 71 & 72 \\
+$G^{32}$ & 1 & 45 & 77 & 78 \\
+$G^{36}$ & 1 & 69 & 101 & 102 \\
+$G^{51}$ & 1 & 85 & 117 & 118 \\
+$G^{59}$ & 1 & 163 & 195 & 196 \\
+
+    \bottomrule
+    \end{tabular}
+    \TabDef{iter-invariants}{Upper-bounds on dimensions of the spaces of the invariants of degree at most $d$ of the function $G$ from NORX8 iterated multiple times.}
+\end{table}
+
+I also verified correctness of the algorithm on a toy S-Box permutation of $\field{16}$ with an invariant of degree $11$. The algorithm successfully recovered this invariant.
+
+I conclude that invariants of the mapping $G\colon (\field{8})^4 \to (\field{8})^4$ from NORX8 have maximum degree. Furthermore, invariants of $G$ iterated for several rounds have also close to maximum degree. I remark that this observation does not rule out a possibly simple structure or property of those invariants. Indeed, the invariant subspace of dimension $2^{8w}$ shown in \SecRef{symmetries} corresponds to an invariant function of quite large degree $8w$. On the other hand, a low-degree invariant could correspond to a bit-level property of $G$, whereas the invariant subspace from \SecRef{symmetries} corresponds to a high-level structural property of the NORX's permutation.

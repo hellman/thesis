@@ -1,0 +1,134 @@
+\begin{table}[ht]
+    \renewcommand\tabcolsep{0.15cm}
+    \begin{center}
+        \begin{tabular}{>{\centering\arraybackslash}p{1.5cm}c>{\centering\arraybackslash}p{1.5cm}>{\centering\arraybackslash}p{2.0cm}l}
+            \toprule
+            \#words copied & optim. for & best int. char. & min. rounds (diff./linear) & {\centering matrix} \\
+            
+            \midrule
+            
+            \multirow{2}{*}{0} & diff./linear & 4 & 7/7 & [\texttt{10L0,010L,L001,0L10}] \\
+            & diffusion & 2+S & 8/8 &  [\texttt{10L0,01L0,LLL1,001L}] \\
+             
+            \midrule
+            
+            \multirow{2}{*}{1} & diff./linear & 4+S & 7/7 & [\texttt{001L,0001,10L0,L10L}] \\
+            & diffusion & 3+S & 7/8 &  [\texttt{001L,0001,100L,L1LL}] \\
+            
+            \midrule
+            
+            \multirow{3}{*}{2} & diff./linear & 7+S & 6/6 & [\texttt{00L1,1000,L100,0010}] (A) \\
+            & diffusion & 3+S & 8/11 &  [\texttt{0010,0001,1LLL,L1LL}] \\
+            & tradeoff & 4+S & 7/7 &  [\texttt{0001,1L0L,0100,0L1L}] (B) \\
+            
+            \midrule
+            
+            \multirow{2}{*}{3} & diff./linear & 9+S & 7/7 & [\texttt{LL01,1000,0100,0010}] \\
+            & diffusion & 7+S & 8/9 &  [\texttt{LLL1,1000,0100,0010}] \\
+             
+            \bottomrule
+        \end{tabular}
+        \TabDef{layers3}{The best linear layers for $r_a = 3$.}
+    \end{center}
+\end{table}
+
+\begin{table}[ht]
+    \renewcommand\tabcolsep{0.15cm}
+    \begin{center}
+        \begin{tabular}{>{\centering\arraybackslash}p{1.5cm}c>{\centering\arraybackslash}p{1.5cm}>{\centering\arraybackslash}p{2.0cm}l}
+            \toprule
+            \#words copied & optim. for & best int. char. & min. rounds (diff./linear) & matrix \\
+            
+            \midrule
+            
+            \multirow{2}{*}{0} & diff./linear & 3 & 5/5 & [\texttt{L010,00L1,1L0L,01L0}] \\
+            & diffusion & 2+S & 6/5 &  [\texttt{10L0,01L0,LLL1,001L}] \\
+             
+            \midrule
+            
+            1 & both & 3+S & 5/5 &  [\texttt{10LL,01L0,LLL1,0010}] \\
+            %[10LL,01L0,LLL1,0010] \\
+            
+            \midrule
+            
+            \multirow{2}{*}{2} & diff./linear & 4+S & 5/5 & [\texttt{0010,0001,10LL,01LL}] (C)\\
+            & diffusion & 3+S & 5/6 &  [\texttt{0010,0001,1LLL,L1LL}] (D)\\
+             
+            \midrule
+             
+            3 & both & 7+S & 5/6 & [\texttt{LLL1,1000,0100,0010}] \\
+             
+            \bottomrule
+        \end{tabular}
+        \TabDef{layers4}{The best linear layers for $r_a = 4$.}
+    \end{center}
+\end{table}
+
+
+% \begin{table}[ht]
+%     \renewcommand\tabcolsep{0.15cm}
+%     \caption{The best linear layers for $r_a = 3$.}
+%     \label{tab:sparx-best-linear-3arx}
+%     \begin{center}
+%         \begin{tabular}{>{\centering\arraybackslash}p{1.5cm}c>{\centering\arraybackslash}p{1.5cm}>{\centering\arraybackslash}p{2.0cm}c}
+%             \toprule
+%             \#words copied & optim. for & best int. char. & min. rounds (diff./linear) & matrix \\
+            
+%             \midrule
+            
+%             \multirow{2}{*}{0} & diff./linear & 4 & 7/7 & [\texttt{10L0,010L,L001,0L10}] \\
+%             & diffusion & 2+S & 8/8 &  [\texttt{10L0,01L0,LLL1,001L}] \\
+             
+%             \midrule
+            
+%             \multirow{2}{*}{1} & diff./linear & 4+S & 7/7 & [\texttt{L1L0,1000,L001,001L}] \\
+%             & diffusion & 3+S & 7/8 &  [\texttt{L1LL,1000,L001,L010}] \\
+            
+%             \midrule
+            
+%             \multirow{3}{*}{2} & diff./linear & 7+S & 6/6 & [\texttt{00L1,1000,L100,0010}] \\
+%             & diffusion & 3+S & 8/11 &  [\texttt{L1LL,1000,LLL1,0010}] \\
+%             & tradeoff & 4+S & 7/7 &  [\texttt{L0L1,1000,L1L0,0010}] \\
+            
+%             \midrule
+            
+%             \multirow{2}{*}{3} & diff./linear & 9+S & 7/7 & [\texttt{LL01,1000,0100,0010}] \\
+%             & diffusion & 7+S & 8/9 &  [\texttt{LLL1,1000,0100,0010}] \\
+             
+%             \bottomrule
+%         \end{tabular}
+%     \end{center}
+% \end{table}
+
+% \begin{table}[ht]
+%     \renewcommand\tabcolsep{0.15cm}
+%     \caption{The best linear layers for $r_a = 4$.}
+%     \label{tab:sparx-best-linear-4arx}
+%     \begin{center}
+%         \begin{tabular}{>{\centering\arraybackslash}p{1.5cm}c>{\centering\arraybackslash}p{1.5cm}>{\centering\arraybackslash}p{2.0cm}c}
+%             \toprule
+%             \#words copied & optim. for & best int. char. & min. rounds (diff./linear) & matrix \\
+            
+%             \midrule
+            
+%             \multirow{2}{*}{0} & diff./linear & 3 & 5/5 & [\texttt{L100,10LL,0L01,0L10}] \\
+%             & diffusion & 2+S & 6/5 &  [\texttt{10L0,01L0,LLL1,001L}] \\
+             
+%             \midrule
+            
+%             1 & both & 3+S & 5/5 &  [\texttt{10LL,01L0,LLL1,0010}] \\
+%             %[10LL,01L0,LLL1,0010] \\
+            
+%             \midrule
+            
+%             \multirow{2}{*}{2} & diff./linear & 4+S & 5/5 & [\texttt{LL10,LL01,1000,0100}] \\
+%             & diffusion & 3+S & 5/6 &  [\texttt{L1LL,1000,LLL1,0010}] \\
+             
+%             \midrule
+             
+%             3 & both & 7+S & 5/6 & [\texttt{LLL1,1000,0100,0010}] \\
+             
+%             \bottomrule
+%         \end{tabular}
+%     \end{center}
+% \end{table}

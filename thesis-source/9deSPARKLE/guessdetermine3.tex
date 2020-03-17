@@ -1,0 +1,37 @@
+\subsection{Attack on 3.5-step \aeadversion{256}{256}}
+
+Consider \aeadversion{256}{256}, which uses the \aCipher{} permutation reduced to 3 steps and has the rate whitening.
+
+\newcommand\aalpha{\boldsymbol{\alpha}}
+\newcommand\bbeta{\boldsymbol{\beta}}
+\newcommand\ggamma{\boldsymbol{\gamma}}
+Let $y$ be the input to the linear Feistel function $\M$ in the second step (see~Figure~\ref{fig:mitm3.5whit}). We aim to find a pair of encryptions with zero difference in $y$. We further restrict the input and the output difference of $\M$ in the first round to have form $\aalpha=(\alpha, \alpha, 0, 0$ for any $\alpha \in \bField{64}$. Note that this happens in the fraction $2^{-3\cdot64}$ of all inputs to $M$, because $(\alpha,\alpha,0,0)$ is always mapped to $(\alpha,\alpha,0,0)$ by $M$. In total, we require 7 independent branches to have zero difference.
+
+{\FigTex{mitm_3p5steps_whitening.tex}}
+
+First, observe that for some $\bbeta \in (\bField{64})^4 = (\beta_0, \beta_1, 0, 0)$, the following differential transitions hold (see the topmost purple area in Figure~\ref{fig:mitm3.5whit}):
+\begin{align*}
+&\aalpha \xrightarrow{\AAA{0}} \beta \oplus \Delta{\Min},\\
+&\aalpha \xrightarrow{\BBB{0}} \beta,
+\end{align*}
+where $\Delta{\Min}$ is the difference in $\Min$. It follows that $(\Delta{\Min})_2 = (\Delta{\Min})_3 = 0$, because $\aalpha_2 = \aalpha_3 = 0$. For $i = 0$ and $i=1$ we obtain an instance of Problem 3 from Section~\ref{sec:mitm-arx-assum}:
+\begin{align*}
+&\alpha \xrightarrow{\A{0}{i}} \beta_i \oplus (\Min)_i, \\
+&\alpha \xrightarrow{\B{0}{i}} \beta_i.
+\end{align*}
+Note that here the same unknown $\alpha \in \bField{64}$ appears in two instances of the problem, thus adding more constraints on $\alpha$.
+Consider the leftmost purple area in Figure~\ref{fig:mitm3.5whit}. It describes another differential transition:
+$$
+\aalpha \xrightarrow{\BBB{1}} \ggamma \xrightarrow{\AAA{2}\circ\R} \Delta\Mout',
+$$
+where $\ggamma \in (\bField{64})^4 = (\gamma_0, \gamma_1, 0, 0)$ and $\Delta\Mout'$ is the difference of $\Mout' = \MINV (\RINV(\Mout))$. It follows that $(\Delta\Mout')_1 = (\Delta\Mout')_2 = 0$ and for $i = 0$ and $i=1$, the following differential transition holds:
+$$
+\alpha \xrightarrow{\B{1}{i}} \ggamma_i \xrightarrow{\A{2}{i-1}} (\Delta\Mout')_{i-1}.
+$$
+
+In total, $\eta=7$ branches are constrained to have zero difference and $\mu=4$ branches with zero differences can be observed from $\Min,\Mout$, providing strong initial filter. Using $2^{64\eta/2+1/2}$ data, we expect to get  $2^{64(\eta-\mu)}=2^{64\cdot 3}$ encryption pairs after the initial filtering. Furthermore, we assume that the constraints on the unknown difference $\alpha \in \bField{64}$ are very strong and are enough to significantly reduce the number of possible encryption pairs. We assume it can be done efficiently, since a precomputation time of $2{64\cdot3}$ is available.
+After values of branches involved in differential transitions with $\alpha$ are recovered, the rest of the state can be recovered in negligible time.
+
+Therefore, we estimate the data complexity of the attack by $2^{224.5}$ and same time complexity (the heavy filtering step has to filter $2^{192}$ pairs). By precomputations costing $2^{224+\epsilon}$ time and memory, the data complexity may be reduced to $2^{224-\epsilon}$, for any $\epsilon < 32$.
+
+This attack does not directly apply to \aeadversion{128}{128}, \aeadversion{192}{192} since the constraint on the linear map $\M$ in the first step is too costly. For $\aeadversion{192}{192}$ with $\aalpha = (\alpha,\alpha,0)$ we would obtain $\eta=5,\mu=2$ leaving with $2^{192}$ pair candidates, which is too much to filter in time $2^{192}$. Therefore, a stronger initial filter is required.

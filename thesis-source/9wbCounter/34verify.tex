@@ -1,0 +1,57 @@
+\SubSecDef{verify}{Verifying Algebraic Security}
+
+\PropRef{composability} shows that we can compose algebraically secure circuits. Large circuits can be constructed from a set of \emph{gadgets} - small algebraically secure circuits with some useful semantics. In order to design new gadgets we need to be able to check their algebraic security. The simplest way to get a bound on the absolute correlation is based on the algebraic degree of computed functions: the minimum weight of a \emph{nonzero} function of $n$ bits of degree $d$ is equal to $2^{n-d}$ (see e.g. \cite{Carlet}). Therefore, we can think about the following algorithm for checking a circuit $C(x,r_C)$: for any fixed input $x$ compute the ANFs of the functions computed in $C(x,\cdot)$ (functions of $r_C$) and return the maximum observed degree. The degree does not grow when functions are combined linearly. Therefore, the absolute correlation bound can not grow as well, except when the resulting function is constant in which case the absolute correlation is maximal and the gadget may be insecure. As a result, our method for verifying algebraic security splits into two parts:
+
+\begin{enumerate}
+    \item verify that there is no absolute correlation equal to 1 among restrictions of functions from $\FUNCSD{1}(C)$ except the constant functions and affine functions of $x$;
+    \item compute the maximum degree among all restrictions of the intermediate functions and compute the corresponding correlation bound.
+\end{enumerate}
+
+The second step is straight-forward. We describe an algorithm that solves the first step.
+
+Consider a circuit $C(x,r): \field{N}\times\field{R}\to\field{M}$.
+For all $c \in \field{N}$ let $L_c$ be the linear map that returns the restriction $x=c$ of a function $f$ from $\FUNCSD{1}(C)$ (e.g. if functions are represented as truth table vectors then $L_c$ returns the truth table entries corresponding to the case $x = c$). Note that the domain of $L_c$ is defined to be the subspace $\FUNCSD{1}(C)$.
+
+We now give an equivalent condition for the first part of the verification. It serves as a basis for the verification algorithm given in \AlgRef{verify}.
+
+\begin{proposition}
+The circuit $C$ is $\maxcor$-1-AS for some $\maxcor < 1$ if and only if for all $c$ the following holds:
+\begin{equation}
+    \dim{\ker{L_c}} = N.
+\end{equation}
+\end{proposition}
+\begin{proof}
+For any $c \in \field{N}$ let $F_c$ be the subspace of $\FUNCSD{1}(C)$ containing functions that are constant when $x$ is fixed to $c$. Also let $F = \bigcup_c F_c$.
+$\maxcor < 1$ requires that any $f\in \FUNCSD{1}(C)$ either belongs to $\XFUNCSD{1}(C)$ or is non-constant for any fixed $x$. It is equivalent to require that $F$ is equal to $\XFUNCSD{1}(C)$. Note that each $F_c$ includes $\XFUNCSD{1}(C)$ as a subset. Therefore, $F = \bigcup_c F_c$ is equal to $\XFUNCSD{1}(C)$ if and only if for all $c$ $F_c = \XFUNCSD{1}(C)$. Since these are linear subspaces then we can compare their dimensions.
+
+$\XFUNCSD{1}(C)$ is spanned by all $x_i$ and the constant-1 function:
+\eql{prop-algo-dimX}{
+    \dim{\XFUNCSD{1}(C)} = N + 1;
+}
+
+The constant-1 function always belongs to $\FUNCSD{1}(C)$ and to any of the $F_c$. The subspace of functions that are constant on the restriction can be obtained by adding the constant-1 function to the subspace of functions that are equal to zero on the restriction:
+\eql{xxx}{
+    F_c &= \ker{L_c} \oplus \pset{\fzero,\fone}, \\
+    \EqLabel{prop-algo-dimFc}
+    \dim{F_c} &= \dim{\ker{L_c}} + 1.
+}
+
+By comparing the dimensions obtained in \EqRef{prop-algo-dimX},\EqRef{prop-algo-dimFc} we prove the proposition.
+\end{proof}
+
+
+\newcommand\tbas{\bas_c}
+
+The algorithm operates on functions using their truth tables. The truth tables are obtained by evaluating the circuit on all possible inputs and recording the values computed in each node. The set of computed truth tables corresponds to $\FUNCS(C)$. By removing redundant vectors we can compute a basis $\bas$ of $\FUNCSD{1}(C)$ (and also ensure presence of the constant-1 vector). Then, for each $c$ we take the part of each basis vector that corresponds to the fixed $x=c$ (and $r$ taking all possible values). These parts form the subspace $\Ima{L_c}$. We compute a basis $\tbas$ of these parts. Finally, we verify that
+\begin{equation}
+    \dim{\ker{L_c}} = \dim{\FUNCSD{1}(C)} - \dim{\Ima{L_c}} = |\bas| - |\tbas| = N.
+\end{equation}
+
+\FigTex{algo-verify.tex}
+
+The algorithm is implemented in SageMath~\cite{sage} and is publicly available in~\cite{OurWhiteboxCode}.
+
+\paragraph{Complexity analysis.}
+The truth tables have size $2^{N+R}$ bits. Computing the basis of $\FUNCSD{1}(C)$ takes time $\OO(min(2^{N+R}, |C|)^\matexp)$. The same holds for $\Ima{L_c}$ except that the vectors have size $2^{R}$ and for small $R$ this can be done more efficiently. The total complexity is $\OO(min(2^{N+R}, |C|)^\matexp + 2^N min(2^{R}, |C|)^\matexp)$. Recall that by Proposition~\ref{wba.prop:nonlinear-gates} we should consider only the nonlinear nodes of the circuit. 
+
+

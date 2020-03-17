@@ -1,0 +1,94 @@
+\SecDef{dca}{Differential Computational Analysis}
+
+I describe the general setting for our attacks. We consider \emph{a keyed symmetric primitive}, e.g. a block cipher. A \emph{white-box designer} takes a naive implementation with a hardcoded secret key and obfuscates it producing \emph{a white-box implementation}. An adversary receives the white-box implementation and her goal is to recover the secret key or a part of it. We restrict our analysis to implementations in the form of \emph{Boolean circuits}. 
+
+\begin{definition}
+    \Label{def:circuit}
+    A \emph{Boolean circuit} $C$ is a directed acyclic graph where each node with the indegree $k > 0$ has an associated $k$-ary symmetric Boolean function $g_v$. Nodes with the indegree equal to zero are called \emph{inputs} of $C$ and nodes with the outdegree equal to zero are called \emph{outputs} of $C$. 
+    
+    Let $x = (x_1, \ldots, x_N)$ (resp. $y = (y_1, \ldots, y_M)$) be a vector of input (resp. output) nodes in a fixed order. For each node $v$ in $C$ we say that it computes a Boolean function $f_v: \field{N} \to \field{}$ defined as follows:
+    \begin{itemize}
+        \item for all $1 \le i \le N$ set $f_{x_i}(z) = z_i$,
+        \item for all non-input nodes $v$ in $C$ set $f_{v}(z) = g_v(f_{c_1}(z), \ldots, f_{c_k}(z))$,\\
+        where $c_1, \ldots, c_k$ are nodes having an outgoing edge to $v$.
+    \end{itemize}
+    
+    The set of $f_v$ for all nodes $v$ in $C$ is denoted $\FUNCS(C)$ and the set of $f_{x_i}$ for all input nodes $x_i$ is denoted $\XFUNCS(C)$. By an abuse of notation we also define the function $C: \field{N} \to \field{M}$ as $C = (f_{y_1}, \ldots, f_{y_m})$.
+\end{definition}
+
+\subsubsection{Masking Schemes}
+We assume that the white-box designer uses masking in some form, but we do not restrict him from using other obfuscation techniques. The only requirement is that there exists a relatively small set of nodes in the obfuscated circuit (called \emph{shares}) such that during a legitimate computation the values computed in these nodes sum to \emph{a predictable value}. We at least expect this to happen with overwhelming probability. In a more general case, we allow arbitrary functions to be used to compute the predictable value from the shares instead of plain \txor{}. We call these functions \emph{decoders}. The classic Boolean masking technique is based on the \txor{} decoder. The number of shares is denoted by $\numshares$.
+
+I give a broad definition of a masking scheme that will be used also in \ChapRef{wbc}.
+
+\begin{definition}[Masking Scheme]
+\Label{def:masking}
+An $\nsh$-bit masking scheme is defined by an encoding function $\enc: \field{} \times \field{\nrand} \to \field{\nsh}$, a decoding function $\dec: \field{\nsh} \to \field{}$ and a set of triplets $\{(\op, Eval_\op, \cir_\op), \ldots\}$ where each triplet consists of:
+\begin{enumerate}
+    \item a Boolean operator $\op: \field{}\times\field{} \to \field{}$,
+    \item a circuit $Eval_{\op}: \field{\nsh}\times\field{\nsh}\times\field{\nrand'} \to \field{\nsh}$.
+\end{enumerate}
+For any $r\in\field{\nrand}$ and any $x\in\field{}$ it must hold that $\dec(\enc(x,r)) = x$. Moreover, the following equation must be satisfied for all operators $\op$ and all values $r' \in \field{\nrand'}, x_1 \in \field{\nsh}, x_2 \in \field{\nsh}$:
+$$\dec(Eval_{\op}(x_1, x_2, r')) = \dec(x_1) \op \dec(x_2).$$
+
+The degree of the masking scheme is the algebraic degree of the $\dec$ function. The masking scheme is called nonlinear if its degree is greater than 1.
+\end{definition}
+
+Note that $Eval_\op$ takes three arguments in the definition. The first two are shares of the secret values and the third one is optional randomness that must not change the secret values. 
+
+% -------------------------------------------------------------------
+
+\subsubsection{Predictable Values}
+
+\emph{A predictable value} typically is a value computed in the beginning or in the end of the reference algorithm such that it depends only on a few key bits and on the plaintexts/ciphertexts. In such case the adversary makes a guess for the key bits and computes the corresponding candidate for the predictable value. The total number of candidates is denoted by $\numpred$.
+
+The obfuscation method may require random bits e.g. for splitting the secret value into random shares. Even if the circuit may have input nodes for random bits in order to achieve non-deterministic encryption, the adversary can easily manipulate them. Therefore, the obfuscation method has to rely on pseudorandomness computed solely from the input. Locating and manipulating the pseudorandomness generation is a possible attack direction. However, as we aim to study the applicability of masking schemes, we assume that the adversary can not directly locate the pseudorandomness computations and remove the corresponding nodes. Moreover, the adversary can not predict the generated pseudorandom values with high probability, i.e. such values are not predictable values. 
+
+% -------------------------------------------------------------------
+
+\subsubsection{Window Coverage}
+
+In a typical case shares of a predictable value will be relatively close in the circuit (for example, at the same circuit level or at a short distance in the circuit graph).  This fact can be exploited to improve efficiency of the attacks. The adversary covers the circuit by sets of closely located nodes. Any such set is called \emph{a window} (as in power analysis attack terminology e.g. from~\cite{BosApects}). The described attacks can be applied to each window instead of the full circuit. By varying the window size the attacks may become more efficient. Here we do not investigate methods of choosing windows to cover a given circuit. One possible approach is to assign each level or a sequence of adjacent levels in the circuit to a window. Choosing the full circuit as a single window is also allowed. In our attacks we assume that a coverage is already chosen. For simplicity, we describe how each attack is applied to a single window. In case when multiple windows are chosen, the attack has to be repeated for each window. The window size is denoted by $\winsize$. It is equal to the circuit size in the case of the single window coverage.
+
+% -------------------------------------------------------------------
+
+\subsubsection{General DCA Attack}
+
+I would like to note that the term ``differential computation analysis'' (DCA) is very general. In~\cite{AttackBos} the authors introduced it mainly for the correlation-based attack. In fact our new attacks fit the term well and provide new tools for the ``analysis'' stage of the attack. The first stage remains the same except that we adapt the terminology for the case of Boolean circuits instead of recording the memory access traces. Our view of the procedure of the DCA attack on a white-box implementation $C$ is given in \AlgRef{dca}
+
+\begin{algorithm}[ht]
+\AlgDef{dca}{General procedure of DCA attacks on a Boolean circuit $C\colon \field{N} \to \field{M}$}
+
+\begin{algorithmic}[1]
+    \State generate a random tuple of plaintexts $\textset = (p_1, p_2, \ldots), p_i \in \field{N}$
+    
+    \ForAll{$p_i \in \textset$}
+        \State compute the circuit $C$ on input $p_i$: $c_i \gets C(p_i) \in \field{M}$
+        
+        \ForAll{$j \in \seg{1}{|C|}$}
+            \State $v_{j,i} \gets$ computed value in the node indexed $j$
+        \EndFor
+
+        \ForAll{$j \in \seg{1}{k}$}
+            \State $\pv_{j,i} \gets$ predictable value indexed $j$ 
+            \Statex \hspace{2.35cm} computed from plaintext $p_i$ and/or ciphertext $c_i$
+        \EndFor
+    \EndFor
+    
+    \State generate the list of all computed vectors:
+    \Statex $\vecset \gets (v_1, \ldots, v_{|C|})$, where $v_j = (v_{j,1}, \ldots, v_{j,\numtext}) \in \field{\numtext}$
+    
+    \State generate the list of all predictable vectors:
+    \Statex $\predset \gets (\pv_1, \ldots, \pv_{\numpred})$, where $\pv_j = (\pv_{j,1}, \ldots, \pv_{j,\numtext}) \in \field{\numtext}$ 
+    
+    \State choose a coverage $\mathcal{P}$ of $\vecset$ by windows of size $\winsize$
+    
+    \ForAll{$W \in \mathcal{P}$}
+        \State\Label{dca-step-window} perform analysis on the window $W \subseteq \vecset$
+        \Statex \hspace{0.5cm} using the set of predictable vectors~$\predset$
+    \EndFor
+\end{algorithmic}
+\end{algorithm}
+We remark that the correlation-based DCA attack from \cite{AttackBos} can be implemented on-the-fly, without computing the full vectors $v_j$. In contrast, most of our attacks require full vectors. Though, various optimizations are possible.
+
+In the following two sections I describe two classes of DCA attacks: combinatorial and algebraic. They both follow the procedure described above and differ only in the analysis part (Step~\Ref{dca-step-window}). Afterwards, I describe two fault-injection attacks which allow to find locations of shares efficiently.

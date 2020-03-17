@@ -1,0 +1,22 @@
+{
+  \renewcommand\arraystretch{1.0}
+  \setlength{\tabcolsep}{5pt}
+%   \tiny
+  \begin{table}
+    \centering
+    \begin{tabular}{l@{\hskip 0.5cm}rrrrrrrr@{\hskip 0.5cm}c}
+        \toprule
+    & $\hex{0}$ & $\hex{1}$ & $\hex{2}$ & $\hex{3}$ & $\hex{4}$ & $\hex{5}$ & $\hex{6}$ & $\hex{7}$ & Interpolation polynomial \\
+        \midrule
+$T'^{-1}_{\hex{0}}$ & $\hex{0}$ & $\hex{5}$ & $\hex{7}$ & $\hex{4}$ & $\hex{2}$ & $\hex{6}$ & $\hex{1}$ & $\hex{3}$ & $\WW^3x^6 + \WW^1x^5 + \WW^3x^4 + \WW^6x^3 + \WW^1x^2 + {\WZ}x$\\
+$T'^{-1}_{\hex{1}}$ & $\hex{0}$ & $\hex{3}$ & $\hex{1}$ & $\hex{4}$ & $\hex{7}$ & $\hex{5}$ & $\hex{2}$ & $\hex{6}$ & $\WW^3x^6 + \WW^1x^5 + \WW^7x^4 + \WW^6x^3 + \WW^2x^2 + \WW^1x$\\
+$T'^{-1}_{\hex{2}}$ & $\hex{0}$ & $\hex{4}$ & $\hex{5}$ & $\hex{7}$ & $\hex{3}$ & $\hex{6}$ & $\hex{2}$ & $\hex{1}$ & $\WW^3x^6 + \WW^1x^5 + {\WZ}x^4 + \WW^6x^3 + {\WZ}x^2 + {\WZ}x$\\
+$T'^{-1}_{\hex{3}}$ & $\hex{0}$ & $\hex{2}$ & $\hex{3}$ & $\hex{7}$ & $\hex{6}$ & $\hex{5}$ & $\hex{1}$ & $\hex{4}$ & $\WW^3x^6 + \WW^1x^5 + \WW^1x^4 + \WW^6x^3 + \WW^4x^2 + \WW^1x$\\
+$T'^{-1}_{\hex{4}}$ & $\hex{0}$ & $\hex{2}$ & $\hex{5}$ & $\hex{1}$ & $\hex{7}$ & $\hex{4}$ & $\hex{6}$ & $\hex{3}$ & $\WW^3x^6 + \WW^1x^5 + \WW^3x^4 + \WW^6x^3 + {\WZ}x^2 + \WW^6x$\\
+$T'^{-1}_{\hex{5}}$ & $\hex{0}$ & $\hex{4}$ & $\hex{3}$ & $\hex{1}$ & $\hex{2}$ & $\hex{7}$ & $\hex{5}$ & $\hex{6}$ & $\WW^3x^6 + \WW^1x^5 + \WW^7x^4 + \WW^6x^3 + \WW^4x^2 + \WW^5x$\\
+$T'^{-1}_{\hex{6}}$ & $\hex{0}$ & $\hex{3}$ & $\hex{7}$ & $\hex{2}$ & $\hex{6}$ & $\hex{4}$ & $\hex{5}$ & $\hex{1}$ & $\WW^3x^6 + \WW^1x^5 + {\WZ}x^4 + \WW^6x^3 + \WW^1x^2 + \WW^6x$\\
+$T'^{-1}_{\hex{7}}$ & $\hex{0}$ & $\hex{5}$ & $\hex{1}$ & $\hex{2}$ & $\hex{3}$ & $\hex{7}$ & $\hex{6}$ & $\hex{4}$ & $\WW^3x^6 + \WW^1x^5 + \WW^1x^4 + \WW^6x^3 + \WW^2x^2 + \WW^5x$\\
+    \end{tabular}
+    \TabDef{tp-inter}{The codebook and polynomial representation of~each~$T'^{-1}_k$.}
+  \end{table}
+}

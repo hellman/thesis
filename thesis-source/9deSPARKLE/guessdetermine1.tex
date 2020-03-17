@@ -1,0 +1,133 @@
+\subsection{Attack on 3.5-step \aead{} Instances without Rate Whitening}
+
+Consider an instance of \aead{} with the rate equal to the capacity (i.e. one of 
+\aeadversion{128}{128},
+\aeadversion{192}{192},
+\aeadversion{256}{256}),
+which uses the \aCipher{} permutation reduced to 3 steps and has no rate whitening.
+
+Let $y$ denote the output of the linear Feistel function $\M$ in second step (as shown in Figure~\ref{fig:mitm3.5nowhit}). It lies on the following \emph{cyclic} structure (marked with dashed red rectangle):
+{\FigTex{mitm_3p5steps_nowhitening.tex}}
+$$
+y = \M \circ
+    \BBBINV{2} \circ
+    \XOR{\RINV(\Mout)} \circ
+    \M \circ 
+    \AAA{2} \circ
+    \R \circ
+    \XOR{\BBB{1} (\AAA{0} (\Min))} \circ
+    (y).
+$$
+Let 
+\begin{align*}
+    &\Min' = \BBB{1} (\AAA{0} (\Min)),\\
+    &\Mout' = \MINV(\RINV(\Mout)).
+\end{align*}
+Then
+\begin{equation}
+\label{eq:mitm-3step-cycle}
+y = \Big(
+    \M \circ
+    \BBBINV{2} \circ
+    \M \Big) \circ
+    \Big(
+    \XOR{\Mout'} \circ
+    \AAA{2} \circ
+    \R \circ
+    \XOR{\Min'} \Big)
+    (y), ~\text{and}
+\end{equation}
+\begin{equation}
+\label{eq:mitm-3step}
+\MINV \circ
+\BBB{2} \circ
+\MINV (y)
+=
+\XOR{\Mout'} \circ
+\AAA{2} \circ
+\R \circ
+\XOR{\Min'} (y).
+\end{equation}
+
+Note that Equation~\ref{eq:mitm-3step-cycle} shows that the unknown part of the state $y$ is a \emph{fixed point} of a particular bijective structure using the constants $\Min',\Mout'$. This is an interesting formulation of the constraint on the unknown part of the state.
+
+
+\paragraph{Precomputation/data trade-off attack.}
+Note that the left part of Equation~\ref{eq:mitm-3step} is independent of $\Min',\Mout'$. Moreover, the right part  consists of independent ARX-boxes. Therefore, guessing one $64$-bit branch of $y$ leads to knowledge of an input and an output $64$-bit branches of the function from the left-hand side. A data trade-off attack follows. The trade-off parameterized by an integer $r$, $0 < r \le 64$.
+
+We start by the precomputation phase.
+Let $z = \MINV \circ \BBB{2} \circ \MINV(y)$. We iterate over all $y_1 \in \bField{64-r}$ and all $y_i \in \bField{64}$ for $i \ne 1$, and generate the table mapping $(y_1, z_0)$ to all values $y$ satisfying the constraint. 
+On average, we expect $2^{64\halfbranches-r}/2^{64}=2^{64(\halfbranches-1)-r}$ candidates per each $(y_1, z_0)$ in the table. 
+This step requires $2^{64\halfbranches-r}$ time and memory blocks.
+
+In the online phase,
+we collect $2^r$ known plaintexts-ciphertext pairs and compute the corresponding $\Min',\Mout'$ for each pair. Then, for each $y_1 \in \bField{64-r}$ we compute
+$$
+z_0 = (\Mout')_0 \oplus \A{2}{0} ((\Min')_1 \oplus y_1).
+$$
+For each preimage candidate of $(y_1, z_0)$ in the precomputed table, we recover the full state in the middle of the second step. We then check if the corresponding state correctly connects $\Min,\Mout$ and possibly recover the secret key by inverting the sponge operation.
+
+If a considered plaintext-ciphertext pair is such that the leftmost $r$ bits of $y_1$ are equal to zero, then the attack succeeds. Indeed, then, for one of the guesses of $y_1$, the pair $(y_1, z_0)$ corresponds to the correct preimage. 
+For each of $2^r$ plaintext-ciphertext pairs we guess $2^{64-r}$ values of $(y_1, z_0)$. Correct $y_1$ identifies a table mapping the 
+$z_0$ to all possible $y$. Therefore, on average, there will be $2^{64-r}\cdot 2^{64(\halfbranches-1)-r}= 2^{64\halfbranches-2r}$ total candidates. The time required to check a candidate and to recover the secret key is negligible.
+
+The online phase requires $2^r$ different 2-block plaintext-ciphertext pairs, $2^{64\halfbranches-2r}$ time and negligible amount of extra memory.
+
+The following attacks on \aead{} instances follow:
+\begin{enumerate}
+    \item \aeadversion{128}{128}: with $r=64$, the full attack requires $2^{64}$ time, memory and data; with $r=32$, the full attack requires $2^{96}$ time and memory, and $2^{32}$ data.
+
+    \item \aeadversion{192}{192}: with $r=64$, the full attack requires $2^{128}$ time, memory and $2^{64}$ data.
+    
+    \item \aeadversion{256}{256}: with $r=64$, the full attack requires $2^{192}$ time, memory and $2^{64}$ data.
+\end{enumerate}
+
+\paragraph{Low-data variant of the attack on \aeadversion{256}{256}.}
+Due to the high branching number of $\M$, it is hard to exploit the structure of the function $\MINV \circ \BBB{2} \circ \MINV$ by guessing several branches. However, for the largest instance \aeadversion{256}{256}, a simple attack requiring one known-plaintext and $2^{192}$ time is possible.
+
+The key observation is that when $\El(x)$ is fixed, $\M(x)$ splits into $\halfbranches$ independent xors with $\El(x)$. In the attack, we simply guess the corresponding $\El$ for the two calls to $\M$. Precisely, let $\El_y = \El(\MINV(y))$ and $\El_z = \El(\MINV\circ\BBB{2}\circ\MINV(y))$. The computations from Equation~\ref{eq:mitm-3step-cycle} then split into one large cycle:
+\begin{align*}
+    &y_0 = \XOR{\El_y} \circ \BINV{2}{0} \circ \XOR{\El_z} \circ \XOR{(\Mout')_0} \circ \A{2}{0} \circ \XOR{(\Min')_1} (y_1),\\
+    &y_1 = \XOR{\El_y} \circ \BINV{2}{1} \circ \XOR{\El_z} \circ \XOR{(\Mout')_1} \circ \A{2}{1} \circ \XOR{(\Min')_2} (y_2),\\
+    &y_2 = \XOR{\El_y} \circ \BINV{2}{2} \circ \XOR{\El_z} \circ \XOR{(\Mout')_2} \circ \A{2}{2} \circ \XOR{(\Min')_3} (y_3),\\
+    &y_3 = \XOR{\El_y} \circ \BINV{2}{3} \circ \XOR{\El_z} \circ \XOR{(\Mout')_3} \circ \A{2}{3} \circ \XOR{(\Min')_0} (y_0).
+\end{align*}
+Let us guess $y_0$ and compute the whole cycle. If the result matches guessed $y_0$, then we obtain a candidate for the full $y = (y_0, y_1, y_2, y_3)$. On average, we can expect to find one false-positive candidate.
+
+The attack requires 1 known plaintext-ciphertext pair, negligible amount of memory, and $2^{192}$ time. 
+
+
+\paragraph{Birthday-differential attack.}
+A birthday-differential attack can be mounted too. We are looking for a pair having zero difference in $y$. Then the expression
+\begin{equation}
+\XOR{\Mout'} \circ
+\AAA{2} \circ
+\R \circ
+\XOR{\Min'} (y)
+\end{equation}
+has zero difference in the input $y$ and zero difference in the output. Therefore, the difference in $\Min'$ is transformed into the difference in $\R(\Mout')$ by an ARX-box layer. This is the first problem we noted in~Section~\ref{sec:mitm-arx-assum}.
+
+Note that the amount of pairs of encryptions in the pool has to be greater than $2^{64\halfbranches}$ in order for a pair with zero difference in $y$ to exist. Therefore, enumeration of all pairs and checking the possibility of the differential transition $\Min' \xrightarrow{\AAA{2} \circ \R} \Mout'$ results in an ineffective attack.
+
+As described in the birthday-differential attack framework, we further strengthen the constraints in order to obtain an efficient initial filtering. We require that $t$ branches of $\Min'$ starting from the second branch have zero difference too, $0 < t < \halfbranches$. Then, $\Mout'$ must have zero difference in the first $t$ branches. This allows us to obtain initial filtering with $\mu=2t$, i.e. with the probability $2^{-64\cdot 2t}$. In total we need zero difference in $\halfbranches+t$ branches. Therefore, we need $2^{64(\halfbranches+t)/2+1/2}$ data and we expect to keep $2^{64(\halfbranches+t)}\cdot2^{-64\cdot2t}=2^{64(\halfbranches-t)}$ pairs on average after the initial filtering procedure.
+
+The second filtering step is based on filtering possible differential transitions. In the correct pair, the differences $\Delta\Min'$ and $\Delta\Mout'$ of the values $\Min'$ and $\Mout'$ respectively are related by the layer $\AAA{2}$ of ARX-boxes. More precisely, for all $i, 0\le i < \halfbranches,$ the following differential transition holds:
+$$
+(\Delta\Min')_{i+1} \xlongrightarrow{\A{2}{i}} (\Delta\Mout')_i.
+$$
+Verifying a pair requires checking whether a differential transition over an ARX-box is possible or not (see Problem 1 in Section~\ref{sec:mitm-arx-assum}). We assume that there only a fraction $\solratio$ of all differential transitions over an ARX-box is possible, and that for any differential transitions all solutions can be found in time $\soltime$ on average.
+
+The branch values corresponding to zero difference transitions can be found exhaustively in time $\finalrec \le 2^{64t}$ or more efficiently by exploiting the structure further.
+
+We estimate the final complexity of the attack by $2^{64(\halfbranches+t)/2+1/2}$ data and $2^{64(\halfbranches-t)}(\soltime + \solratio^{\halfbranches-t} \finalrec)$ time.
+Assuming low values of $\solratio,\soltime$ and $\finalrec$, we estimate the following attack complexities for different instances of \aead{}:
+\begin{enumerate}
+    \item \aeadversion{128}{128}: with $t=1$, the attack requires $2^{96.5}$ data, and slightly more than $2^{64}$ time.
+    By the precomputation cost of $2^{96+\epsilon}$ time and memory, the data requirement can be reduced to $2^{96-\epsilon}$ for any $\epsilon < 32$.
+
+    \item \aeadversion{192}{192}: with $t=1$, the attack requires $2^{128.5}$ data, and slightly more than $2^{128}$ time.
+    By the precomputation cost of $2^{128+\epsilon}$ time and memory, the data requirement can be reduced to $2^{128-\epsilon}$ for any $\epsilon < 64$.
+    
+    \item \aeadversion{256}{256}: with $t=1$, the attack requires $2^{160.5}$ data, and slightly more than $2^{192}$ time.
+    By the precomputation cost of $2^{160+\epsilon}$ time and memory, the data requirement can be reduced to $2^{160-\epsilon}$ for any $\epsilon < 96$.
+\end{enumerate}

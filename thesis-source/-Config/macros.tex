@@ -1,0 +1,122 @@
+% Field
+\newcommand\field[1]{\mathbb{F}_2^{#1}}
+\newcommand\ffield[2]{(\mathbb{F}_2^{#1})^{#2}}
+\newcommand\fielde[1]{\mathbb{F}_{2^{#1}}}
+\newcommand\hex[1]{\mathtt{\MakeUppercase{#1}}}
+\newcommand\hext[1]{\texttt{\MakeUppercase{#1}}}
+
+% Matrices, etc.
+\newcommand\idvec[1]{I_{#1}}
+\newcommand\idmat[1]{I_{#1 \times #1}}
+\newcommand\linmap[2]{\field{#2 \times #1}}
+\newcommand\linbij[1]{\mathsf{GL}_{#1}(\field{})}
+\newcommand\linbije[2]{\mathsf{GL}_{#1}(\fielde{#2})}
+\newcommand\affbij[1]{\mathsf{GA}_{#1}(\field{})}
+\newcommand\invtop[1]{(#1^{-1})^{\top}}
+
+% Boolean functions
+\newcommand\BF[1]{\mathcal{BF}_{#1}}
+\newcommand\valvec[1]{\mathcal{V}_{#1}}
+\newcommand\wt{\mathbf{wt}}
+% \newcommand\imb{\mathcal{E}}
+% \newcommand\bias{\mathcal{E}}
+\newcommand\cor{\mathbf{cor}}
+\newcommand\coef[2]{\rho_{#1}\psquare{#2}}
+\newcommand\lookup[1]{\mathsf{LookupTable(#1)}}
+
+\newcommand\fmult{\odot}
+\newcommand\fdiv{\oslash}
+% \newcommand\hmult{\odot}
+
+\newcommand\NL{\mathcal{NL}}
+\newcommand\LIN{\mathcal{L}}
+\newcommand\DU{\delta}
+\newcommand\walsh[1]{\mathcal{W}_{#1}}
+\newcommand\LAT[1]{\mathsf{LAT}_{#1}}
+\newcommand\DDT[1]{\mathsf{DDT}_{#1}}
+
+% Number sets
+\newcommand\ZZ{\mathbb{Z}}
+\newcommand\ZZplus{\ZZ_+}
+\newcommand\ZZzeroplus{\mathbb{Z}_{\ge 0}}
+\newcommand\ZZn[1]{\ZZ_{#1}}
+% \newcommand\RR{\mathbb{R}}
+\newcommand\seg[2]{\psquare{#1\ldots#2}}
+
+\newcommand{\Ind}{\mathbbm{1}}
+\newcommand\eqdef{\coloneqq}
+\newcommand\OO{\mathcal{O}}
+
+\newcommand\DP[2]{\mathcal{D}^{#1}_{#2}}
+
+\renewcommand\Tr{\mathsf{Tr}}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Ima}{Im}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand\fzero{\mathbf{0}}
+\newcommand\fone{\mathbf{1}}
+
+\newcommand\sumbinom[2]{\binom{#1}{\le#2}}
+
+% Text operations
+\newcommand\tor{{\sffamily{OR}}\xspace}
+\newcommand\txor{{\sffamily{XOR}}\xspace}
+\newcommand\tnxor{{\sffamily{NXOR}}\xspace}
+\newcommand\tand{{\sffamily{AND}}\xspace}
+\newcommand\tnot{{\sffamily{NOT}}\xspace}
+
+% brackets
+\newcommand\ceil[1]{\left\lceil #1 \right\rceil}
+\newcommand\floor[1]{\left\lfloor #1 \right\rfloor}
+
+\newcommand\pround[1]{\left( #1 \right)}
+\newcommand\proundd[1]{\big( #1 \big)}
+\newcommand\psquare[1]{\left[ #1 \right]}
+\newcommand\pset[1]{\left\{ #1 \right\}}
+\newcommand\psize[1]{\left| #1 \right|}
+\newcommand\pabs[1]{\left| #1 \right|}
+\newcommand\inprod[1]{\left\langle #1 \right\rangle}
+
+\newcommand\Left{\mathsf{left}}
+\newcommand\Right{\mathsf{right}}
+\newcommand\Swap{\mathsf{swap}}
+
+% (x) if x is not empty otherwise nothing
+\newcommand\ifPar[1]{\ifthenelse{\equal{#1}{}}{}{(#1)}}
+
+\newcommand\matb[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand\matp[1]{\begin{pmatrix}#1\end{pmatrix}}
+\newcommand\matbtwo[4]{
+\begin{bmatrix}
+#1 & #2 \\
+#3 & #4
+\end{bmatrix}
+}
+
+\newcommand\eq[1]{\begin{align*}
+#1
+\end{align*}}
+
+\newcommand\eql[2]{\begin{align}
+\EqLabel{#1}
+#2
+\end{align}}
+
+% Weird texts
+\newcommand\Mobius{Möbius\xspace}
+\newcommand\etal{\emph{et al.}\xspace}
+
+\newcommand\enumroman{\renewcommand{\labelenumi}{(\roman{enumi})}}
+
+% TODO tasks
+\if\showTODO1
+    \newcommand{\Todo}[2][]{\todo[inline,#1]{TODO: #2}}
+\fi
+\if\showTODO0
+    \newcommand{\Todo}[2][]{}
+\fi
+
+\algnewcommand{\LeftComment}[1]{\Statex \(\triangleright\) #1}

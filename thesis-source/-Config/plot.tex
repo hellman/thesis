@@ -1,0 +1,107 @@
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+\ChapDef{intro}{Introduction}
+\Todo{HIDE TODOS BEFORE FINAL COMPILATION}
+\if\showIntro1
+    \ChapterImport{intro}{1_Intro}
+\fi
+
+\ChapDef{prelim}{Preliminaries and Framework}
+\if\showPrelim1
+    \ChapterImport{prelim}{2_Prelim}
+\fi
+
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+\PartDef{str}{Structural and Decomposition Cryptanalysis}
+\import{Intros/}{str.tex}
+
+\ChapDef{feistel}{Structural Cryptanalysis of Feistel Networks}
+\if\showFeistel1
+    \ChapterImport{feistel}{9strFeistel}
+\fi
+
+\ChapDef{kuz}{Decompositions of the GOST S-Box}
+\if\showKuz1
+    \ChapterImport{kuz}{9strKuz}
+\fi
+    
+\ChapDef{apn}{Decomposition of the 6-bit APN Permutation}
+\if\showAPN1
+    \ChapterImport{apn}{9strAPN}
+\fi
+    
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+\PartDef{ni}{Nonlinear Invariant Cryptanalysis}
+\import{Intros/}{ni.tex}
+
+\ChapDef{norx}{Analysis of the NORX Permutation}
+\if\showNORX1
+    \ChapterImport{norx}{9niNORX}
+\fi
+
+\ChapDef{linear}{Nonlinear Invariant-Preserving Linear Layers}
+\if\showNLI1
+    \ChapterImport{linear}{9niLinear}
+\fi
+
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+\PartDef{wb}{White-box Cryptography}
+\import{Intros/}{wb.tex}
+
+\ChapDef{wba}{Attacks on White-box Implementations}
+\if\showWBA1
+    \ChapterImport{wba}{9wbAttacks}
+\fi
+
+\ChapDef{wbc}{Provably Secure Countermeasures}
+\if\showWBC1
+    \ChapterImport{wbc}{9wbCounter}
+\fi
+
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+\PartDef{de}{Design of Symmetric-key Algorithms}
+\import{Intros/}{de.tex}
+
+\ChapDef{sparx}{The SPARX Family of Block Ciphers}
+\if\showSPARX1
+    \ChapterImport{sparx}{9deSPARX}
+\fi
+
+\ChapDef{sparkle}{The SPARKLE, ESCH and SCHWAEMM Algorithms}
+\if\showSPARKLE1
+    \ChapterImport{sparkle}{9deSPARKLE}
+\fi
+\if\showSPARKLE0
+    \import{9deSPARKLE/}{stub.tex}
+\fi
+
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+\bibliographystyle{alpha}
+\bibliography{biblio}
+
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+% \appendix
+% \include{Appendices/AppendixA}
+
+% -----------------------------------------------------
+% -----------------------------------------------------
+
+\if\showTODO1
+\listoftodos[To Do]
+\fi
+
+% -----------------------------------------------------
+% -----------------------------------------------------

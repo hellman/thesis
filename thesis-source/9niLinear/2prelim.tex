@@ -1,0 +1,110 @@
+\SecDef{prelim}{Preliminaries}
+
+In this chapter I use a specific notation to simplify expressions. A vector $v \in \field{n}$ is considered a row vector. Any matrix $L \in \F_2^{n\times m}$ defines a linear mapping $\varphi \colon \F_2^n \rightarrow \F_2^m, \ x \mapsto xL$.
+
+\subsection{Higher-Order Derivatives, Affine Equivalence and Algebraic Immunity of Boolean Functions}
+
+Boolean functions have several applications in cryptography, e.g., for designing stream ciphers. In order to resist algebraic attacks, the notion of algebraic immunity was introduced in 2004 as follows.
+
+\begin{definition}[Algebraic immunity~\cite{EC:MeiPasCar04}]
+Let $f\colon \F_2^n \rightarrow \F_2$. An $n$-bit Boolean function $g \neq 0$ is called an \emph{annihilator} of $f$, if $f g = 0$. The set of annihilators of $f$ together with $g=0$ form a vector space, denoted by $\AN(f)$. We denote by $\AN_d(f)$ the subspace of annihilators of $f$ with algebraic degree at most $d$ together with the zero-function. The \emph{algebraic immunity} of $f$, denoted $\AI(f)$, is defined as the minimum $k$ for which $\AN_k(f) \cup \AN_k(f+1) \neq \{0\}$.
+\end{definition}
+
+An important concept for Boolean function is the notion of affine equivalence. 
+
+\begin{definition}[Domain Affine Equivalence]
+Two Boolean functions $f,g\colon \F_2^n \rightarrow \F_2$ are called \emph{domain affine equivalent} if there exists a linear bijection $\varphi \colon \F_2^n \rightarrow \F_2^n$ and a vector $c \in \F_2^n$ such that $g = f \circ (\varphi + c)$. If $c = 0$, $f$ and $g$ are called \emph{linear equivalent}.
+\end{definition}
+I remark that, in the literature, \emph{domain affine equivalence} of Boolean functions is called simply \emph{affine equivalence}. I specify the term to avoid ambiguity, as, for example, $g$ and $g\oplus1$ are not domain affine equivalent in general.
+It is well known that the weight, the algebraic degree and the dimensions of the annihilator spaces (and thus the algebraic immunity) are invariant under domain affine equivalence. 
+
+\subsection{Orthogonal Matrices and Preservation of Nonlinear Invariants}
+
+In~\cite{NonlinInv}, Todo, Leander and Sasaki introduced the \emph{nonlinear invariant attack} and successfully distinguished the block ciphers Midori, Scream and iScream from a random permutation for a significant fraction of weak keys. For an $n$-bit permutation $G \colon \F_2^n \rightarrow \F_2^n$, the main idea consists in finding a non-constant $n$-bit Boolean function $f$ and a constant $\varepsilon \in \F_2$ such that 
+$$
+\forall x \in \F_2^n\colon f(x) = f(G(x)) + \varepsilon.
+$$
+
+Such a function $f$ is called an \emph{invariant} for $G$.
+In order to find an invariant for the cipher, Todo \etal. observed that if $L \in \F_2^{n \times n}$ is an orthogonal matrix, i.e., if $\inprod{xL, yL} = \inprod{x, y}$ for all $x,y \in \F_2^n$, then for all Boolean functions $f \in \BF{t}{2}$ it is
+\eql{target_equation}{
+\forall X \in \F_2^{t \times n} \colon
+\bigoplus_{i=1}^n f\big( (X^\top)_i \big) =
+\bigoplus_{j=1}^n f\big( ((XL)^\top)_j \big).
+}
+In other words, \emph{any} Boolean function $f\colon \F_2^t \rightarrow \F_2$ of algebraic degree at most 2 gives rise to an invariant over the linear layers of Midori, Scream and iScream of the form
+$(x_1,\dots,x_n) \mapsto f(x_1)+\dots f(x_n)$, where $n$ denotes the number of S-boxes, $t$ denotes the bit length of the S-box and $x_i \in \F_2^t$.
+ 
+We illustrate this from a slightly different point of view on the example of the linear layer used in Midori (see~\cite{AC:BBISHA15}), which is defined by the following matrix:
+\eql{midori}{
+L = \matb{
+0 & 1 & 1 & 1 \\
+1 & 0 & 1 & 1 \\
+1 & 1 & 0 & 1 \\
+1 & 1 & 1 & 0
+}.
+}
+It is easy to see that $L$ is orthogonal. Thus, according to \EqRef{target_equation}, for \emph{any} $f \in \BF{t}{2}$ and all $x_1,x_2,x_3,x_4 \in \F_2^t$, the following equation holds:
+\eq{
+    &f(x_1) + f(x_2) + f(x_3) + f(x_4) = \\ &f(x_2+x_3+x_4)+f(x_1+x_3+x_4)+f(x_1+x_2+x_4)+f(x_1+x_2+x_3).
+}
+
+Consider an alternative way of proving this. The arguments of $f$ form an affine subspace of dimension 3, namely
+$$
+x_1 + \Span(x_1+x_2, x_1+x_3, x_1+x_4).
+$$
+Therefore, the equation is equivalent to
+$$
+    \delta_{x_1+x_2}\delta_{x_1+x_3}\delta_{x_1+x_4}f(x_1) = 0,
+$$
+which is clearly true for any $f \in \BF{t}{2}$ and any $x_1,x_2,x_3,x_4$ since all third-order derivatives of a quadratic function are equal to zero. This observation gives new insights on how to generalize the linear layer in order to preserve \emph{higher-degree invariants}.
+
+\begin{proposition}
+\PropLabel{expanding-linear-high-degree}
+Let $d \ge 2$ be an integer. Then there exists a matrix $L \in \F_2^{n \times m}$ with $n = d+2, m=2^{d+1}-d-2$ and full rank $n$ such that for any $t \ge 1$ and any $f \in \BF{t}{d}$, the following property holds: 
+\eql{invariant_preserving_linear}{
+\forall X \in \F_2^{t \times n} \colon
+\bigoplus_{i=1}^n f\big( (X^\top)_i\big) =
+\bigoplus_{j=1}^m f\big( ((XL)^\top)_j \big).
+}
+An example of such $L$ is given by a matrix with columns taken as all vectors from $\field{n}$ with an odd Hamming weight greater or equal to 3.
+\end{proposition}
+\begin{proof}
+For any $t \ge 1$ and any $x_0,\ldots,x_{d+1}\in \F_2^t$ consider the $(d+1)$-dimensional affine subspace
+\[V = x_0 + \Span(x_0+x_1,x_0+x_2,\ldots,x_0+x_{d+1})\;.\]
+For any Boolean function $f$ of degree $d$, any $(d+1)$-th derivative vanishes. Therefore, $\bigoplus_{v \in V} f(v) = 0$. This can be equivalently written as
+\eql{higher-order-expanding}{
+    & f(x_0) + f(x_1) + \ldots + f(x_{d+1}) = \\
+    & = \bigoplus_{\substack{I \subseteq \{1, \ldots, d+1\} \\ |I| \ge 2 ~\text{even}}}f(x_0 + \bigoplus_{i \in I}x_i) +
+        \bigoplus_{\substack{I \subseteq \{1, \ldots, d+1\} \\ |I| \ge 3 ~\text{odd}}}f(\bigoplus_{i \in I}x_i) \\
+    & = \bigoplus_{\substack{I \subseteq \{0, \ldots, d+1\} \\ |I| \ge 3 ~\text{odd}}}f(\bigoplus_{i \in I}x_i)
+    .
+}
+The right-hand side contains $2^{d+1}-d-2$ applications of $f$. Let $Y$ be the set of the linear functions defining the arguments of $f$ in the right-hand side of \EqRef{higher-order-expanding}, i.e.,
+$$
+Y =
+\pset{ \bigoplus_{i \in I}x_i ~\biggm|~ I \subseteq \{0, \ldots, d+1\}, \ |I| \ge 3 ~\text{odd} },
+$$
+and let $L$ be the matrix of the linear function that maps $(x_0, x_1, \ldots, x_{d+1})$ to $(y_1, y_2, \ldots, y_{2^{d+1}-d-2})$, where $y_i \in Y$ and all $y_i$ are pairwise different. Then, \EqRef{higher-order-expanding} is equivalent to \EqRef{target_equation} with the described $L$.
+
+Since $m \ge n \ge 4$, any unit vector from $\F_2^n$ can be expressed a linear combination of 3 columns of $L$, e.g., $$
+(1,0,0,0,\ldots,0)=(1,1,1,0,\ldots,0)+(1,0,1,1,\ldots, 0)+(1,1,0,1,\ldots,0).
+$$
+We conclude that $L$ has full rank $n$.
+\end{proof}
+
+
+\begin{example}
+For $d=2$ we obtain the orthogonal matrix given in \EqRef{midori}. For $d=3$ we obtain an expanding linear mapping $\varphi: \field{5} \to \field{11}$ defined by the following $5 \times 11$ matrix $L$:
+$$
+L = \matb{
+0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+0 & 1 & 1 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 1 \\
+1 & 0 & 1 & 1 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1 & 1 & 0 & 1 & 1 & 0 & 1 & 0 & 1 & 0 & 1 \\
+1 & 1 & 1 & 0 & 1 & 1 & 0 & 1 & 0 & 0 & 1 \\
+}.
+$$
+\end{example}
+
+

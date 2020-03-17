@@ -1,0 +1,98 @@
+\SecDef{minimalist}{Minimalist Quadratic Masking Scheme}
+
+In this section I show a first-order algebraically secure quadratic masking scheme. Then I describe concrete circuits which can be verified to be first-order algebraically secure gadgets using \AlgRef{verify}.
+
+\subsubsection{Minimalist Quadratic Masking.}
+Since the decoding function has to be at least quadratic, we need at least two bits to encode a single bit. For two bits all nonlinear decoding functions are linear equivalent to a quadratic monomial being simply the product of the two input bits. Unfortunately, this decoding function is vulnerable to the linear algebra attack. Any quadratic function with 2-bit input is unbalanced. Therefore, one of the reference bit values can be encoded by 3 different values and the other value has only 1 possible encoding. For example, if the value is equal to 1 and the decoding function is simply AND, the input has to be equal to (1, 1). In this case there is no randomness involved and the hidden value is leaked. 
+The conclusion is that any value of the original bit should include randomness in its encoding. In particular, the decoding function can not be a point function.
+
+We move on to 3-bit encodings. The simplest quadratic function using all 3 input bits $a,b,c$ is $ab\oplus c$. Note the similarity with the broken 2-bit scheme: the quadratic monomial $ab$ is simply linearly masked by $c$. However, this linear mask is enough to prevent the attack: in this case $\dec(a,b,c)=1$ does not imply $a=1$ or $b=1$. In fact, such $\dec$ is balanced: both 0 and 1 have exactly 4 preimages. We first describe an insecure yet simple masking scheme based on this decoding function in \FigRef{insecure}. It is easy to verify that $Eval_{XOR}$ and $Eval_{AND}$ satisfy the requirements from Definition~\ref{wba.def:masking}. In addition, $Refresh(a, r)$ returns fresh random encoding of $a$, meaning that $\dec(a) = \dec(Refresh(a, r))$ for any $r$ and new encoding reveals no information about the old encoding.
+
+\begin{figure}
+\vspace{-0.5em}
+\FigDef{insecure}{An Insecure Quadratic Masking Scheme.}
+\vspace{-0.5em}
+\begin{align}
+    \enc(x,r_a,r_b)              &~=~ (r_a,r_b,r_ar_b \oplus x),\\
+    \dec(a,b,c)                  &~=~ ab \oplus c,\\
+    Eval_{XOR}((a,b,c),(d,e,f)) &~=~ (a\oplus d,~ b \oplus e,~  ae \oplus bd \oplus c \oplus f),\\
+    Eval_{AND}((a,b,c),(d,e,f)) &~=~ (ae,~        bd,~         (cd)e \oplus a(bf) \oplus cf),\\
+    Refresh((a,b,c),(r_a,r_b))  &~=~ (a \oplus r_a,~ b \oplus r_b,~ c \oplus r_ab \oplus r_ba \oplus r_a r_b).
+\end{align}
+\vspace{-0.5em}
+\end{figure}
+
+We now observe that $Refresh$ is not $\maxcor$-1-AS for any $\maxcor < 1$: the computed term $r_a b$ is constant when $b$ is fixed to 0 and equals to $r_a$ otherwise (leading to $\maxcor = 1$). This can be fixed by using an extra random bit $r_c$ to mask $a,b$ through the computations:
+\begin{multline}
+    Refresh((a,b,c),(r_a,r_b,r_c)) ~=~ \\
+    \big(
+    a \oplus r_a,~
+    b \oplus r_b,~
+    c \oplus r_a(b \oplus r_c) \oplus r_b (a \oplus r_c) \oplus (r_a \oplus r_c)(r_b \oplus r_c) \oplus r_c
+    \big).
+\end{multline}
+
+The new $Refresh$ function can be verified to be secure using the algorithm from \SecRef{verify}. Moreover, the circuit computing $Eval_{XOR}$ applied to refreshed inputs is secure as well. However, $Eval_{AND}$ is not secure even if composed with the fixed $Refresh$ gadget. Consider the linear combination of computed terms $a(bf) \oplus cf = (ab \oplus c)f$. Here the variables are refreshed masks and can not be fixed by the adversary. However, the refreshing function does not change the hidden value. Therefore, $ab \oplus c$ would be equal to the value hidden by initial non-refreshed shares which can be fixed. Fixing the hidden value to 0 makes the combination $f(ab \oplus c)$ equal to 0 and be equal to the random share $f$ when the hidden value is fixed to 1. We observe that it is possible to use a trick similar to the one used to fix the $Refresh$ function. In fact, the extra random shares added to fix the $Refresh$ function may be reused to fix the $Eval_{AND}$ function. As a result, we obtain a fully secure masking scheme. The complete description is given in \AlgRef{mqms}.
+
+\begin{algorithm}[ht]
+    \AlgDef{mqms}{Minimalist Quadratic Masking Scheme.}
+    \begin{algorithmic}[1]
+        \Function{Encode}{$x,r_a,r_b$}
+            \State \Return{$(r_a,r_b,r_ar_b \oplus x)$}
+        \EndFunction
+        \Statex
+        \Function{Decode}{$a,b,c$}
+            \State \Return{$ab\oplus c$}
+        \EndFunction
+        \Statex
+        \Function{EvalXOR}{$(a,b,c),(d,e,f),(r_a,r_b,r_c),(r_d,r_e,r_f)$}
+            \State $(a,b,c) \gets \textsc{Refresh}((a,b,c),(r_a,r_b,r_c))$
+            \State $(d,e,f) \gets \textsc{Refresh}((d,e,f),(r_d,r_e,r_f))$
+            \State $x \gets a \oplus d$
+            \State $y \gets b \oplus e$
+            \State $z \gets c \oplus f \oplus ae \oplus bd$
+            \State \Return{$(x,y,z)$}
+        \EndFunction
+        \Statex
+        \Function{EvalAND}{$(a,b,c),(d,e,f),(r_a,r_b,r_c),(r_d,r_e,r_f)$}
+            \State $(a,b,c) \gets \textsc{Refresh}((a,b,c),(r_a,r_b,r_c))$
+            \State $(d,e,f) \gets \textsc{Refresh}((d,e,f),(r_d,r_e,r_f))$
+            \State $m_a \gets bf \oplus r_c e$
+            \State $m_d \gets ce \oplus r_f b$
+            \State $x \gets ae \oplus r_f$
+            \State $y \gets bd \oplus r_c$
+            \State $z \gets am_a \oplus dm_d \oplus r_c r_f \oplus cf$
+            \State \Return{$(x,y,z)$}
+        \EndFunction
+        \Statex
+        \Function{Refresh}{$(a,b,c),(r_a,r_b,r_c)$}
+            \State $m_a \gets r_a \cdot (b \oplus r_c)$
+            \State $m_b \gets r_b \cdot (a \oplus r_c)$
+            \State $r_c \gets
+                m_a \oplus m_b \oplus
+                (r_a \oplus r_c) (r_b \oplus r_c) \oplus
+                r_c$
+            \State $a \gets a \oplus r_a$
+            \State $b \gets b \oplus r_b$
+            \State $c \gets c \oplus r_c$
+            \State \Return{$(a,b,c)$}
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+\paragraph{Security.}
+First, we verify $Eval_{XOR}$ and $Eval_{AND}$ gadgets using \AlgRef{verify}. We obtain that they are $\maxcor$-1-AS circuits for some $\maxcor < 1$. Then we construct the ANFs of intermediate functions. The maximum degree is equal to 4. It is achieved for example in the term $cf$ in the gadget $Eval_{AND}$: its ANF contains the term $r_ar_br_dr_e$. Therefore, $Eval_{AND}$ is $\maxcor$-1-AS with $\maxcor \le 7/8$. The gadget $Eval_{XOR}$ has degree 2 and is $1/2$-1-AS. Unfortunately, we do not have a pen-and-paper proof for security of the gadgets and rely solely on the verification algorithm (which is able to spot the described weaknesses in the insecure versions of the gadgets).
+
+Verifying security of the encoding function $\enc$ can be done in the same way. Clearly, no linear combination of $r_a,r_b,r_ar_b\oplus x$ is constant for any fixed $x$. The coordinate $r_ar_b\oplus x$ has degree 2 and its absolute correlation is equal to $1/2$. Therefore, $\enc$ is an $\maxcor$-1-AS encoding with $\maxcor=1/2$.
+
+By applying \PropRef{combine}, we obtain that for any adversary $\adv$, for any circuit $C$ build from the gadgets $Eval_{XOR}, Eval_{AND}$ and for the described $\enc$ encoding we have:
+\begin{equation}
+    \advanPS[\adv] \le min(2^{Q-\rC}, 2^{eQ}),
+\end{equation}
+
+where $e = \log_2{(1+7/8)/2}\approx -0.093$. According to Corollary~\Ref{cor:seclevel}, in order to achieve provable 80-bit security we need to have $\rC \ge 80(1 - 1/e) \approx 940$ random bits in the circuit. Note that it does not depend on the actual size of the circuit, i.e. 940 random bits are enough for an arbitrary-sized circuit. However, the adversary should not be able to shrink the window so that it contains less than 940 random bits. This is expected to be guaranteed by a \SH{} protection. Finally, we remark that the bounds are rather loose and more fine-grained analysis should improve the bound significantly.
+
+
+\subsection{Implementation}
+
+We applied our masking scheme to an AES-128 implementation to estimate the overhead. Our reference AES circuit contains 31,783 gates. It is based on Canright's S-Box implementation~\cite{Canright} and naive implementation of MixColumns. After applying our nonlinear masking scheme and a first-order linear masking scheme on top the circuit expands to 2,588,743 gates of which 409,664 gates are special gates modeling external random bits. The circuit can be encoded in 16.5 MB. Extra RAM needed for computations is less than 1KB. On a common laptop it takes 0.05 seconds to encrypt 1 block. Since the implementation is bitwise, 64 blocks can be done in parallel at the same time on 64-bit platforms. There is still a large room for optimizations. We used the Daredevil CPA tool~\cite{SCM} to test our implementation. Due to the first-order linear masking on top we did not detect any leakage. Pure nonlinear masking scheme does leak the key so the combination of both is needed as we suggested in \SecRef{method}. The implementation code is publicly available~\cite{OurWhiteboxCode}. We remark that it is a proof-of-concept and not a secure white-box implementation; it can be broken in various ways.

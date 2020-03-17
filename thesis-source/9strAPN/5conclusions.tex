@@ -1,0 +1,15 @@
+\SecDef{conclusions}{Conclusions}
+
+In this chapter I described a decomposition of the 6-bit APN permutation, which we obtained together with my colleagues Léo Perrin and Alex Biryukov. The discovered structure is simple and algebraic: it is based on the finite field arithmetics. We generalized this structure to larger dimensions, though no new APN permutations were found. The decomposition also shed more light on the process used to obtain it by Dillon~\etal{}. Furthermore, many new interesting properties and relations with other structures were observed.
+
+I would like to highlight main tools used to obtain the decomposition and study it:
+\begin{enumerate}
+    \item TU-decomposition. This tool is the most effective way to obtain a high-level decomposition when it is possible.
+    \item Affine- and linear- equivalence algorithm from~\cite{LinAffEQ}. It helps to discover relations between different components and between parts of a single component, e.g. between single permutations inside a keyed permutation. The algorithm is also useful to find affine and linear- self-equivalence mapping pairs. 
+    \item Polynomial interpolation in the finite field. This tool was particularly useful due to the mathematical nature of the analyzed object.
+    \item Algebraic degree evaluation. In the decomposition process it makes sense to choose steps that result in components of lower algebraic degree.
+\end{enumerate}
+
+Unfortunately, no new APN permutations in even dimensions were found, even though many natural generalizations emerged. Recently, Canteaut~\etal{} proved that a generalized butterfly structure is not APN for $n > 6$. Therefore, the big APN problem is still unsolved:
+
+\center{Do there exist APN permutations of $\fielde{n}$ for even $n \ge 8$?}

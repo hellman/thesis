@@ -1,0 +1,77 @@
+\SecDef{multi}{Feistel-like Decomposition based on Finite Field Multiplications}
+
+Similarly to \ChapRef{feistel}, this chapter illustrates the usefulness of the "Jackson Pollock representation" of the LAT of an S-Box. Consider a heatmap of $\LAT{\pi}$ shown in \FigRef{pi_lat}. It looks rather random overall, except several vertical stripes clearly sticking out. This effect is weaker or stronger depending on the colormap chosen for plotting. By a closer inspection it can be observed that the stripes stick out because of the same color appearing mote often than in another columns. In order to strengthen the effect, I define a \emph{column frequency table}.
+\begin{definition}
+Let $L$ be an $n \times m$ matrix. The \emph{column frequency table} of $L$ is the $n\times m$ matrix $\CF{L}$ over $\ZZ$ given by:
+$$
+\CF{L}[y,x] \eqdef \pabs{\pset{y' \mid L[y',x] = L[y,x]}}.
+$$
+\end{definition}
+
+\FigTex{pi_lat.tex}
+
+The column frequency table of the $\LAT{\pi}$ is shown in \FigRef{cf_pi_lat}. The same columns are clearly sticking out as in the LAT of $\pi$. Let $S$ denote their $x$-coordinates:
+\begin{multline*}
+S = \{
+\hex{00},
+\hex{1a},
+\hex{20},
+\hex{3a},
+\hex{44},
+\hex{5e},
+\hex{64},
+\hex{7e},\\
+\hex{8a},
+\hex{90},
+\hex{aa},
+\hex{b0},
+\hex{ce},
+\hex{d4},
+\hex{ee},
+\hex{f4}
+\}\subseteq\field{8}.
+\end{multline*}
+Note that $\hex{00}$ was added in order to complete the set to a linear subspace of $\field{8}$. It follows that we can choose 4 linearly independent coordinates and they will correspond to 4 linearly independent components of $\pi$. By composing $\pi$ with a linear map, the outstanding columns of the $\LAT{\pi}$ can be grouped together. Let $L\in \linbij{8}$ be such that
+\begin{align*}
+L(\hex{80}) &= \hex{08},~~
+L(\hex{40}) = \hex{04},~~
+L(\hex{20}) = \hex{02},~~
+L(\hex{10}) = \hex{01},\\
+L(\hex{08}) &= \hex{8a},~~
+L(\hex{04}) = \hex{44},~~
+L(\hex{02}) = \hex{20},~~
+L(\hex{01}) = \hex{1a}.
+\end{align*}
+Let $\pi_1 \eqdef L^{\top} \circ \pi$. The LAT of $\pi_1$ is shown in \FigRef{pi1_lat}. According to Proposition~\ref{prelim.prop:linear-lat} from \ChapRef{prelim}, the outstanding columns are grouped on the left. Furthermore, inside these 16 columns we can now observe similarly outstanding rows. Coincidentally, their coordinates form the same linear subspace $S$. In order to group the rows on the top, let $\pi_2 \eqdef L^{\top} \circ \pi \circ \invtop{L}$. The LAT of $\pi_2$ is shown in \FigRef{pi2_lat}.
+
+\FigTex{pi_lat1_2.tex}
+
+\subsection{TU-decomposition}
+\Label{sec:tu}
+
+The LAT of $\pi_2$ has interesting artifacts. The special 16 columns now have a visible structure consisting of $16\times16$ squares. More importantly, the topmost square fully consists of zeroes, i.e. $\LAT{\pi_2}(a,b)=0$ for $0 \preceq a,b \preceq \hex{0f}$. These zeroes can be interpreted as follows: if we fix any linear combination of the 4 rightmost input bits to any constant, then any linear combination of the 4 rightmost output bits is balanced. Following this idea, the following multiset property can be verified: for any $c \in \field{4}$, 
+$$
+\Right \pround{\pi_2(X)} = \field{4}, ~\text{where}~X \eqdef \pset{(l, c) \mid l \in \field{4}}.
+$$
+\Todo{proposition}
+In other words, there exists 16 permutations $T_{\hex{0}},\ldots, T_{\hex{f}}$ of $\field{4}$ such that for all $l,r \in \field{4}$
+$$\Right(\pi_2(l, r)) = T_{r}(l).$$ 
+Let $U_{\hex{0}},\ldots,U_{\hex{f}}\colon \field{4} \to \field{4}$ be such that $U_{T_r(l)}(r) \eqdef \Left(\pi_2(l,r))$ for all $l,r \in \field{4}$. Then
+$$
+\pi_2(l,r) = \pround{U_{T_r(l)}(r), T_r(l)}.
+$$
+The high-level decomposition of $\pi_2$ into $T$ and $U$ is shown in \FigRef{tu} and the look-up tables of $T$ and $U$ are given in \TabRef{tu-lt}. Note that since $\pi_2$ and all $T_i$ are permutations, all $U_i$ must be permutations as well. It can be easily verified from the look-up table of $U$. Due to this bijectivity, $T$ and $U$ can be viewed as mini-block ciphers. Such decomposition into two mini block-ciphers shall be called a \emph{TU-decomposition}. It will prove its usefulness again in \ChapRef{apn}.
+
+\FigTex{tu.tex}
+
+\FigTex{tu-lt.tex}
+
+\begin{remark}
+It might seem that the TU-decomposition provides little insight into the structure. Indeed, any 8-bit function can be described by two tables of the same size as $T$ and $U$, for example by considering the left and right halves of the output separately. The only special property that TU-decomposition adds is that each $T_i$ is a permutation (and thus, each $U_i$). This is a very unlikely event that a random permutation has such decomposition, even if extra linear encodings (such as $L$ in the case of $\pi$) are allowed. This property justifies the separation of $T$ and $U$ and their independent analysis.
+\end{remark}
+
+The decomposition procedure of $T$ and $U$ are described in \SecRef{t} and \SecRef{u} respectively.
+
+\subimport{}{11u.tex}
+\subimport{}{11t.tex}
+\subimport{}{12full.tex}

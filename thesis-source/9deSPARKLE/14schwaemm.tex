@@ -1,0 +1,52 @@
+\SubSecDef{spec-aead}{The \aead{} Authenticated Ciphers}
+
+We propose four instances for authenticated encryption with associated data: 
+\begin{align*}
+  \text{\aeadversion{128}{128}},~&\text{\aeadversion{192}{192}},~\text{\aeadversion{256}{256}}, \\
+  \text{and}~&\text{\aeadversion{256}{128}}
+\end{align*}
+which, for a given key $K$ and nonce $N$ allow to process associated data $A$ and messages $M$ of arbitrary length (up to a certain threshold) and output a ciphertext $C$ with $|C| = |M|$ and an authentication tag $T$. For given $(K, N, A, C, T)$, the decryption procedure returns the decryption $M$ of $C$ if the tag $T$ is valid, otherwise it returns the error symbol $\bot$. All instances use (a slight variation of) the \beetle{} mode of operation presented in~\cite{beetle}, which is based on the well-known duplexed sponge construction. The difference between the instances is the version of the underlying \aCipher{} permutation (and thus the rate and capacity is different) and the size of the authentication tag. As a naming convention, we used \aeadversion{r}{c}, where $r$ refers to the size of the rate and $c$ to the size of the capacity in bits. Similar as for hashing, we use the big version of \aCipher{} for initialization, separation between processing of associated data and secret message, and finalization, and the slim version of \aCipher{} for updating the intermediate state. \TabRef{schwaemm} gives an overview of the parameters of the \aead{} instances. The data limits correspond to $2^{64}$ blocks of $r$ bits rounded up to the closest power of two, except for the high security \aeadversion{256}{256} for which it is $r \times 2^{128}$ bits.
+
+\begin{table}
+    \centering
+    {
+    \TabDef{schwaemm}{The instances we provide for authenticated encryption together with their (joint) security level in bit with regard to confidentiality and integrity and the limitation in the data (in bytes) to be processed.}
+    \begin{tabular}{ccccccccc}
+      \toprule
+      & $n$ & $r$ & $c$ & $|K|$ & $|N|$ & $|T|$&  security & data limit   \\
+      \midrule
+      \aeadversion{128}{128}&256 & 128 & 128 & 128 & 128 & 128 & 120 & $2^{68}$ \\
+      \midrule
+      \aeadversion{256}{128}&384 & 256 & 128 & 128 & 256 & 128 & 120 & $2^{68}$ \\
+      \aeadversion{192}{192}&384 & 192 & 192 & 192 & 192 & 192 & 184 & $2^{68}$ \\
+      \midrule
+      \aeadversion{256}{256}&512 & 256 & 256 & 256 & 256 & 256 & 248 & $2^{133}$ \\
+      \bottomrule
+    \end{tabular}
+    }
+\end{table}
+
+The main difference between the \beetle{} mode and duplexed sponge modes is the usage of a combined feedback $\rho$ to differentiate the ciphertext blocks and the rate part of the states. This combined feedback is created by applying the function $\fswap$ to the rate part of the state, which is computed as
+\[
+\fswap(S) = S_2 \| (S_2 \oplus S_1)\;,
+\]
+where $S \in \ftwo^r$ and $S_1\|S_2 = S$ with $|S_1|=|S_2| = \frac{r}{2}$. The feedback function $\rho \colon (\ftwo^r \times \ftwo ^r) \rightarrow (\ftwo^r \times \ftwo^r)$ is defined as $\rho(S,D) = (\rho_1(S,D),\rho_2(S,D))$, where
+\[
+\rho_1\colon (S,D) \mapsto \fswap(S) \oplus D, \quad \rho_2\colon (S,D) \mapsto S \oplus D\;.
+\]
+
+For decryption, we have to use the inverse feedback function $\rho' \colon (\ftwo^r \times \ftwo ^r) \rightarrow (\ftwo^r \times \ftwo^r)$ defined as $\rho'(S,D) = (\rho'_1(S,D),\rho'_2(S,D))$, where
+\[
+\rho'_1\colon (S,D) \mapsto \fswap(S) \oplus S \oplus D, \quad \rho'_2\colon (S,D) \mapsto S \oplus D\;.
+\]
+
+After each application of $\rho$ and the additions of the domain separation constants, i.e., before each call to the \aCipher{} permutation except the one for initialization, we prepend a \emph{rate whitening} layer which XORs the value of $\mathcal{W}_{c,r}(S_R)$ to the rate, where $S_R$ denotes the internal state corresponding to the capacity part. For the \aead{} instances with $r=c$, we define $\mathcal{W}_{c,r}\colon \ftwo^c \rightarrow \ftwo^r$ as the identity (i.e., we just XOR the capacity part to the rate part). For \aeadversion{256}{128}, we define $\mathcal{W}_{128,256}(x,y) = (x,y,x,y)$, where $x,y \in \ftwo^{64}$. Note that this tweak can still be described in the \beetle{} framework as the prepended rate whitening can be considered to be part of the definition of the underlying permutation.
+
+Figure~\ref{fig:schwaemm} depicts the mode for our primary member \aeadversion{192}{192}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\columnwidth]{\PathFig{schwaemm.pdf}}
+  \caption{The Authenticated Encryption Algorithm \aeadversion{192}{192} with rate $r=192$ and capacity $c=192$.}
+  \label{fig:schwaemm}
+\end{figure}

@@ -1,0 +1,18 @@
+\SecDef{conclusions}{Discussion and Conclusions}
+
+This chapter presented two different decompositions of $\pi$, the S-Box used in Russian cryptographic standards. The decompositions show that the S-Box has a strong structure related to the finite field arithmetic. The reasons behind such structure are unclear. It is not known whether a trapdoor can be hidden in such S-Box, such that the block cipher or the hash function using it becomes weaker. A more likely reason is the possibility of having better hardware implementation than for a random S-Box.
+
+The first decomposition, presented in \SecRef{multi}, is based on finite field multiplications forming a Feistel-like 2-round network, several 4-bit S-Boxes and two 8-bit whitening linear layers. The bijectivity is preserved differently in each round. In the first round, a multiplexer is used such that multiplication by 0 is not performed. In the second round, the multiplication is performed by a non-bijective function of the left branch, which is never equal to 0. Such structure was never used before in cryptography. 
+
+The second decomposition, presented in \SecRef{expo}, is based on the finite field logarithm, one 4-bit S-Box, one 8-bit whitening linear layer and a simple but strange arithmetic layer, given in \TabRef{taupibetaq}. It is almost the identity mapping, except that multiples of 17 are cut out and placed in the beginning, together with 0. This simplicity suggests that indeed $\pi$ is very closely related to the finite field logarithm. Nevertheless, we could not find a meaningful arithmetic expression or simple circuit for computing it. 
+
+The second decomposition is ``lighter'' then the first one, because it contains less information-heavy elements, as the large part of the complexity is taken away by the finite field logarithm. The relation between the two decompositions is also not clear. The first decomposition can be seen as an implementation of the finite field logarithm using operations in the smaller field, $\fielde{4}$. This is similar to the Canright's implementation of the AES S-Box~\cite{Canright}, the finite field inversion.
+Note however, that the finite field logarithm itself does not have a TU-decomposition. It is the extra part of $\pi$ that activates this multiset property. There is also a possibility that both decompositions are a side effect of another algebraic construction.
+
+This chapter shows usefulness of the following S-Box reverse-engineering tools:
+\begin{enumerate}
+    \item Jackson-Pollock representation of the LAT for visual patters.
+    \item TU-decomposition as initial step and high-level decomposition.
+    \item Affine-equivalence algorithms.
+\end{enumerate}
+It also shows different methods of simplifying complicated structures and random-looking components. The ways of reasoning employed to obtained the decompositions of $\pi$ are proved to be useful again in \ChapRef{apn}, where it is shown that \emph{mathematical} structures can also be decomposed using S-Box reverse-engineering methods. 

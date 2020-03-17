@@ -1,0 +1,12 @@
+\myminitoc
+{
+\subimport{}{macros.tex}
+
+In this chapter, I describe analysis of the attacks from \ChapRef{wba} and a general method for protecting white-box implementations. The protection splits into two independent components: \emph{value hiding} and \emph{structure hiding}. Value hiding must provide protection against passive DCA-style attacks that rely on analysis of computation traces. Structure hiding must provide protection against circuit analysis attacks. We focus on the development of the value hiding component. As a result, I show a nonlinear masking scheme provably secure against the linear algebra attack, described in~\ChapRef{wba}. This chapter is based on the second part of~\cite{OurWhitebox}, a joint work with Alex Biryukov.
+
+\subimport{}{1intro.tex}
+\subimport{}{2method.tex}
+\subimport{}{30framework.tex}
+\subimport{}{4minimalist.tex}
+\subimport{}{9conclusions.tex}
+}

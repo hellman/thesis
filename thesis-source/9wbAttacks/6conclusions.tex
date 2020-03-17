@@ -1,0 +1,9 @@
+\SecDef{conclusions}{Conclusions}
+
+In this chapter we studied the possibility of using masking techniques for white-box implementations. We presented several attacks applicable in different scenarios. As a result, we obtained several requirements for a masking scheme useful for white-box implementations. In \ChapRef{wbc}, I will describe an analysis the requirements and a partial solution against DCA-style attacks - a nonlinear masking scheme with provable properties that guarantee security against the linear algebra attack.
+
+We applied the attacks to several challenges from the WhibOx 2017 competition~\cite{whibox}. However, we did not perform an extensive study of the applicability of the attacks to public white-box implementations. One problem is that most implementations can not be converted to a circuit in a simple way.
+This is an interesting direction for future work.
+
+Another interesting open problem is to develop countermeasures for fault attacks in the white-box setting. Indeed, these attacks are quite powerful and known gray-box protection may be not strong enough. From the attacks we can see that the \emph{shares} must be protected as well, meaning that an integrity protection should be applied on top of a masking scheme.
+

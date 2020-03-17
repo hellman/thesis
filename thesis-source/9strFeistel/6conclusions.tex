@@ -1,0 +1,15 @@
+\section{Conclusions}
+\SecLabel{conclusions}
+
+This work started by observing interesting patterns in the LAT modulo 8 of small Feistel Networks. The analysis of the patterns resulted in the definition of High-Degree Indicator Matrix (HDIM). This tool shows a link between the LAT and the highest-degree monomials in the ANF. Furthermore, its properties allow to prove upper bounds on the algebraic degree of cryptographic structures and to prove finer algebraic degeneracies. Though these results do not improve the state of the art, the upper bounds given are expressed in a simple closed formula and there is a room for improvement, e.g. by combining methods. Finally, the most useful application of HDIM is in the cryptanalysis of Feistel Networks masked with secret affine layers. The generalized HDIM-motivated ideas allow to prove lower-degree degeneracies as well, i.e. impossible monomials. I show how they can be used to mount decomposition attacks on Feistel Networks. The results of this chapter together allow to fully decompose affinely-whitened Feistel Networks satisfying the attack conditions. I think it provides many useful tools for S-Box reverse-engineering and white-box analysis toolkit.
+
+The work leaves several open problems:
+\begin{enumerate}
+    \item Better degree evaluation. Is it possible to improve the HDIM-motivated method? Is it possible to combine it with other methods, e.g. division property?  
+    
+    \item Proving Conjecture~\Ref{conj:impmono}. Are there always enough impossible monomials to recover the last Feistel function, if the type-II distinguisher applies?
+
+    \item In which cases it is possible to decompose Feistel Networks having at least 1 more round than Feistel Networks satisfying the type-II distinguisher?
+    
+    \item A big open problem: lower bounds in Feistel Networks or Substitution-Permutation Networks. How to prove non-trivial lower bounds on the degree of a structure, i.e. that at least one instance of the structure has high enough degree? Strong lower bounds could shed light on how close are current degree evaluation methods to optimal ones.
+\end{enumerate}

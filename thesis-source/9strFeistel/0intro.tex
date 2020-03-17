@@ -1,0 +1,64 @@
+\section{Introduction}
+\SecLabel{intro}
+
+A Feistel Network (FN) together with Substitution-Permutation Network (SPN) are the two main structures used to design a block cipher. Both are iterated structures in which a simple round function is iterated multiple times. The Feistel Network was invented by Horst Feistel who designed the Lucifer~\cite{Lucifer} block cipher at IBM. Lucifer was a direct predecessor of the Data Encryption Standard (DES)~\cite{DES} block cipher which has a 16-round Feistel Network as its structure.
+
+A classical Feistel Network operates on two $n$-bit branches of the same size. The round function works in the following way. A so-called Feistel function is applied to the right branch and the result is added to the left branch using the \txor{} or the modular addition. Afterward, the branches are swapped. The swap in the last round is usually omitted. A 3-round Feistel Network is shown in \FigRef{F3}. The Feistel function is not required to be bijective. In fact, a Feistel Network can be seen as a way to construct a pseudorandom \emph{permutation} from several pseudorandom \emph{functions}. In 1988, Luby and Rackoff~\cite{LubyRackoff} proved adaptive chosen-plaintext security of a 3-round Feistel Network under the assumption of (pseudo)random Feistel functions. The proof states that any adversary making $q$ queries to the primitive cannot distinguish it from a random permutation with a probability higher than $q^2/2^n$. It follows that the security is guaranteed only as long as $q$ is much smaller than the birthday bound $2^{n/2}$.
+
+\FigTex{F3.tex}
+
+A block cipher must have a relatively large block size, $2n \ge 64$. In this case, it is impractical to generate fully random $n$-bit Feistel functions and store them during encryption. Usually, the Feistel function is chosen to have a simple and efficient structure and is public. However, a secret round key is injected before application of the Feistel function. This construction is called a Key-Alternating Feistel (KAF) cipher. It is much weaker than the ideal one and requires much more rounds in order to achieve strong security. For example, DES has 16 rounds and the recent block cipher Simon~\cite{Simon} by the NSA has at least 32 rounds in its variants. An analysis of KAF ciphers was done by  Lampe~\etal{}~\cite{KeyFeistel1}, Dinur~\etal{}~\cite{KeyFeistel2} and more recently by Guo~\etal{}~\cite{KeyFeistel3}.
+
+From the viewpoint of structural cryptanalysis, it is still important to analyze Feistel Networks with secret round functions. This may have applications in white-box cryptography or S-Box reverse-engineering. Patarin~\cite{Feistel5Patarin,Feistel5Patarin2} first described attacks on generic 5-round Feistel Network. In the seminal S-Box reverse-engineering paper~\cite{LeoRE}, Biryukov and Perrin proposed a SAT-solver based heuristic algorithm which seems to be practical for branch sizes of up 7 bits and up to 7 rounds. Biryukov~\etal{}~\cite{LeoFeistel} described several cryptanalysis methods against generic Feistel Networks with up to 7 rounds, including integral and Yoyo cryptanalysis. More recently, Durak~\etal{}~\cite{FeistelDurak} described decomposition attacks against Feistel Networks with small branch domains based on optimized exhaustive search and the Meet-in-the-Middle technique.
+
+Often the Feistel function has a low algebraic degree for the efficiency reasons. For example, many FN-based ciphers (DES, Camellia) use one SPN round as a Feistel function. The degree of the Feistel function is then upper-bounded by the S-Box size minus one. The same degree bound applies for the inverses of such Feistel Functions. Todo~\cite{division} proposed a novel method for finding integral characteristics in general structures, called division property. He evaluated FNs and SPNs based on a degree bound of components. Léo Perrin and I analyzed the algebraic degree of Feistel Networks in~\cite{OurFeistel}. In addition, we showed how to cryptanalyze a Feistel Network composed with random affine encodings. Affine encodings are motivated by S-Box reverse-engineering and white-box applications, where such encodings can provide extra security at a low cost for the designer. These results form the plot of this chapter.
+
+\subsection{Notation}
+In this chapter, I will use the following definition of a Feistel Network. It includes a bound on the algebraic degree of the Feistel functions as a parameter since proposed attacks exploit low degree or algebraic degeneracy.
+
+\begin{definition}[Feistel Network]
+\Label{def:feistel}
+    $\bij{r}{d}$ (resp. $\nbij{r}{d}$) denotes the set of all permutations that can be expressed as an $r$-round Feistel Network with bijective (resp. unrestricted) Feistel functions $f_1,\ldots,f_r\colon \field{n} \to \field{n}$ of an algebraic degree at most $d$:
+    \begin{align*}
+        & \bij{r}{d} \eqdef \pset{\Swap \circ R_{f_n}\circ\ldots\circ R_{f_1} \mid f_i\colon \field{n}\to\field{n}~\text{bijective}}, \\
+        & \nbij{r}{d} \eqdef \pset{\Swap \circ R_{f_n}\circ\ldots\circ R_{f_1} \mid f_i\colon \field{n}\to\field{n}}, \\
+        & \text{where}\\
+        & R_f\colon (\field{n})^2 \to (\field{n})^2,~~ (a,b)\mapsto(b, a\oplus f(b)).
+    \end{align*}
+\end{definition}
+
+In a few cases, the algebraic degree of the \emph{inverse} of the Feistel function is considered. The upper bound is denoted by $\dinv$.
+
+
+\subsection{Contribution}
+Our work~\cite{OurFeistel} has several contributions and I believe that it enriches the toolkit of structural cryptanalysis. I distinguish the following parts:
+\begin{enumerate}
+    \item We show an interesting link between the integral cryptanalysis and the LAT modulo 8. This fact does not seem to have direct applications but is interesting from a theoretical viewpoint. It might be useful for locating visual patterns in the LAT for the purpose of S-Box reverse-engineering.
+    \item We define the High-Degree Indicator Matrix of a vectorial Boolean function. While it simply captures classic integral distinguishers, it has many useful properties and provides more insights into integral cryptanalysis.
+    \item We study algebraic degree growth in Feistel Networks. As a result, we provide simple closed formulas that give rather good degree upper bounds. Though the algorithmic approach using the division property by Todo~\cite{division} provides similar or slightly better results.
+    \item We propose decomposition attacks on Feistel Networks masked with affine layers. Previously, a similar attack was only described for unmasked 5-round Feistel Networks in~\cite{LeoFeistel}. We generalize it for more rounds based on the algebraic degeneracies proved in this work.
+\end{enumerate}
+
+The summary of structural attacks against Feistel Networks is given in \TabRef{attacks1}, including attacks against Feistel Networks whitened with affine encodings.
+
+\FigTex{attacks1.tex}
+
+\subsection{Outline}
+This chapter starts with the description of visual patterns in the LAT of random instances of 3- and 4-round Feistel Networks in~\SecRef{hdim}. These patterns then are explained and linked to the algebraic degeneracies in these structures. The relevant algebraic structure is encoded in a new object called High-Degree Indicator Matrix. In~\SecRef{hdim-feistel} the algebraic degeneracies are proved and generalized to a larger number of rounds depending on the algebraic degree of Feistel functions. This immediately yields integral distinguishers. In the following~\SecRef{afa} these attacks are extended to Feistel Networks composed with secret affine encodings.
+Further, I show lower degree algebraic degeneracies in Feistel Networks in~\SecRef{impmono}. In~\SecRef{monoattack} I describe how to exploit such weaknesses to mount a round function recovery attack. I discuss the results and conclude in~\SecRef{conclusions}.
+
+
+\subsection{Differences with~\cite{OurFeistel}}
+This chapter is a rather significantly reworked version of the paper~\cite{OurFeistel} that we wrote together with Léo Perrin. Here I briefly describe the most significant modifications and additions that I have done in this chapter.
+\begin{enumerate}
+    \item I redefined and generalized the parametrization of the conditions on the integral distinguishers. I distinguish the case of bijective Feistel functions in a stricter way. Further, instead of using the parameter $\theta(r,d)=d^{\floor{r/2}-1} + d^{\ceil{r/2}-1}$ from the original paper which comes from a very basic degree evaluation method, I use the parameters $\thetabij{r}{d},\thetanbij{r}{d}$ which correspond to exact degree bounds and are hard to evaluate but can be upper bounded using various methods. In this way, improving the upper bounds on the degrees would directly improve the results. In addition, I consider the effect of the degree of the inverse of the Feistel functions.
+    
+    \item I describe a generalization of the LAT-ANF link to congruences with larger powers of 2. It is a simple corollary from the Poisson Summation formula, which I think is not very well-known or used often. It provides a clear relation between the ANF and the LAT of a Boolean function and gives an insight into the structure of the Walsh transform. 
+    
+    \item I describe a generalization of the HDIM-ANF link, an alternative expression for an arbitrary ANF coefficient. The HDIM expression yields a new method of proving the absence of particular monomials of degree $n-1$ in a permutation; the generalization yields analogous method for arbitrary monomials.
+    
+    \item I provide a more rigorous and explicit analysis of the attacks on Feistel Networks masked with affine encodings. I distinguish the cases of linear and quadratic equation systems and analyze the conditions of success. Furthermore, I describe the re-randomization trick which allows attacking arbitrary affine encodings.
+    
+    \item I describe the impossible monomial attack in a more concise and accurate way. Furthermore, I provide an algorithm in pseudocode. In addition, I propose a conjecture about the instances of Feistel Networks that can be attacked. I perform an experimental evaluation of the attack and the conjecture.
+\end{enumerate}
+

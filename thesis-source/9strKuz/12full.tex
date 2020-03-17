@@ -1,0 +1,70 @@
+\subsection{Full Decomposition}
+\SecLabel{full}
+
+The full decomposition of $\pi$ is obtained from the decompositions of mini-block ciphers $T$ and $U$. First, let me describe the whitening linear layers. 
+
+Recall the whitening linear layer $L^{\top}$ $L$ was described in the beginning of \SecRef{multi}. Let $L_{in} \in \linbij{8}$ be given by
+$$
+L_{in} \eqdef l_{\swaplsb} \circ l_{\eta} \circ l_{\delta} \circ L^{\top},
+$$
+where $L$ was described in the beginning of \SecRef{multi}, $l_{\eta}, l_{\delta}, l_{\swaplsb} \in \linbij{8}$ are given by
+\begin{align*}
+    l_{\delta}(x, k) &\eqdef (x \oplus \delta(k), k), \\
+    l_{\eta}(x, k) &\eqdef (\eta(x), \delta(k)), \\
+    l_{\swaplsb}(x, k) &\eqdef (x, \swaplsb(k)).
+\end{align*}
+Let $L_{out} \in \linbij{8}$ be given by
+$$
+L_{out} \eqdef \invtop{L} \circ l_{\alpha},
+$$
+where $l_{\alpha} \in \linbij{8}$ is given by
+\begin{align*}
+    l_{\alpha}(x, k) &\eqdef (x \oplus \alpha(k), k), \\
+\end{align*}
+
+The matrix representations of $L_{in}$ and $L_{out}$ are as follows:
+\begin{equation}
+    \Label{eq:lin}
+L_{in} = \matb{
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 \\
+1 & 1 & 1 & 0 & 1 & 1 & 1 & 1 \\
+1 & 0 & 0 & 0 & 1 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 & 1 & 0 & 1 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+},~~
+L_{out} = \matb{
+1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 1 \\
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+}.
+\end{equation}
+
+The final decomposition of $\pi$ using the linear layers $L_{in}, L_{out}$ and the nonlinear components are given in \FigRef{final}. An algorithmic representation of the decomposition is shown in Algorithm~\Ref{alg:pimulti}.
+
+\FigTex{final.tex}
+
+\begin{algorithm}
+    \caption{\Label{alg:pimulti}
+    Computing $\pi$: $v = \pi(u)$ using finite field multiplications.
+    }
+    \begin{algorithmic}[1]
+        \State{$(x, k) \gets L_{in}(u)$}
+        \If{$r = 0$}
+            \State{$x \gets \zeta_0(x)$}
+        \Else
+            \State{$x \gets \zeta_+(x \fmult \inv(k))$} \Comment{in $\fielde{4} \simeq \field{}[X]/(X^4 + X^3 + 1)$}
+        \EndIf
+        \State{$(x, k) \gets (k, x)$}
+        \State{$x \gets \beta(x \fmult \gamma(k))$} \Comment{in $\fielde{4} \simeq \field{}[X]/(X^4 + X^3 + 1)$}
+        \State{$v \gets L_{out}(x,k)$}
+        \State{\Return{$v$}}
+    \end{algorithmic}
+\end{algorithm}

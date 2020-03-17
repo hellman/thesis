@@ -1,0 +1,55 @@
+\SecDef{combinatorial}{Combinatorial DCA attacks}
+
+The most straightforward way to attack a masked implementation is to guess location of shares inside the current window. For each guess we need to check if the shares match the predictable value. In the basic case of classic Boolean masking where the decoder function is simply \txor{} of the shares the check is trivial. If an unknown general decoder function has to be considered, the attack becomes more difficult. One particularly interesting case is a basic \txor{} decoder with added noise (i.e. low-weight pseudorandom functions of the input). The main attack method in such cases is correlation.
+
+% -------------------------------------------------------------------
+
+\SubSecDef{attack-correlation}{Correlation attack}
+
+The correlation DCA attack from~\cite{AttackBos} is based on correlation between single bits. However, in the case of classic Boolean masking with strong pseudorandom masks all $\numshares$ shares are required to perform a successful correlation attack. In the case of a nonlinear decoder less shares may be enough: even a single share correlation can break many schemes as demonstrated in~\cite{AttackBos,WangEncodings}. Existing higher-order power analysis attacks are directly applicable to memory or value traces of white-box implementations. However, the values leaked in the white-box setting are exact in contrast to side-channel setting and the attack may be described in a simpler way. I reformulate the higher-order correlation attack in our DCA framework. Different correlation metrics of binary vectors can be used, see e.g. \cite{warrens2008similarity}. In this chapter I defined the correlation as the sample Pearson correlation coefficient.
+{
+\newcommand\naa{n_{00}}
+\newcommand\nab{n_{01}}
+\newcommand\nba{n_{10}}
+\newcommand\nbb{n_{11}}
+\begin{definition}
+The \emph{correlation} of two $n$-bit vectors $v_1$ and $v_2$ is defined as
+$$\cor(v_1,v_2) = \frac
+{\nbb\naa - \nab\nba}
+{\sqrt{(\naa+\nab)(\naa+\nba)(\nbb+\nab)(\nbb+\nba)}},
+$$
+where $n_{ij}$ denotes the number of positions where $v_1$ equals to $i$ and $v_2$ equals to $j$. If the denominator is zero then the correlation is set to zero. $\cor$ is the sample Pearson correlation coefficient of two binary variables, also known as the Phi coefficient. 
+\end{definition}
+}
+    
+
+Assume that locations of $\cororder$ shares are guessed and $\cororder$ vectors $v_j \in \field{\numtext}$ are selected. For simplicity, I denote them by $(v_1, \ldots, v_{\cororder}) \subseteq V$. For each vector $m \in \field{\cororder}$ we compute $\vmask_m \in \field{\numtext}$ where 
+$$
+\vmask_{m,i}=(v_{1,i} = m_{1}) \land \ldots \land (v_{\cororder,i} = m_{\cororder}).
+$$
+In other words, $\vmask_{m,i}$ is equal to 1 if and only if during encryption of the $i$-th plaintext the shares took the value described by $m$ .
+For each predictable vector $\pv$ we compute the correlation $\cor(\vmask_m, \pv)$.
+If its absolute value is above a predefined threshold, we conclude that the attack succeeded and possibly recover part of the key from the predictable value $\pv$. Furthermore, the entire vector of correlations $(\cor(\vmask_{(0,\ldots,0)}, \pv), \cor(\vmask_{(0,\ldots,1)}, \pv), \ldots)$ may be used in analysis, e.g. the average or the maximum value of its absolute entries.
+
+We assume that the predictable value is not highly unbalanced. Then for the attack to succeed we need the correlated shares to hit at least one combination~$m$ a constant number of times (that is obtain $wt(\vmask_{m}) \ge const$). Therefore the data complexity is $\numtext = \OO(2^{\cororder})$. However, with larger number of shares the noise increases and more data may be required. We estimate the time complexity of the attack as $\OO(\winsize^{\cororder} \numpred 2^{\cororder} \numtext) = \OO(\winsize^{\cororder} \numpred 2^{2\cororder})$. Here $\winsize^{\cororder}$ corresponds to guessing location of shares inside each window (we assume $\cororder \ll \winsize$); $\numpred$ corresponds to iterating over all predictable values; $2^{2\cororder}$ corresponds to iterating over all $t$-bit vectors $m$ and computing the correlations.
+
+The main advantage of this attack is its generality. It works against general decoder functions even with additional observable noise. In fact, the attack may work even if we correlate less shares than the actual encoding requires. Indeed, the attack from~\cite{AttackBos} relied on single-bit correlations and still was successfully applied to break multiple whitebox designs. The generality of the attack makes it inefficient for some special cases, in particular for the classic Boolean masking. We investigate this special case and describe more efficient attacks. 
+
+% -------------------------------------------------------------------
+
+\SubSecDef{attack-tmt}{Time-Memory Trade-off}
+Consider now the case of \txor{} decoder and absence of observable noise. That is, the decoder function must map the shares to the correct predictable value for all recorded plaintexts. In such case we can use extra memory to improve the attack. Consider two simple cases by the number of shares:
+\begin{enumerate}
+    \item Assume that the decoder uses a single share (i.e. unprotected implementation). We precompute all the predictable vectors and put them in a table. Then we simply sweep through the circuit nodes and for each vector $v_i$ check if it is in the table. For the right predictable vector $\pv$ we will have a match.
+    
+    \item Assume that the decoder uses two shares (i.e. first-order protected implementation). We are looking for indices $i,j$ such that $v_i \oplus v_j = \pv$ for some predictable vector $\pv$. Equivalently, $v_i = \pv \oplus v_j$. We sweep through the window's nodes and put all the node vectors in a table. Then we sweep again and for each vector $v_j$ in the window and for each predictable vector $\pv$ we check if $v_j \oplus \pv$ is in the table. For the right $\pv$ we will have a match and it will reveal both shares.
+\end{enumerate}
+
+This method easily generalizes for arbitrary number of shares. We put the larger half of shares on the left side of the equation and put the corresponding tuples of vectors in the table. Then we compute the tuples of vectors for the smaller half of shares and look-up them in the table. We remark that this attack's complexity still has combinatorial explosion. However the time-memory trade-off essentially allows to half the exponent in the complexity.
+
+The attack effectively checks $\winsize^sk$ sums of vectors to be equal to zero. To avoid false positives, the data complexity should be set to $O(s\log_2{\winsize} + \log_2{k})$.
+We consider this data complexity negligible, especially because for large number of shares the attack quickly becomes infeasible.
+For simplicity, we assume the data complexity is $O(1)$ and then the time complexity of the attack is $\OO(\winsize^{\lceil \numshares/2 \rceil} + \winsize^{\lfloor \numshares/2 \rfloor} \numpred)$.
+
+The described attack is very efficient for unprotected or first-order masked implementations. 
+For small windows it can also be practical for higher-order protections. In the following section I describe a more powerful attack whose complexity is independent of the number of shares.

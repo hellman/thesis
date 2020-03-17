@@ -1,0 +1,102 @@
+\SecDef{lindiff}{Resistance against Linear and Differential Cryptanalysis}
+
+Linear and differential cryptanalysis are powerful methods of attacking symmetric cryptographic primitives. 
+
+In most block ciphers, S-Boxes are usually the only source of nonlinearity. The resistance of a cipher depends largely on the cryptographic strength of the S-Boxes it uses. Due to typically small sizes of S-Boxes, the linear and differential propagations through them may be analyzed in an exhaustive manner. For this purpose, the \emph{Linear Approximation Table (LAT)} and the \emph{Difference Distribution Table (DDT)} are used. Even though these objects are motivated by the analysis of S-Boxes, they are also useful theoretical tools in the analysis of larger cryptographic functions.
+
+\begin{definition}[Walsh Transform]
+The \emph{Walsh transform} $\walsh{f}$ of a Boolean function $f\colon \field{n} \to \field{}$ is defined as:
+\begin{align*}
+    & \walsh{f}\colon \field{n} \to \ZZ,\\
+    & \walsh{f}(a) \eqdef \sum_{x \in \field{n}} (-1)^{f(x)\oplus \inprod{a,x}} = -2^n \cor(f \oplus \varphi_a),
+\end{align*}
+where $\varphi_a(x) \eqdef \inprod{a,x}$. It can be seen as a multidimensional Fourier transform of the function $x \mapsto (-1)^{f(x)}$. The multiset of all values of the Walsh transform of $f$ is called the \emph{Walsh spectrum} of $f$.
+\end{definition}
+
+\begin{definition}[Linear Approximation Table (LAT)]
+Let $S: \field{n} \to \field{m}$. The linear approximation table (LAT) of $S$ is the mapping
+\begin{align*}
+& \LAT{S}: \field{n}\times\field{n} \to \ZZ,\\    
+& \LAT{S}(a,b) \eqdef \walsh{S_b}(a) = 2\psize{\pset{x \in \field{n} \mid \inprod{a,x} = \inprod{b,S(x)} }} - 2^{n}
+= \sum_{x \in \field{n}} (-1)^{\inprod{a,x} \oplus \inprod{b,S(x)}}
+.
+\end{align*}
+$\LAT{S}$ naturally defines a $2^n \times 2^n$ matrix over $\ZZ$ (where the inputs $a,b$ are ordered in the lexicographic order). The columns of $\LAT{S}$ correspond to \emph{Walsh transforms} of the components of $S$.
+\end{definition}
+
+I remark that in several papers the LAT is defined with a coefficient $1/2$ or $-1/2$, e.g. in~\cite{OurFeistel}. 
+
+\begin{definition}[Difference Distribution Table (DDT)]
+Let $S: \field{n} \to \field{m}$. The difference distribution table (DDT) of $S$ is the mapping
+\begin{align*}
+& \DDT{S}: \field{n}\times\field{n} \to \ZZzeroplus, \\
+& \DDT{S}(a,b) =
+\psize{\pset{x \in \field{n} \mid S(x\oplus a) \oplus S(x) = b }}
+.    
+\end{align*}
+$\DDT{S}$ naturally defines a $2^n \times 2^n$ matrix over $\ZZzeroplus$ (where the inputs $a,b$ are ordered in the lexicographic order).
+\end{definition}
+
+The maximum absolute values of the LAT and the DDT of an S-Box are used to measure the cryptographic strength of the S-Box. For this purpose, the \emph{linearity} and the \emph{differential uniformity} of an function are defined.
+
+\begin{definition}[Linearity]
+Let $f\colon \field{n} \to \field{}$ be a Boolean function. The \emph{linearity} of $f$ is denoted by $\LIN(f)$ and is defined to be the maximum absolute value in the Walsh spectrum of $f$:
+$$
+\LIN(f) \eqdef \max_{a \in \field{n}} \pabs{\walsh{f}(a)}
+= \max_{a \in \field{n}} \abs{\sum_{x \in \field{n}}(-1)^{f(x) \oplus \inprod{a,x}}}
+.$$
+
+Let $S: \field{n} \to \field{m}$ be a Vectorial Boolean function. The \emph{linearity} of $S$ is denoted by $\LIN(S)$ and is equal to the maximum linearity among the components of $S$:
+$$
+\LIN(S) \eqdef \max_{b \in \field{n}, b \ne 0} \LIN(S_b)
+= \max_{a \in \field{n},b\in \field{n},b\ne 0} \abs{\sum_{x \in \field{n}} (-1)^{\inprod{b,f(x)} \oplus \inprod{a,x}}}
+.
+$$
+\end{definition}
+
+
+
+\begin{definition}[Differential Uniformity]
+Let $f: \field{n} \to \field{m}$. The differential uniformity of $f$ is denoted by $\DU(f)$ and is given by:
+$$
+\DU(f) = \max_{a\in \field{n}, b\in \field{m}, a\ne 0} \DDT{f}(a,b).
+$$
+\end{definition}
+
+The entries of the DDT of any S-Box are always even. It follows that the differential uniformity can never be smaller than 2. The functions achieving this lower bound are called \emph{Almost Perfect Nonlinear (APN)}. For example, the cube function over the finite field is always APN~\cite{Nyb94}: $x \mapsto x^3, x \in \fielde{n}$. When $n$ is odd, the cube function is a \emph{permutation} of $\fielde{n}$ and thus is an \emph{APN permutation}. However, it is not bijective when $n$ is even. The question of existence of APN permutations in even dimensions is a long-standing problem. For $n=4$ the answer is known to be negative, and for $n=6$ the positive answer was given by Dillon~\etal{}~\cite{DillonAPN} who explicitly provided a 6-bit APN permutation as a look-up table. In \ChapRef{apn} I describe an interesting decomposition of this function which we found together with my colleagues using S-Box reverse-engineering methods~\cite{OurAPN}. For even $n\ge 8$ the question is still a big open problem.
+
+
+\subsubsection{Effect of Affine Encodings on the LAT}
+
+Compositions of a function with affine mappings have a simple effect on the function's LAT. The following propositions describe the effect separately for addition of constants and composition with linear maps. The constant addition only affects the signs of the LAT coefficients, and the linear encodings shuffle the LAT coefficients in a linear way.
+
+\begin{proposition}
+Let $S\colon \field{n} \to \field{m}$ and let $S'\colon \field{n} \to \field{m}, S'(x) = S(x \oplus c_x) \oplus c_y$ for some $c_x \in \field{n}, c_y \in \field{m}$. Then for any $a \in \field{n}, b \in \field{m}$
+$$
+\LAT{S'}(a,b) = \LAT{S}(a,b) (-1)^{\inprod{a,c_x}\oplus {\inprod{b, c_y}}}.
+$$
+\end{proposition}
+% \begin{proof}
+% \begin{multline*}
+% \LAT{S'}(a,b) =
+% \sum_{x \in \field{n}} (-1)^{\inprod{a,x} \oplus \inprod{b,S(x \oplus c_x)\oplus  c_y}} =
+% \sum_{z \in \field{n}} (-1)^{\inprod{a,z \oplus c_x} \oplus \inprod{b,S(z)\oplus  c_y}} = \\
+% = \sum_{z \in \field{n}} (-1)^{\inprod{a,z} \oplus \inprod{b,S(z)}} (-1)^{\inprod{a, c_x} \oplus \inprod{b, c_y}} = \LAT{S}(a,b) (-1)^{\inprod{a, c_x} \oplus \inprod{b, c_y}}.
+% \end{multline*}
+% \end{proof}
+
+\begin{proposition}
+\Label{prop:linear-lat}
+Let $S\colon \field{n} \to \field{m}$ and let $S' \eqdef B \circ S \circ A$ for some $A \in \linbij{n}, B \in \linbij{m}$. Then for any $a \in \field{n}, b \in \field{m}$
+$$
+\LAT{S'}(a,b) = \LAT{S}(\invtop{A} \times a, B \times b).
+$$
+\end{proposition}
+% \begin{proof}
+% \begin{multline*}
+% \LAT{S'}(a,b) =
+% \sum_{x \in \field{n}} (-1)^{\inprod{a,x} \oplus \inprod{b,B(S(A(x)))}} =
+% \sum_{z \in \field{n}} (-1)^{\inprod{a,A^{-1}(z)} \oplus \inprod{b,B(S(z))}} = \\
+% \sum_{z \in \field{n}} (-1)^{\inprod{\invtop{A} (a),(z)} \oplus \inprod{B^{\top} (b), S(z)}} = \LAT{S}(\invtop{A} \times a, B^{\top} \times b).
+% \end{multline*}
+% \end{proof}

@@ -1,0 +1,153 @@
+Diffusion is relatively fast in \aCipher{} and we expect guess-and-determine attack to be infeasible. This section shows several attacks on round-reduced variants of \aead{}. The attacks are summarized in \TabRef{mitm-attacks}.
+
+\begin{table}[h!tb]
+    \centering
+    {
+    \TabDef{mitm-attacks}{Guess and determine attacks on \aead{} instances. $\epsilon$ is an arbitrary positive parameter. 0.5 step denotes an extra layer of ARX-boxes.}
+    \begin{tabular}{cccccc}
+      \toprule
+      Instance & Steps & Whitening & Method & Time & Data  \\
+      \midrule
+      \aeadversion{128}{128} & 3.5 & no & data trade-off & $2^{64}$ & $2^{64}$ \\
+      \aeadversion{192}{192} & 3.5 & no & data trade-off & $2^{128}$ & $2^{64}$ \\
+      \aeadversion{256}{256} & 3.5 & no & data trade-off & $2^{192}$ & $2^{64}$ \\
+      
+      \aeadversion{256}{256} & 3.5 & no & guess and det. & $2^{192}$ & $1$ \\
+      
+    %   \aeadversion{128}{128} & 3.5 & no & birthday diff. & $2^{96+\epsilon}$ & $2^{96-\epsilon}$ \\
+    %   \aeadversion{192}{192} & 3.5 & no & birthday diff. & $2^{128+\epsilon}$ & $2^{128-\epsilon}$ \\
+    %   \aeadversion{256}{256} & 3.5 & no & birthday diff. & $2^{160+\epsilon}$ & $2^{160-\epsilon}$ \\
+      
+      \midrule 
+      
+      \aeadversion{128}{128} & 4.5 & no & birthday diff. & $2^{96+\epsilon}$ & $2^{96-\epsilon}$ \\
+      \aeadversion{192}{192} & 4.5 & no & birthday diff. & $2^{128+\epsilon}$ & $2^{128-\epsilon}$ \\
+      \aeadversion{256}{256} & 4.5 & no & birthday diff. & $2^{192}+2^{160+\epsilon}$ & $2^{160-\epsilon}$ \\
+      
+      \midrule 
+      
+      \aeadversion{256}{256} & 3.5 & yes & birthday diff. & $2^{224+\epsilon}$ & $2^{224-\epsilon}$ \\
+      
+      \bottomrule
+    \end{tabular}
+    }
+\end{table}
+
+
+\subsection*{Notation used in the Attacks}
+
+\renewcommand\A[2]{\mathbf{A}_{#2}^{#1}}
+\newcommand\B[2]{\mathbf{B}_{#2}^{#1}}
+\newcommand\AINV[2]{(\A{#1}{#2})^{-1}}
+\newcommand\BINV[2]{(\B{#1}{#2})^{-1}}
+\newcommand\AAA[1]{\mathbf{A}^{#1}}
+\newcommand\BBB[1]{\mathbf{B}^{#1}}
+\newcommand\AAAINV[1]{(\AAA{#1})^{-1}}
+\newcommand\BBBINV[1]{(\BBB{#1})^{-1}}
+
+\newcommand\R{\mathbf{R}}
+\newcommand\RINV{\mathbf{R}^{-1}}
+\newcommand\M{\mathbf{M}}
+\newcommand\El{\ell'}
+\newcommand\MINV{\mathbf{M}^{-1}}
+\newcommand\Min{m_{in}}
+\newcommand\Mout{m_{out}}
+\newcommand\xMin{\hat{m}_{in}}
+\newcommand\xMout{\hat{m}_{out}}
+\newcommand\XOR[1]{\mathbf{X}\left[#1\right]}
+
+Consider an instance of \aead{}. Let $\A{i}{j}$ denote $j$-th ARX-box at the left half of the state at step $i$ together with the step constant addition:
+$$
+\A{i}{j}(x) = 
+\begin{cases}
+A_{c_0}(x \oplus c_i), & \text{if}~ j = 0, \\
+A_{c_1}(x \oplus i), & \text{if}~ j = 1, \\
+A_{c_j}(x), & \text{if}~ 2 \le j < \halfbranches.
+\end{cases}
+$$
+Let $\B{i}{j}$ denote the $j$-th ARX-box at the right half of the state at step $i$: $\B{i}{j} = A_{c_{\halfbranches+j}}$.
+Let $\AAA{i}$ denote the parallel application of $\A{i}{0},\ldots,\A{i}{\halfbranches-1}$; $\BBB{i}$ denote the parallel application of $\B{i}{0},\ldots,\B{i}{\halfbranches-1}$.
+
+Let $\XOR{a}$ denote the map $x \mapsto (x \oplus a)$. Let $\M$ denote the linear Feistel map $\linFeist{\halfbranches}$ and let $\El$ denote the linear feed-forward function used in $\M$:
+$$
+\El((x_1 || x_2), (y_1 || y_2)) = (y_2 || y_1 \oplus y_2), (x_2 || x_1 \oplus x_2), ~~~~\text{where}~ x_1,x_2,y_1,y_2 \in \mathbb{F}_2^{16}.
+$$
+Let $\R$ denote the rotation of $\halfbranches$ branches to the left by one position:
+$$
+\R(x_0, \ldots, x_{\halfbranches-1}) = (x_1, \ldots, x_{\halfbranches-1}, x_0).
+$$
+
+A high-level structure of a 4-round \aCipher{} in a \aead{} instance using the described notations is depicted in \FigRef{high-level}.
+
+Consider a known-plaintext scenario. The rate part of the state becomes known before and after a call to a (round-reduced) \aCipher{} permutation. Let $\Min$ be the initial rate part and $\Mout$ be the final rate part. We call the ARX-box layer a \emph{half-step}. Note that in the considered scenario, any attack on $t$ full steps can be trivially extended to $t+1/2$ steps, since the final ARX-boxes in the rate part can be easily inverted.
+
+\FigTex{Sparkle.tex}
+
+% ================================================
+% ================================================
+
+\subsection*{Differential Assumptions on the ARX-boxes}
+\label{sec:mitm-arx-assum}
+
+A single isolated ARX-box does not have a strong resistance against differential attacks. Indeed, there is a differential trail with probability $2^{-6}$. In our attacks, we assume that particular problems about differential transitions involving random differences can be solved efficiently, even though we do not propose concrete algorithms. For example, consider the problem of checking whether a random differential transition over an ARX-box is possible. A naive approach would require $2^{64}$ evaluations. However, we can expect that with a meet-in-the-middle method it can be done much more efficiently. Indeed, an ARX-box has only 4 rounds. We further assume that the difference distribution table (DDT) of an ARX-box is very sparse and such problems about differential transitions have few solutions on average.
+
+The problems we consider are about finding all solutions of the following differential transition types:
+\begin{enumerate}
+    \item[Problem 1.] $a \xrightarrow{A} b$, where $a,b\in \bField{64}$ are known random differences, $A$ is an ARX-box or the inverse of an ARX-box,
+    
+    \item[Problem 2.] $a \xrightarrow{A} \alpha, b \xrightarrow{B} \alpha$, where $a,b\in \bField{64}$ are known random differences, $A,B$ are ARX-boxes or their inverses, $\alpha \in \bField{64}$ is an unknown difference.
+    
+    \item[Problem 3.] $\alpha \xrightarrow{A} \beta, \alpha \xrightarrow{B} \beta + a$, where $a\in \bField{64}$ is a known random difference, $A,B$ are ARX-boxes or their inverses, $\alpha, \beta \in \bField{64}$ are unknown differences.
+\end{enumerate}
+
+\newcommand\solratio{\nu}
+\newcommand\soltime{\tau_f}
+\newcommand\finalrec{\tau_r}
+We denote the average ratio of solutions to a problem by $\solratio$, and the average time to enumerate all solutions by $\soltime$.
+
+% ================================================
+% ================================================
+
+\subsection{Birthday-Differential Attacks}
+
+Encryptions with unique nonces can be expected to be completely independent. Therefore, a nonce-respecting adversary can not easily inject differences in the state in the encryption queries. Indeed, the difference between two encryptions in any part of the state can be expected to be random, and independent of the message due to the state randomization by the initialization with unique nonces. However, any fixed difference in $n$-bit part of the state may be obtained randomly among approximately $2^{n/2}$ random states. Therefore, with $2^{n/2}$ data, we can expect to have a pair satisfying an $n$-bit differential constraint. However, the procedure of finding this pair in the pool of encryptions has to be efficient.
+
+The most useful differentials for this attack method are zero differences on full branches. They propagate to zero difference through ARX-boxes. It is also desirable that this differences imply the zero difference of some function of observable parts of the state (i.e. $\Min, \Mout$). Then a hash table can be used to filter pairs from the data pool efficiently. 
+
+\begin{proposition}
+Assume that $64\eta$ bits in the encryption process are chosen such that for a pair of encryptions having zero difference in those $64\eta$ bits,
+\begin{enumerate}
+    \item $64\mu$ bits can be efficiently computed from $\Min,\Mout$ (denote the function by $\pi$), such that they also have zero difference;
+    \item pairs of encryptions that satisfying the zero difference can be further filtered in time $\soltime$, keeping a fraction of most $\solratio^{\eta-\mu}$ pairs (denote the function by $\mathsf{filter}$
+    \item given such a pair, the full state can be recovered in time $\finalrec$ (denote the function by $\mathsf{recover}$).
+\end{enumerate}
+Then, the full state can be recovered using $2^{64\eta/2+1/2}$ data and $2^{64(\eta-\mu)}(\soltime + \solratio^{\eta-\mu} \finalrec)$ time. The general attack procedure is given in~Algorithm~\ref{alg:bday-diff}.
+\end{proposition}
+\begin{proof}
+There are $2^{64 \eta}$ pairs in the encryption pool and we can expect to have a pair having the required zero difference with a high probability. The complexity of the initial filtering by $\pi$ can be neglected. Therefore, we assume that all $2^{64(\eta - \mu)}$ pair candidates (on average) can be enumerated efficiently. For each candidate, the verification and, in case of verification success, the state recovery take time $\soltime + \solratio^t \finalrec$.
+\end{proof}
+
+\begin{algorithm}
+    \caption{
+    \label{alg:bday-diff}
+    Birthday-Differential attack procedure.}
+    {
+    \fontsize{9}{12}\selectfont % first arg is the font size, the second is the size of the vertical space between the lines
+    \begin{algorithmic}
+        \State collect $2^{64\eta/2+1/2}$ known-plaintext encryptions
+        \State compute corresponding rate parts $\Min, \Mout$
+        \State store $\pi(\Min,\Mout)$ for each encryption in a hash table
+        \ForAll{$(\Min,\Mout),(\Min',\Mout')$ such that $\pi(\Min,\Mout) = \pi(\Min',\Mout')$}
+            \If{$\mathsf{filter}((\Min,\Mout),(\Min',\Mout'))$}
+                \State $s \gets \mathsf{recover}((\Min,\Mout),(\Min',\Mout'))$
+                \State \Return $s$
+            \EndIf
+        \EndFor
+    \end{algorithmic}
+    }
+\end{algorithm}
+
+Attacks of this type typically have quite large data complexity, violating the data limit set in the specification. However, it should be noted, that the actual key used does not matter as each state is always expected to be random and independent. Therefore, re-keying does not prevent the attack. If the required difference is achieved by a pair of encryptions under different keys, then both states are recovered by the attack.
+
+An adversary can further exploit this fact. The data complexity may be reduced by performing a precomputation. The adversary encrypts $2^{64 t}$ data ($t$ may be fractional), and forms a pool in the same way as in the normal attack. Then, $2^{64(\eta-t)}$ data is collected from encryptions under the unknown secret key. Among too pools, there are $2^{64\eta}$ pairs and at least one pair will satisfy the zero difference with a high probability. Note that the data reduction starts only with $t > \eta / 2$ and is costly in the time and memory complexity.
+

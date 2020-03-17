@@ -1,0 +1,80 @@
+\SecDef{intro}{Introduction}
+
+With the advent of the Internet of Things (IoT), a myriad of devices are being connected one to another in order to exchange information. This information has to be secured. Symmetric cryptography can ensure that the data those devices share remains confidential, that it is properly authenticated and that it has not been tampered with.
+
+As such objects have little computing power---and even less so that is dedicated to information security---the cost of the algorithms ensuring these properties has to be as low as possible. To answer this need, the NIST has called for the design of authenticated ciphers and hash functions providing a sufficient security level at as small an implementation cost as possible.
+
+We present a suite of algorithms that answer this call. All our algorithms are built using the same core, namely the \aCipher{} family of permutations. The authenticated ciphers, \aead{}, provide confidentiality of the plaintext as well as both integrity and authentication for the plaintext and for additional public associated data. The hash functions, \hash{}, are (second) preimage and collision resistant. Our aim for our algorithms is to use as little CPU cycles as possible to perform their task while retaining strong security guarantees and a small implementation size. This speed will allow devices to use much fewer CPU cycles than what is currently needed to ensure the protection of their data. To give one of many very concrete applications of this gain, the energy demanded by cryptography for a battery-powered micro-controller will be decreased.
+
+The parameters of instances of \hash{} and \aead{} are summarized in \TabRef{instances}.
+
+\begin{table}
+    \resizebox{\linewidth}{!}{
+    \begin{tabular}{cccccc}
+       \toprule
+        \multirow{2}{*}{Type} & \multirow{2}{*}{Name} & Internal state size & Data block size & Security level  \\
+        & & (bytes) & (bytes) & (bits) \\
+        \midrule
+        \multirow{2}{*}{Hash function}
+        & \hash{256} & 48 & 16 & 128 \\
+        & \hash{384} & 64 & 16 & 192 \\
+        \midrule
+        % \multirow{4}{*}{AEAD} 
+        & \aeadversion{128}{128} & 32 & 16 & 120 \\
+        Authenticated & \aeadversion{256}{128} & 48 & 32 & 120 \\
+        encryption & \aeadversion{192}{192} & 48 & 24 & 184 \\
+        & \aeadversion{256}{256} & 64 & 32 & 248 \\
+        \bottomrule
+    \end{tabular}
+    \TabDef{instances}{Algorithms in the lightweight cryptographic suite.}
+    }
+\end{table}
+
+\subsection*{Permutation \aCipher{}}
+
+\aCipher{} is a family of cryptographic permutations built on the ARX paradigm. Its name comes from the block cipher \sparx{}~\cite{OurSPARX}, which \aCipher{} is closely related to, hence its name:
+\begin{center}
+  \textbf{SPAR}x, but \textbf{K}ey \textbf{LE}ss.
+\end{center}
+
+We provide three versions corresponding to three block sizes, namely \aCipher{256}, \aCipher{384}, and \aCipher{512}. The number of steps used varies with the use case.
+
+
+\subsection*{Hash Function \hash{}}
+
+A \emph{hash function} takes a message of arbitrary length and outputs a digest with a fixed length. It should provide the cryptographic security notions of \emph{preimage resistance}, \emph{second preimage resistance} and \emph{collision resistance}. 
+The main instance of \hash{} is \hash{256} which produces a 256-bit digest, offering a security level of 128 bits with regard to the above mentioned security goals. It is based on the permutation family \aCipher{384}.  We also provide the member \hash{384} based on the permutation family \aCipher{512}, which produces a 384-bit digest and offers a security level of 192 bits.
+
+The name \hash{} stands for
+\begin{center}
+  \textbf{E}fficient, \textbf{S}ponge-based, and \textbf{C}heap \textbf{H}ashing.
+\end{center}
+
+
+\subsection*{Authenticated Cipher \aead{}}
+
+A scheme for \emph{authenticated encryption with associated data (AEAD)} takes a key and a nonce of fixed length, as well as a message and associated data of arbitrary size. The encryption procedure outputs a ciphertext of the message as well as a fixed-size authentication tag. The decryption procedure takes the key, nonce, associated data and the ciphertext and tag as input and outputs the decrypted message if the tag is valid, otherwise a symbolic error $\bot$.
+An AEAD scheme should fulfill the security notions of \emph{confidentiality} and \emph{integrity}. Users are expected to \emph{not} reuse nonces for processing messages in a fixed-key instance.
+
+The main instance of \aead{} is \aeadversion{256}{128} which takes a 256-bit nonce, a 128-bit key and outputs a 128-bit authentication tag. It achieves a security level of 120 bits with regard to confidentiality and integrity.
+We further provide three other instances, i.e., \aeadversion{128}{128}, \aeadversion{192}{192}, and \aeadversion{256}{256} which differ in the length of key, nonce and tag and in the achieved security level.
+
+The name \aead{} stands for
+\begin{center}
+  \textbf{S}ponge-based \textbf{C}ipher for
+  \\
+  \textbf{H}ardened but \textbf{W}eightless \textbf{A}uthenticated \textbf{E}ncryption \\
+  on \textbf{M}any~\textbf{M}icrocontrollers
+\end{center}
+
+
+\subsection*{Outline}
+This chapter is structured as follows. First, in \SecRef{spec}, I briefly describe the specification of \aCipher{},\hash{} and \aead{} families. In the following sections, I describe the security analysis that I performed on this suite.
+
+In \SecRef{lineariz}, I describe attempts to linearize the S-boxes used in \aCipher{}, which we call ARX-boxes, by finding all inputs that inflict no carries during the ARX computations. The problem requires a solution of a system of quadratic equations. I describe a simple heuristics for a guess-and-determine algorithm that allows to solve the problems in a reasonable time. The results suggest that ARX-boxes are resistant against such linearization.
+
+In \SecRef{truncated}, I describe a truncated differential analysis of \aCipher{}. I propose a generic method for truncated trail analysis based on the binary matrix representation of the linear layer. The results show that \aCipher{} has a strong resistance against structural truncated differential trails.
+
+In \SecRef{division}, I use the division property technique to find integral characteristics of \aCipher{}. First, the best characteristics of maximum dimension are found using MILP-aided bit-based division property. Then, I optimize them and prove by a pen-and-paper argument and the classical division property.
+
+Finally, in \SecRef{cryptanalysis}, I describe several attacks on reduced-round variants of \aead{}. They are based on a technique that I call birthday-differential attacks. It is a variant of known-plaintext attack where particular differences can be found from a relatively small pool of data by the birthday paradox.

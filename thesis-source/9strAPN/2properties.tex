@@ -1,0 +1,48 @@
+\SecDef{properties}{Properties of the Decomposition}
+
+\subsection{Cryptographic Properties}
+The decomposition uncovers an interesting property of the 6-bit APN permutation $S_0$: it is affine-equivalent to a 6-bit APN involution $S_{\inv}$. The DDT and the LAT of the involution $S_{\inv}$ are illustrated in \FigRef{ddt-lat} (the DDT of $\Swap \circ S_{\inv} \circ \Swap$ is illustrated, because it has clearer structure). $S_{\inv}$ has differential uniformity 2 and its linearity is 16. The left and right halves of the output of $S_{\inv}$ have algebraic degree 4 and 3 respectively.
+
+\FigTex{ddt-lat}
+
+We used the algorithm from~\cite{LinAffEQ} to find all pairs of affine self-equivalence mappings, i.e. maps $A,B\in\affbij{6}$ such that $S_{\inv} = B \circ S_{\inv} \circ A$. In~\cite{LinAffEQ} it was suggested as a measure of symmetry of the permutation. The number of such pairs is invariant under affine-equivalence. Therefore, the decomposition is not necessary to count them. On the other hand, the decomposition shows that these maps have a simple expression. Let $(a,b)\otimes(c,d) \eqdef (ac, bd)$ denote the component-wise $\fielde{3}$-multiplication. Then, for each $\lambda \in \fielde{3},\lambda \ne 0$ the following holds for all $x,y\in\fielde{3}$:
+$$
+S_{\inv}(\lambda x, \lambda^{-1}y) = (\lambda, \lambda^{-1}) \otimes S_{\inv}(x,y).
+$$
+That is, multiplying the input halves by $\lambda$ and $\lambda^{-1}$ is equivalent to multiplying the output halves by $\lambda$ and $\lambda^{-1}$. In~\SecRef{relations} it is shown that this property is similar to a property that the Kim mapping has.
+
+\subsection{Univariate Representations}
+
+In this section I show that there exist 6-bit APN permutations with simpler univariate polynomials, than a random permutation or the Dillon's APN permutation has. These results are based on interpolating the involution $S_{\inv}$ in $\fielde{6} \simeq \fielde{3} \times \fielde{3}$ using different field basis. This is done by composing $S_{\inv}$ with linear maps corresponding to the basis change. All polynomial presented in this section are defined over $\fielde{6} \simeq \field{}[v]/(v^6 + v^4 + v^3 + v + 1)$, where $v$ is primitive.
+
+\textbf{Single polynomial.}
+In~\cite{DillonAPN}, the APN permutation was given as a univariate polynomial over $\fielde{6}$ with 52 nonzero coefficients. Our decomposition allows to obtain an APN permutation from 25 monomials. The permutation $s$ of $\fielde{6}$ given by
+\begin{align*}
+    s(x) &= x^{58} + x^{51} + x^{44} + x^{37} + \VV^{27}x^{36} + \VV^{38}x^{32} + x^{30} \\
+         &+ \VV^{53}x^{28} + \VV^{7}x^{25} + \VV^{51}x^{24} + x^{23} + \VV^{53}x^{21} + \VV^{7}x^{18} + \VV^{24}x^{17}\\
+         &+ \VV^{7}x^{16} + \VV^{46}x^{14} + \VV^{7}x^{11} + \VV^{4}x^{10} + x^{9} + \VV^{22}x^{8} + \VV^{46}x^{7}\\
+         &+ \VV^{3}x^{4} + \VV^{50}x^{3} + \VV^{56}x^{2} + \VV^{52}x
+\end{align*}
+is APN.
+
+\textbf{Composition of 2 polynomials.}
+Dillon~\etal{} also represented $S_0$ as the composition $S_0 = f_2 \circ f_1^{-1}$, where polynomials $f_1$ and $f_2$ contain 18 monomials each. Using our decomposition, we found more compact polynomials. Let $f_1', f_2'$ be permutations of $\fielde{6}$ given by
+\begin{align*}
+f_1'(x) &= \VV^{11}x^{34} + \VV^{53}x^{20} + x^{8} + x,\\
+f_2'(x) &= \VV^{28}x^{48} + \VV^{61}x^{34} + \VV^{12}x^{20} + \VV^{16}x^{8} + x^{6} + \VV^{2}x.
+\end{align*}
+Then $f_2' \circ f_1'^{-1}$ is an APN permutation.
+
+\textbf{Composition of 3 polynomials.}
+Finally, the representation becomes even simpler if 3 functions are used in the composition. Let $i,m$ be permutations of $\fielde{6}$ given by
+$$
+i(x) = \VV^{21}x^{34} + x^{20} + x^8 + x, \quad
+m(x) = \VV^{52}x^8 + \VV^{36}x.
+$$
+Then $i \circ m \circ i^{-1}$ is an APN permutation. Similarly, let $i',m'$ be permutations of $\fielde{6}$ given by
+$$
+i'(x) = \VV^{37}x^{48} + x^{34} + \VV^{49}x^{20} + \VV^{21}x^{8} + \VV^{30}x^{6} + x, \quad
+m'(x) = x^8.
+$$
+Then $i' \circ m' \circ i'^{-1}$ is also an APN permutation.
+These decompositions are obtained by interpolating parts of the decomposition separately. $i$ and $i'$ correspond to the part with the inverses and $m,m'$ correspond to the central linear layer.

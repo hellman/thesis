@@ -1,0 +1,57 @@
+\begin{figure}
+\begin{subfigure}{0.45\textwidth}
+    \begin{center}
+        \begin{tikzpicture}[scale=0.5]
+            % operations
+            % \draw (-2.9, +4.6) rectangle node[pos=0.5]{$\oplus k^i_r$} (+2.9, +5.6) ;
+            \draw (-3.0, +3.5) rectangle node[pos=0.5]{$\ggg 7$} (-1.0, +4.5) ;
+            \draw (-2.0, +2.5) node[inner sep=0](add){$\boxplus$} ;
+            \draw (+1.0, +1.0) rectangle node[pos=0.5]{$\lll 2$} (+3.0, +2.0) ;
+            \draw (+2.0, +0.0) node[inner sep=0](xor){$\oplus$} ;
+            % arrows
+            \draw[->] (-2.0, +5.0) -- (-2.0, +4.5) ;
+            \draw[->] (+2.0, +5.0) -- (+2.0, +2.0) ;
+            \draw[->] (-2.0, +3.5) -- (add) ;
+            \draw[->] (+2.0, +2.5) -- (add) ;
+            \draw[->] (add) -- (-2.0, -1.0) ;
+            \draw[->] (+2.0, +1.0) -- (xor) ;
+            \draw[->] (-2.0, +0.0) -- (xor) ;
+            \draw[->] (xor) -- (+2.0, -1.0) ;
+        \end{tikzpicture}
+        \FigDef{speckey-a}{$A$.}
+    \end{center}
+\end{subfigure}
+\begin{subfigure}{0.45\textwidth}
+        \begin{center}
+            \begin{tikzpicture}[yscale=0.6, xscale=0.75]
+                \draw (+0.5, 5.5) node[inner sep=0](xor00){$\oplus$};
+                \draw (+1.5, 5.5) node[inner sep=0](xor01){$\oplus$};
+                \draw[->] (+0.5, 6.0) -- (xor00) ;
+                \draw[->] (xor00) -- (+0.5, 5.0);
+                \draw[->] (+1.5, 6.0) -- (xor01) ;
+                \draw[->] (xor01) -- (+1.5, 5.0);
+                \draw (+0.0, 4.0) rectangle node[pos=0.5]{$A$} (+2.0, 5.0) ;
+                \draw (+0.0, 1.5) rectangle node[pos=0.5]{$A$} (+2.0, 2.5) ;
+                \draw (+0.5, 3.0) node[inner sep=0](xor10){$\oplus$};
+                \draw (+1.5, 3.0) node[inner sep=0](xor11){$\oplus$};
+                \draw[dashed,->] (+0.5, 4.0) -- (xor10) ;
+                \draw[dashed,->] (+1.5, 4.0) -- (xor11) ;
+                \draw[->] (xor10) -- (+0.5, 2.5) ;
+                \draw[->] (+0.5, 1.5) -- (+0.5, 1.0) ;
+                \draw[->] (xor11) -- (+1.5, 2.5) ;
+                \draw[->] (+1.5, 1.5) -- (+1.5, 1.0) ;
+                % Key addition
+                \draw (-0.5, 5.5) node[inner sep=0](k_top_left_l){$k^1_L$} ;
+                \draw (+2.5, 5.5) node[inner sep=0](k_top_left_r){$k^1_R$} ;
+                \draw[->] (k_top_left_l) -- (xor00) ;
+                \draw[->] (k_top_left_r) -- (xor01) ;
+                \draw (-0.5, 3.0) node[inner sep=0](k_bottom_left_l){$k^{r}_L$} ;
+                \draw (+2.5, 3.0) node[inner sep=0](k_bottom_left_r){$k^{r}_R$} ;
+                \draw[->] (k_bottom_left_l) -- (xor10) ;
+                \draw[->] (k_bottom_left_r) -- (xor11) ;
+            \end{tikzpicture}
+            \FigDef{speckey-ark}{$A_k^r$.}
+        \end{center}
+    \end{subfigure}
+    \FigDef{arx-box}{The ARX-box.}
+\end{figure}

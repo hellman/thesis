@@ -1,0 +1,11 @@
+\myminitoc
+
+\subimport{}{macros.tex}
+
+In this chapter, I describe two interesting decompositions of the S-Box used in the recent Russian cryptographic ``GOST'' standards (Kuznyechik block cipher and Streebog~\cite{streebog} hash function). The S-Box was also used in the first version of the authenticated cipher STRIBOB~\cite{STRIBOB}, a candidate of the CAESAR competition; later, the S-Box was replaced.
+This chapter is based on the joint work with Alex Biryukov and Léo Perrin from EUROCRYPT~2016~\cite{OurKuz1} and on the joint work with Léo Perrin from TOSC~2016~\cite{OurKuz2}. In the first work we describe a Feistel Network-like decomposition with finite field multiplications and affine whitening layers. In the second work we show that this structure is related to exponentiation/logarithm in the finite field, which was also used in the standard block cipher of Belarus, BelT~\cite{BELT}.
+
+\subimport{}{00intro.tex}
+\subimport{}{10multi.tex}
+\subimport{}{20expo.tex}
+\subimport{}{3conclusions.tex}
