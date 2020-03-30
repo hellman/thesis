@@ -10,5 +10,8 @@ main:
 	g++ -O3 -std=c++11 invariant_equations.cpp -I../ -o invariant_equations 
 
 run:
-	time ./invariant_equations 1 >invariant_equations.txt
-	time sage2 solve.py invariant_equations.txt >result_norx.txt
+	for i in 10 11 12 13 14 15 16 1 24 2 30 32 36 3 4 51 59 5 6 7 8 9; do \
+		echo Iterate $$i times \
+		[ -f eqs/eq$$i.txt ] || time ./invariant_equations $i >eqs/eq$$i.txt; \
+		time sage2 solve.py eqs/eq$$i.txt | tee results/norx_iterated$$i.txt; \
+	done

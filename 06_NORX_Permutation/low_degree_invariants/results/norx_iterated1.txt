@@ -1,0 +1,13 @@
+Invariant: subspace dimension 32 degree <=31  invariants dimension 21
+   cycle subset: [0, 21]
+   cycle subset: [1, 21]
+   cycle subset: [2, 21]
+   cycle subset: [3]
+   cycle subset: [4, 21]
+   cycle subset: [5]
+   cycle subset: [6]
+   cycle subset: [7]
+   cycle subset: [8, 21]
+   cycle subset: [9, 21]
+   ...
+

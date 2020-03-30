@@ -1,0 +1,26 @@
+Invariant: subspace dimension 31 degree <=30  invariants dimension 19
+   cycle subset: [0, 23, 24, 25, 29, 31, 33, 36, 41, 42, 45, 46, 49, 50]
+   cycle subset: [1, 16, 20, 23, 24, 28, 29, 32, 33, 36, 37, 44]
+   cycle subset: [2, 16, 23, 24, 25, 27, 29, 30, 32, 33, 37, 42, 43, 44, 45, 46, 48, 49]
+   cycle subset: [3, 16, 22, 24, 27, 28, 29, 31, 32, 34, 35, 36, 37, 38, 41, 42, 43, 47, 48, 49]
+   cycle subset: [4, 16, 19, 20, 22, 25, 26, 29, 33, 34, 36, 38, 39, 41, 42, 43, 48]
+   cycle subset: [5, 16, 19, 20, 27, 28, 32, 33, 34, 35, 37, 42, 43, 47, 48, 49]
+   cycle subset: [6, 16, 22, 23, 25, 26, 29, 30, 33, 35, 39, 40, 41, 42, 43, 49]
+   cycle subset: [7, 16, 19, 22, 24, 26, 34, 35, 39, 49, 50]
+   cycle subset: [8, 16, 20, 24, 29, 30, 31, 32, 36, 37, 38, 39, 40, 43, 46, 47, 48, 49, 51]
+   cycle subset: [9, 19, 20, 23, 26, 27, 28, 29, 32, 34, 37, 39, 40, 41, 45, 50]
+   ...
+
+Invariant: subspace dimension 32 degree <=31  invariants dimension 51
+   cycle subset: [0, 51]
+   cycle subset: [1, 51]
+   cycle subset: [2, 51]
+   cycle subset: [3]
+   cycle subset: [4]
+   cycle subset: [5, 51]
+   cycle subset: [6, 51]
+   cycle subset: [7, 51]
+   cycle subset: [8, 51]
+   cycle subset: [9, 51]
+   ...
+

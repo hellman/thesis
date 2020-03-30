@@ -1,0 +1,26 @@
+Invariant: subspace dimension 31 degree <=30  invariants dimension 33
+   cycle subset: [0, 33, 35, 36, 38, 41, 42, 44, 45, 48, 49, 50, 51, 55, 56, 62, 64]
+   cycle subset: [1, 35, 36, 37, 39, 41, 42, 46, 47, 49, 51, 52, 54, 57, 58, 60, 61, 62, 63, 64, 65]
+   cycle subset: [2, 35, 41, 42, 43, 44, 45, 47, 48, 50, 53, 56, 61, 62, 64, 65]
+   cycle subset: [3, 34, 35, 36, 37, 39, 42, 43, 45, 46, 47, 48, 49, 50, 52, 53, 57, 58, 60, 61, 62]
+   cycle subset: [4, 35, 36, 37, 38, 39, 40, 42, 43, 44, 47, 48, 49, 51, 53, 57, 59, 61, 62, 64]
+   cycle subset: [5, 34, 35, 36, 38, 40, 41, 44, 45, 46, 47, 50, 53, 59, 60, 61, 63, 64, 65]
+   cycle subset: [6, 34, 35, 37, 42, 43, 45, 48, 50, 56, 57, 59, 60, 61, 62, 63, 64]
+   cycle subset: [7, 33, 37, 38, 40, 42, 44, 45, 46, 48, 50, 57, 60, 61, 63]
+   cycle subset: [8, 33, 34, 35, 39, 40, 41, 42, 45, 46, 47, 49, 50, 51, 53, 57, 59, 61, 65]
+   cycle subset: [9, 34, 35, 37, 38, 39, 40, 42, 43, 45, 47, 49, 50, 52, 54, 55, 56, 57, 60, 62]
+   ...
+
+Invariant: subspace dimension 32 degree <=31  invariants dimension 65
+   cycle subset: [0, 65]
+   cycle subset: [1, 65]
+   cycle subset: [2, 65]
+   cycle subset: [3]
+   cycle subset: [4]
+   cycle subset: [5]
+   cycle subset: [6]
+   cycle subset: [7, 65]
+   cycle subset: [8, 65]
+   cycle subset: [9, 65]
+   ...
+
