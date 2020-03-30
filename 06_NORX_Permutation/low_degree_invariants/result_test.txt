@@ -1,0 +1,29 @@
+Invariant: subspace dimension 12 degree <=11  invariants dimension 2
+   cycle subset: [0, 1, 2, 3, 4, 5, 6, 8, 10]
+   cycle subset: [7, 9, 11]
+
+Invariant: subspace dimension 13 degree <=12  invariants dimension 2
+   cycle subset: [0, 1, 2, 3, 4, 5, 6, 8, 10]
+   cycle subset: [7, 9, 11]
+
+Invariant: subspace dimension 14 degree <=13  invariants dimension 2
+   cycle subset: [0, 1, 2, 3, 4, 5, 6, 8, 10]
+   cycle subset: [7, 9, 11]
+
+Invariant: subspace dimension 15 degree <=14  invariants dimension 2
+   cycle subset: [0, 1, 2, 3, 4, 5, 6, 8, 10]
+   cycle subset: [7, 9, 11]
+
+Invariant: subspace dimension 16 degree <=15  invariants dimension 11
+   cycle subset: [0]
+   cycle subset: [1]
+   cycle subset: [2, 11]
+   cycle subset: [3, 11]
+   cycle subset: [4, 11]
+   cycle subset: [5]
+   cycle subset: [6, 11]
+   cycle subset: [7, 11]
+   cycle subset: [8]
+   cycle subset: [9]
+   ...
+
